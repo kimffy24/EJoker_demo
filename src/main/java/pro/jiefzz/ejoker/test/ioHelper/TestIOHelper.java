@@ -1,0 +1,88 @@
+package pro.jiefzz.ejoker.test.ioHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
+
+import com.jiefzz.ejoker.eventing.EventAppendResult;
+import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
+import com.jiefzz.ejoker.z.common.io.AsyncTaskStatus;
+import com.jiefzz.ejoker.z.common.io.IOHelper;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureWrapperUtil;
+
+public class TestIOHelper {
+
+	public static void main(String[] args) {
+
+		new TestIOHelper().start();
+//		System.err.println("invoke LockSupport.park()!!! ");
+		LockSupport.park();
+	}
+	
+	IOHelper ioHelper = new IOHelper();
+
+	public void start() {
+
+		final List<String> testList = new ArrayList<String>();
+
+		testList.add("金飞1");
+		testList.add("龙轩1");
+		testList.add("金飞2");
+		testList.add("龙轩2");
+
+		final AtomicInteger j = new AtomicInteger(0);
+		final AtomicInteger i = new AtomicInteger(0);
+
+		ioHelper.tryAsyncAction2(
+				"测试的IOHelper异步任务",
+				() -> {
+					int cursor = i.get();
+					AsyncTaskResult<EventAppendResult> actualTaskResult;
+
+					if (cursor <= 5) {
+
+						actualTaskResult = new AsyncTaskResult<>(AsyncTaskStatus.IOException,
+								"模拟异步目标任务IO错误！");
+
+						i.getAndIncrement();
+					} else {
+
+						System.out.println("***** 任务开始");
+						System.out.println("testList.get()  ==> " + testList.get(j.get()));
+						System.out.println("***** 任务完成");
+
+						actualTaskResult = new AsyncTaskResult<EventAppendResult>(
+								AsyncTaskStatus.Success, EventAppendResult.Success);
+
+					}
+					return EJokerFutureWrapperUtil.createCompleteFuture(actualTaskResult); },
+				actualResule -> {
+					System.out.println("finishAction() was invoked!");
+					EventAppendResult status = actualResule;
+					switch (status) {
+					case Success:
+						System.out.println("  AsyncAction completed!");
+						System.out.println("  Resulr status = " + status.toString());
+						System.out.println("  cursor = " + i.get());
+
+						System.out.println("=========== 标记一次异步任务完成 ==========");
+						
+						j.incrementAndGet();
+						if(j.get() > 3)
+							break;
+						i.set(0);
+						
+						break;
+					case Failed:
+					default:
+						System.out.println("  AsyncAction completed!");
+						System.out.println("  Resulr status = " + status.toString());
+						System.out.println("  cursor = " + i.get());
+						break;
+					} },
+				() -> "testContextInfo",
+				ex -> System.out.println("faildAction() was invoked! pass: " + ex.getMessage())
+				);
+	}
+}
