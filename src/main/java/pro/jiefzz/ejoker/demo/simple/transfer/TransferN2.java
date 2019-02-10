@@ -90,11 +90,11 @@ public class TransferN2 {
 			TimeUnit.MILLISECONDS.sleep(500l);
 			
 		}
+		System.exit(0);
 		
 		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
-		System.exit(0);
 		LockSupport.park();
 		
 		int loop = 10;

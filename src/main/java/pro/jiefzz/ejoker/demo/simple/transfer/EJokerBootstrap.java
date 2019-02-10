@@ -19,7 +19,8 @@ public class EJokerBootstrap {
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
-	public final static String NameServAddr = "192.168.199.94:9876;192.168.199.123:9876";
+//	public final static String NameServAddr = "192.168.199.94:9876;192.168.199.123:9876";
+	public final static String NameServAddr = "192.168.1.2:9876";
 	
 	public final static String EJokerDomainEventConsumerGroup = "EjokerDomainEventConsumerGroup";
 	
