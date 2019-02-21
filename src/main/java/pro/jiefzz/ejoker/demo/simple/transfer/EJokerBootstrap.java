@@ -1,5 +1,7 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
+import org.apache.rocketmq.common.message.MessageQueue;
+
 import com.jiefzz.ejoker.EJoker;
 import com.jiefzz.ejoker.queue.command.CommandConsumer;
 import com.jiefzz.ejoker.queue.command.CommandResultProcessor;
@@ -11,6 +13,7 @@ import com.jiefzz.ejoker.queue.domainEvent.DomainEventPublisher;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 import com.jiefzz.ejoker.z.common.scavenger.Scavenger;
+import com.jiefzz.ejoker.z.common.system.functional.IFunction1;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
 public class EJokerBootstrap {
@@ -78,6 +81,10 @@ public class EJokerBootstrap {
 	}
 	
 	public DomainEventConsumer initDomainEventConsumer() throws Exception {
+		return initDomainEventConsumer(mq -> true);
+	}
+
+	public DomainEventConsumer initDomainEventConsumer(IFunction1<Boolean, MessageQueue> queueMatcher) throws Exception {
 
 		// 启动领域事件消费者
 		DomainEventConsumer domainEventConsumer = eJokerContext.get(DomainEventConsumer.class);
@@ -85,6 +92,7 @@ public class EJokerBootstrap {
 			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerDomainEventConsumerGroup);
 			defaultMQConsumer.setNamesrvAddr(NameServAddr);
 			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
+			defaultMQConsumer.useQueueSelector(queueMatcher);
 			
 			domainEventConsumer.useConsumer(defaultMQConsumer).subscribe("TopicEJokerDomainEvent").start();
 			scavenger.addFianllyJob(domainEventConsumer::shutdown);
@@ -107,8 +115,12 @@ public class EJokerBootstrap {
 		return domainEventPublisher;
 		
 	}
-	
+
 	public CommandConsumer initCommandConsumer() throws Exception {
+		return initCommandConsumer(mq -> true);
+	}
+	
+	public CommandConsumer initCommandConsumer(IFunction1<Boolean, MessageQueue> queueMatcher) throws Exception {
 
 		// 启动命令消费者
 		CommandConsumer commandConsumer = eJokerContext.get(CommandConsumer.class);
@@ -116,6 +128,7 @@ public class EJokerBootstrap {
 			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerCommandConsumerGroup);
 			defaultMQConsumer.setNamesrvAddr(NameServAddr);
 			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
+			defaultMQConsumer.useQueueSelector(queueMatcher);
 			
 //			defaultMQConsumer.configureFlowControl(true);
 //			defaultMQConsumer.useFlowControlSwitch((mq, amount, loopCount) -> {
