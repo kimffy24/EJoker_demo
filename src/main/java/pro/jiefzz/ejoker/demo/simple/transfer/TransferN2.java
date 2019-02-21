@@ -1,19 +1,21 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jiefzz.ejoker.commanding.CommandReturnType;
 import com.jiefzz.ejoker.commanding.ICommand;
 import com.jiefzz.ejoker.commanding.ICommandRoutingKeyProvider;
 import com.jiefzz.ejoker.queue.ITopicProvider;
 import com.jiefzz.ejoker.queue.command.CommandResultProcessor;
 import com.jiefzz.ejoker.queue.command.CommandService;
 import com.jiefzz.ejoker.utils.EObjectId;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
+import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.service.IJSONConverter;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
@@ -39,12 +41,11 @@ public class TransferN2 {
 
 		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
 		
-		CommandResultProcessor commandResultProcessor = eJokerFrameworkInitializer.getEJokerContext().get(CommandResultProcessor.class);
-		
 		IJSONConverter jsonConverter = eJokerFrameworkInitializer.getEJokerContext().get(IJSONConverter.class);
 		ITopicProvider<ICommand> topicProvider = eJokerFrameworkInitializer.getEJokerContext().get(ITopicProvider.class, ICommand.class);
 		ICommandRoutingKeyProvider commandRoutingKeyProvider = eJokerFrameworkInitializer.getEJokerContext().get(ICommandRoutingKeyProvider.class);
 		SystemAsyncHelper systemAsyncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SystemAsyncHelper.class);
+		IScheduleService scheduleService = eJokerFrameworkInitializer.getEJokerContext().get(IScheduleService.class);
 		
 		TimeUnit.SECONDS.sleep(1l);
 		System.out.println("");
@@ -57,17 +58,17 @@ public class TransferN2 {
 
 		for(int i=0; i<ids.length; i++) {
 			ids[i] = ObjectId.get().toHexString();
+			System.err.println(ids[i]);
 		}
 		
-		SystemFutureWrapper[] sfws = new SystemFutureWrapper[accountLoop];
-		
+		final SystemFutureWrapper[] sfws = new SystemFutureWrapper[accountLoop];
+		final AtomicInteger cursor = new AtomicInteger(0);
 		for(int i=0; i<ids.length; i++) {
-			final int j = i;
-			CreateAccountCommand createAccountCommand = new CreateAccountCommand(ids[i], "owner_" + i);
 			systemAsyncHelper.submit(() -> {
-//				SystemFutureWrapper<AsyncTaskResult<CommandResult>> x = commandService.executeAsync(createAccountCommand, CommandReturnType.EventHandled);
-				SystemFutureWrapper<AsyncTaskResult<Void>> x = commandService.sendAsync(createAccountCommand);
-				sfws[j] = x;
+				int index = cursor.getAndIncrement();
+				CreateAccountCommand createAccountCommand = new CreateAccountCommand(ids[index], "owner_" + index);
+				sfws[index] = commandService.executeAsync(createAccountCommand, CommandReturnType.EventHandled);
+//				sfws[index] = commandService.sendAsync(createAccountCommand);
 			});
 			System.err.println("send No." + i);
 		}
@@ -90,29 +91,34 @@ public class TransferN2 {
 			TimeUnit.MILLISECONDS.sleep(500l);
 			
 		}
-		System.exit(0);
+		
+//		System.exit(0);
 		
 		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
-		LockSupport.park();
-		
-		int loop = 10;
+		int loop = 1;
 		int amount = loop*ids.length;
 		SystemFutureWrapper[] results = new SystemFutureWrapper[amount];
 		long t = System.currentTimeMillis();
 		for(int j=0; j<loop; j++) {
-//			if(j%2 == 0)
-//				TimeUnit.MICROSECONDS.sleep(500l);
 			for(int i=0; i<ids.length; i++) {
 				StartDepositTransactionCommand startDepositTransactionCommand = new StartDepositTransactionCommand(EObjectId.generateHexStringId(), ids[i], i%2==0?110:240);
-				results[--amount] = commandService.sendAsync(startDepositTransactionCommand);
-//				commandService.executeAsync(startDepositTransactionCommand).get();
-//				testSend(commandRoutingKeyProvider, jsonConverter, topicProvider, commandService.getProducer(), startDepositTransactionCommand, null);
+				results[(j*ids.length)+i] = commandService.sendAsync(startDepositTransactionCommand);
 			}
 		}
-		for(SystemFutureWrapper sfw:results) {
-//			sfw.get();
+		while(true) {
+			boolean ok = true;
+			for(SystemFutureWrapper sfw:results) {
+				try {
+					sfw.get();
+				} catch (Exception e) {
+					e.printStackTrace();
+					ok &= false;
+				}
+			}
+			if(ok)
+				break;
 		}
 		String msg = String.format("batch start at: %d, time use: %d ms", t, System.currentTimeMillis() - t);
 		logger.error(msg);

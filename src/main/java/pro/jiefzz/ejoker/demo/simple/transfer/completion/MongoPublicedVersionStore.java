@@ -3,9 +3,9 @@ package pro.jiefzz.ejoker.demo.simple.transfer.completion;
 import com.jiefzz.ejoker.infrastructure.IPublishedVersionStore;
 import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskStatus;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskStatus;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.RipenFuture;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.mongodb.BasicDBObject;
@@ -24,7 +24,7 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 			String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
 		try {
 			updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion);
-			return EJokerFutureWrapperUtil.createCompleteFutureTask();
+			return SystemFutureWrapperUtil.createCompleteFutureTask();
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Void>> ripenFuture = new RipenFuture<>();
 			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));
@@ -37,7 +37,7 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 			String aggregateRootTypeName, String aggregateRootId) {
 		try {
 			long r = getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId);
-			return EJokerFutureWrapperUtil.createCompleteFutureTask(r);
+			return SystemFutureWrapperUtil.createCompleteFutureTask(r);
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Long>> ripenFuture = new RipenFuture<>();
 			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));

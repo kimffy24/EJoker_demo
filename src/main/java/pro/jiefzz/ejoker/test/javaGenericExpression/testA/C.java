@@ -26,13 +26,11 @@ public class C<TM1, TM2> extends B<TM2, TM1> implements IAAA, IB<TM1> {
 
 	@Override
 	public Y<Map<String, ? extends IB<IAggregateRoot>[]>>[] getValueIA4() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void applyValueIA4(Y<Map<String, ? extends IB<IAggregateRoot>[]>>[] target) {
-		// TODO Auto-generated method stub
 		
 	}
 }

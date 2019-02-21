@@ -1,9 +1,5 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.eventHandlers;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -13,13 +9,11 @@ import com.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.assemblies.MessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
-import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.service.IJSONConverter;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.EJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.TransactionType;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.InsufficientBalanceException;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.PreparationType;
@@ -39,32 +33,19 @@ public class TestConsoleHelper extends AbstractMessageHandler {
 	IJSONConverter jsonConverter;
 	
 	//// for debug
-	@Dependence
-	IScheduleService scheduleService;
-
-	private Map<String, Long> accountCreateTime = new ConcurrentHashMap<>();
-	private Map<String, AtomicInteger> counterDeposit = new ConcurrentHashMap<>();
+	private AtomicInteger accountAmount = new AtomicInteger(0);
 	
-	public void d1() {
-		Set<Entry<String, AtomicInteger>> entrySet = counterDeposit.entrySet();
-		for(Entry<String, AtomicInteger> entry : entrySet) {
-			logger.error("account: {}, hitDeposit: {}, timeUse: {}",
-					entry.getKey(),
-					entry.getValue().get(),
-					System.currentTimeMillis() - EJokerBootstrap.BatchDelay - accountCreateTime.get(entry.getKey())
-					);
-		}
+	public void show() {
+		logger.error("账号总数: {}", accountAmount.get());
 	}
 	//// for debug
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountCreatedEvent message) {
 		logger.info("创建账号成功: aggregateId={}, onwer={}, ", message.getAggregateRootId(), message.getOwner());
-		{
-			// for debug
-			accountCreateTime.put(message.getAggregateRootId(), System.currentTimeMillis());
-			counterDeposit.put(message.getAggregateRootId(), new AtomicInteger(0));
+		{ /// for debug
+			accountAmount.incrementAndGet();
 		}
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
@@ -79,7 +60,7 @@ public class TestConsoleHelper extends AbstractMessageHandler {
 			}
 		}
 
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
@@ -102,32 +83,28 @@ public class TestConsoleHelper extends AbstractMessageHandler {
 			}
 		}
 		
-		{
-			// for debug
-			if(null != counterDeposit.get(evnt.getAggregateRootId())) {
-				counterDeposit.get(evnt.getAggregateRootId()).incrementAndGet();
-			}
+		{ /// for debug
 		}
 
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent evnt) {
 		logger.info("转账交易已完成，交易ID：{}", evnt.getAggregateRootId());
 
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
 		logger.info("账户的余额不足，交易ID：{}，账户：{}，可用余额：{}，转出金额：{}", exception.getTransactionId(), exception.getAccountId(),
 				exception.getCurrentAvailableBalance(), exception.getAmount());
 
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCanceledEvent evnt) {
 		logger.info("转账交易已取消，交易ID：{}", evnt.getAggregateRootId());
 
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 }

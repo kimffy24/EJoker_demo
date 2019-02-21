@@ -16,10 +16,9 @@ import com.jiefzz.ejoker.eventing.IDomainEvent;
 import com.jiefzz.ejoker.eventing.IEventSerializer;
 import com.jiefzz.ejoker.eventing.IEventStore;
 import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
-import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -27,9 +26,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.WriteResult;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 
 //@EService
 public class MongoEventStore implements IEventStore {
@@ -63,24 +59,24 @@ public class MongoEventStore implements IEventStore {
 
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> appendAsync(DomainEventStream eventStream) {
-		return EJokerFutureWrapperUtil.createCompleteFutureTask(append(eventStream));
+		return SystemFutureWrapperUtil.createCompleteFutureTask(append(eventStream));
 	}
 
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, long version) {
-		return EJokerFutureWrapperUtil.createCompleteFutureTask(find(aggregateRootId, version));
+		return SystemFutureWrapperUtil.createCompleteFutureTask(find(aggregateRootId, version));
 	}
 
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, String commandId) {
-		return EJokerFutureWrapperUtil.createCompleteFutureTask(find(aggregateRootId, commandId));
+		return SystemFutureWrapperUtil.createCompleteFutureTask(find(aggregateRootId, commandId));
 	}
 
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<Collection<DomainEventStream>>> queryAggregateEventsAsync(
 			String aggregateRootId, String aggregateRootTypeName, long minVersion, long maxVersion) {
 		Collection<DomainEventStream> queryAggregateEvents = queryAggregateEvents(aggregateRootId, aggregateRootTypeName, minVersion, maxVersion);
-		return EJokerFutureWrapperUtil.createCompleteFutureTask(queryAggregateEvents);
+		return SystemFutureWrapperUtil.createCompleteFutureTask(queryAggregateEvents);
 	}
 //	
 //	private Document convert(DomainEventStream des) {
@@ -143,13 +139,11 @@ public class MongoEventStore implements IEventStore {
 				(Map<String, String> )doc.get("items"));
 	}
 
-	@Override
-	public EventAppendResult batchAppend(LinkedHashSet<DomainEventStream> eventStreams) {
+	private EventAppendResult batchAppend(LinkedHashSet<DomainEventStream> eventStreams) {
 		return null;
 	}
 
-	@Override
-	public EventAppendResult append(DomainEventStream eventStream) {
+	private EventAppendResult append(DomainEventStream eventStream) {
 		
 		{
 			BasicDBObject dbo = legacyConvert(eventStream);
@@ -175,8 +169,7 @@ public class MongoEventStore implements IEventStore {
 //		return EventAppendResult.Success;
 	}
 
-	@Override
-	public DomainEventStream find(String aggregateRootId, long version) {
+	private DomainEventStream find(String aggregateRootId, long version) {
 		DBCollection legacyCollection = mongoProvider.getLegacyCollection("EventStream");
 		DBObject result = legacyCollection.findOne(new BasicDBObject("aggregateRootId", aggregateRootId).append("version", version));
 		if(null == result)
@@ -188,8 +181,7 @@ public class MongoEventStore implements IEventStore {
 //		return revert(target);
 	}
 
-	@Override
-	public DomainEventStream find(String aggregateRootId, String commandId) {
+	private DomainEventStream find(String aggregateRootId, String commandId) {
 		DBCollection legacyCollection = mongoProvider.getLegacyCollection("EventStream");
 		DBObject result = legacyCollection.findOne(new BasicDBObject("aggregateRootId", aggregateRootId).append("commandId", commandId));
 		if(null == result)
@@ -204,8 +196,7 @@ public class MongoEventStore implements IEventStore {
 //		return des;
 	}
 
-	@Override
-	public Collection<DomainEventStream> queryAggregateEvents(String aggregateRootId, String aggregateRootTypeName,
+	private Collection<DomainEventStream> queryAggregateEvents(String aggregateRootId, String aggregateRootTypeName,
 			long minVersion, long maxVersion) {
 
 		Collection<DomainEventStream> r = new ArrayList<>();

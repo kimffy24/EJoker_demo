@@ -1,17 +1,18 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jiefzz.ejoker.commanding.CommandReturnType;
-import com.jiefzz.ejoker.queue.command.CommandService;
-import com.jiefzz.ejoker.utils.EObjectId;
-
-import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CreateAccountCommand;
-import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartDepositTransactionCommand;
+import com.jiefzz.ejoker.eventing.IEventStore;
+import com.jiefzz.ejoker.eventing.impl.InMemoryEventStore;
+import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
+import com.jiefzz.ejoker.z.common.context.dev2.impl.EjokerContextDev2Impl;
+import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
+import com.jiefzz.ejoker.z.common.system.wrapper.MittenWrapper;
 
 /**
  * mvn exec:java -Dexec.mainClass=pro.jiefzz.ejoker.demo.simple.transfer.TransferApp
@@ -29,105 +30,57 @@ public class TransferApp {
 	
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 
+		// Q端启动
+		eJokerFrameworkInitializer.initCommandService();
 		eJokerFrameworkInitializer.initDomainEventConsumer();
+		
+		// C端启动
 		eJokerFrameworkInitializer.initDomainEventPublisher();
 		eJokerFrameworkInitializer.initCommandConsumer();
 		
-		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
+		// 监视代码
+		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
+		IScheduleService scheduleService = eJokerContext.get(IScheduleService.class);
+		IEventStore eventStore = eJokerContext.get(IEventStore.class);
 
-//		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
-//		SystemAsyncHelper systemAsyncHelper = eJokerContext.get(SystemAsyncHelper.class);
-//		IScheduleService scheduleService = eJokerContext.get(IScheduleService.class);
-//		scheduleService.startTask("afrqgqhersxx", () -> {
-//			systemAsyncHelper.d1();
-//			DevUtils.moniter();
-//		}, 200l, 200l);
-		
-		
-		TimeUnit.SECONDS.sleep(1l);
-		System.out.println("");
-		System.out.println("====================== TransferAPP ======================");
-		System.out.println("");
+		final MittenWrapper mainMitten = MittenWrapper.currentThread();
+		final AtomicLong lastTotal = new AtomicLong(0);
+		final AtomicInteger x = new AtomicInteger(0);
+		final AtomicInteger y = new AtomicInteger(0);
+		final boolean memoryStoreLoad = InMemoryEventStore.class.isAssignableFrom(eventStore.getClass());
 		
 
-		String[] owners = new String[] {
-				"龙轩",
-				"金飞",
-				"包包",
-				"JiefzzLon",
-				"Kimffy",
-				"SamelodyLau",
-				"Coco",
-				"雯雯",
-				"寿司司",
-				"晴阳",
-				"龙轩_1",
-				"金飞_2",
-				"包包_3",
-				"JiefzzLon_4",
-				"Kimffy_5",
-				"SamelodyLau_6",
-				"Coco_7",
-				"雯雯_8",
-				"寿司司_9",
-				"晴阳_0"
-		};
-
-		String[] ids = new String[] {
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId(),
-				EObjectId.generateHexStringId()
-		};
-		
-		for(int i=0; i<ids.length; i++) {
-			CreateAccountCommand createAccountCommand = new CreateAccountCommand(ids[i], owners[i]);
-			commandService.executeAsync(createAccountCommand, CommandReturnType.EventHandled).get();
-		}
-		
-		System.out.println("Waiting... ");
-		TimeUnit.SECONDS.sleep(20l);
-		System.out.println("Start batch deposit... ");
-		
-		int loop = 10;
-		long t = System.currentTimeMillis();
-		for(int j=0; j<loop; j++) {
-			if(j%2 == 0)
-				TimeUnit.MICROSECONDS.sleep(500l);
-			for(int i=0; i<ids.length; i++) {
-				commandService.sendAsync(new StartDepositTransactionCommand(EObjectId.generateHexStringId(), ids[i], i%2==0?110:240));
-//				commandService.executeAsync(new StartDepositTransactionCommand(EObjectId.generateHexStringId(), ids[i], i%2==0?110:240)).get();
+		scheduleService.startTask("afrqgqhersxx", () -> {
+			if(y.get() - 60 > 0) {
+				MittenWrapper.unpark(mainMitten);
+			};
+			DevUtils.moniterQ();
+			if(memoryStoreLoad) {
+				InMemoryEventStore es = (InMemoryEventStore )eventStore;
+				double milliDiff = es.getMax() - es.getMin();
+				double secondDiff = milliDiff/1000;
+				if(secondDiff <= 0) {
+					logger.error("... {}", x.getAndIncrement());
+					return;
+				}
+				DevUtils.moniterC();
+				long besAmount = es.getBESAmount();
+				long besDelta = besAmount - lastTotal.get();
+				lastTotal.set(besAmount);
+				double avg = besAmount/secondDiff;
+				logger.error(" time use: {} ms", milliDiff);
+				logger.error(" amount of fiber: {}", com.jiefzz.equasar.EJoker.getFiberAmount());
+				logger.error(" amount of business ES: {}, delta: {}", besAmount, besDelta);
+				logger.error(" avg: {}", avg);
+				if(besDelta - 0 == 0) {
+					y.getAndIncrement();
+				} else {
+					y.set(0);
+				}
 			}
-		}
-		logger.error("time use: {} ms", System.currentTimeMillis() - t);
-
+		}, 1000l, 1000l);
+		
 		LockSupport.park();
-		
-//		TimeUnit.SECONDS.sleep(20l);
-//		DevUtils.ttt();
-//		DevUtils.moniter();
-//		ioHelper.d1();
-//		systemAsyncHelper.d1();
-//		LockSupport.park();
-		
-		
-		eJokerFrameworkInitializer.discard();
-		
+		((EjokerContextDev2Impl )eJokerContext).discard();
 	}
 }

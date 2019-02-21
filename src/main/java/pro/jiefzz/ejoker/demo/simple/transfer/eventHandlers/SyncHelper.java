@@ -1,7 +1,5 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.eventHandlers;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -10,10 +8,11 @@ import org.slf4j.LoggerFactory;
 import com.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.assemblies.MessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.extension.AsyncWrapperException;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
+import com.jiefzz.ejoker.z.common.system.wrapper.CountDownLatchWrapper;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 
@@ -23,34 +22,30 @@ public class SyncHelper extends AbstractMessageHandler {
 	
 	private final static Logger logger = LoggerFactory.getLogger(SyncHelper.class);
 	
-//	AtomicLong al1 = new AtomicLong(0);
-//	
-//	AtomicLong lastThousandHit = new AtomicLong(0);
-//	
-//	public void show() {
-//		long Val1 = al1.get();
-//		if(Val1%1000 == 0)
-//			lastThousandHit.set(System.currentTimeMillis());
-//		logger.error("DepositTransactionCompletedEvent hit: {}, lastThousandHit: {}. \n", Val1, lastThousandHit.get());
-//		
-//	}
+	AtomicLong al1 = new AtomicLong(0);
+	
+	public void show() {
+		logger.error("DepositTransactionCompletedEvent hit: {}", al1.get());
+		
+	}
 
-	private CountDownLatch waitHandle = new CountDownLatch(1);
+	private Object waitHandle = CountDownLatchWrapper.newCountDownLatch();
+	
 	
 	public void waitOne() {
 		try {
-			waitHandle.await();
-		} catch (InterruptedException e) {
+			CountDownLatchWrapper.await(waitHandle);
+		} catch (AsyncWrapperException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
-//		al1.getAndIncrement();
-		waitHandle.countDown();
-		waitHandle = new CountDownLatch(1);
+		al1.getAndIncrement();
+		CountDownLatchWrapper.countDown(waitHandle);
+		waitHandle = CountDownLatchWrapper.newCountDownLatch();
 
-		return EJokerFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 //
 //    public Task<AsyncTaskResult> HandleAsync(TransferTransactionCompletedEvent message)

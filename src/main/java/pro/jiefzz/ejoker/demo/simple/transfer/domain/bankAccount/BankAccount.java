@@ -1,10 +1,12 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jiefzz.ejoker.domain.AbstractAggregateRoot;
 import com.jiefzz.ejoker.z.common.context.annotation.assemblies.AggregateRoot;
@@ -17,6 +19,8 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.Tr
 
 @AggregateRoot
 public class BankAccount extends AbstractAggregateRoot<String> {
+
+	private final static Logger logger = LoggerFactory.getLogger(BankAccount.class);
 
 	private String owner;
 	
@@ -70,7 +74,7 @@ public class BankAccount extends AbstractAggregateRoot<String> {
      * 取消一笔预操作
      * @param transactionId
      */
-    public void CancelTransactionPreparation(String transactionId) 
+    public void cancelTransactionPreparation(String transactionId) 
     {
         applyEvent(new TransactionPreparationCanceledEvent(getTransactionPreparation(transactionId)));
     }
@@ -83,6 +87,10 @@ public class BankAccount extends AbstractAggregateRoot<String> {
     private TransactionPreparation getTransactionPreparation(String transactionId) {
         if (null == transactionPreparations || 0 == transactionPreparations.size())
         {
+        	logger.error("current info: {}",
+        				null == transactionPreparations?
+        						"null == transactionPreparations":"0 == transactionPreparations.size()"
+        	);
             throw new TransactionPreparationNotExistException(id, transactionId);
         }
         TransactionPreparation transactionPreparation;
@@ -129,7 +137,7 @@ public class BankAccount extends AbstractAggregateRoot<String> {
     @SuppressWarnings("unused")
 	private void handle(AccountCreatedEvent evt) {
 		this.owner = evt.getOwner();
-		transactionPreparations = new HashMap<>();
+		transactionPreparations = new ConcurrentHashMap<>();
 	}
 
     @SuppressWarnings("unused")

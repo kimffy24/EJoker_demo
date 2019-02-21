@@ -41,31 +41,26 @@ public class GenericType <L extends List<String>, T extends C<String, Double> & 
 
 		@Override
 		public long getVersion() {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
 		public String getUniqueId() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public List<IDomainEvent<?>> getChanges() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public void acceptChanges(long newVersion) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void replayEvents(Collection<DomainEventStream> eventStreams) {
-			// TODO Auto-generated method stub
 			
 		}}
 	

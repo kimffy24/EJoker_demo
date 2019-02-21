@@ -5,7 +5,7 @@ import java.util.TreeSet;
 
 import com.jiefzz.ejoker.z.common.context.dev2.impl.EjokerContextDev2Impl;
 import com.jiefzz.ejoker.z.common.system.functional.IVoidFunction2;
-import com.jiefzz.ejoker.z.common.utils.ForEachUtil;
+import com.jiefzz.ejoker.z.common.system.helper.ForEachHelper;
 import com.jiefzz.ejoker.z.common.utils.genericity.GenericDefination;
 import com.jiefzz.ejoker.z.common.utils.genericity.GenericExpression;
 import com.jiefzz.ejoker.z.common.utils.genericity.GenericExpressionFactory;
@@ -41,7 +41,7 @@ public class ScanAsync {
 				
 				g.forEachInterfaceDefinations((iclazz, ig) -> {
 					t.trigger(iclazz, ig);
-					ForEachUtil.processForEach(ig.getInterfaceDefinations(), (icl, igl) -> igl.forEachInterfaceDefinations(t));
+					ForEachHelper.processForEach(ig.getInterfaceDefinations(), (icl, igl) -> igl.forEachInterfaceDefinations(t));
 				});
 				
 			}

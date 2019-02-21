@@ -6,10 +6,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
 import com.jiefzz.ejoker.eventing.EventAppendResult;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskResult;
-import com.jiefzz.ejoker.z.common.io.AsyncTaskStatus;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
+import com.jiefzz.ejoker.z.common.task.AsyncTaskStatus;
 
 public class TestIOHelper {
 
@@ -56,7 +56,7 @@ public class TestIOHelper {
 								AsyncTaskStatus.Success, EventAppendResult.Success);
 
 					}
-					return EJokerFutureWrapperUtil.createCompleteFuture(actualTaskResult); },
+					return SystemFutureWrapperUtil.createCompleteFuture(actualTaskResult); },
 				actualResule -> {
 					System.out.println("finishAction() was invoked!");
 					EventAppendResult status = actualResule;

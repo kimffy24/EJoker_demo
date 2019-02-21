@@ -19,14 +19,13 @@ public class EJokerBootstrap {
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
-//	public final static String NameServAddr = "192.168.199.94:9876;192.168.199.123:9876";
-	public final static String NameServAddr = "192.168.1.2:9876";
+	public final static String NameServAddr = "192.168.199.94:9876;192.168.199.123:9876";
 	
 	public final static String EJokerDomainEventConsumerGroup = "EjokerDomainEventConsumerGroup";
 	
 	public final static String EJokerCommandConsumerGroup = "EjokerCommandConsumerGroup";
 	
-	public final static long BatchDelay = 6000l;
+	public final static long BatchDelay = 10000l;
 	
 	protected final IEJokerSimpleContext eJokerContext;
 
@@ -66,9 +65,9 @@ public class EJokerBootstrap {
 		eJokerFullContext.discard();
 	}
 	
-	public CommandResultProcessor initCommandResultProcessor() {
+	private CommandResultProcessor initCommandResultProcessor() {
 
-//		 启动命令跟踪反馈控制对象
+		// 启动命令跟踪反馈控制对象
 		CommandResultProcessor commandResultProcessor = eJokerContext.get(CommandResultProcessor.class);
 		{
 			commandResultProcessor.start();
@@ -85,9 +84,7 @@ public class EJokerBootstrap {
 		{
 			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerDomainEventConsumerGroup);
 			defaultMQConsumer.setNamesrvAddr(NameServAddr);
-			defaultMQConsumer.useSubmiter((vf) -> {
-				systemAsyncHelper.submit(vf::trigger);
-			});
+			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
 			
 			domainEventConsumer.useConsumer(defaultMQConsumer).subscribe("TopicEJokerDomainEvent").start();
 			scavenger.addFianllyJob(domainEventConsumer::shutdown);
@@ -118,9 +115,14 @@ public class EJokerBootstrap {
 		{
 			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerCommandConsumerGroup);
 			defaultMQConsumer.setNamesrvAddr(NameServAddr);
-			defaultMQConsumer.useSubmiter((vf) -> {
-				systemAsyncHelper.submit(vf::trigger);
-			});
+			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
+			
+//			defaultMQConsumer.configureFlowControl(true);
+//			defaultMQConsumer.useFlowControlSwitch((mq, amount, loopCount) -> {
+//				if(amount - 75000 > 0)
+//					return true;
+//				return false;
+//			});
 			
 			commandConsumer.useConsumer(defaultMQConsumer).subscribe("TopicEJokerCommand").start();
 			scavenger.addFianllyJob(commandConsumer::shutdown);

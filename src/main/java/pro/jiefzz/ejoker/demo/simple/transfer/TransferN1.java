@@ -1,6 +1,7 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
 import org.slf4j.Logger;
@@ -10,7 +11,7 @@ import com.jiefzz.ejoker.eventing.IEventStore;
 import com.jiefzz.ejoker.eventing.impl.InMemoryEventStore;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
-import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
+import com.jiefzz.equasar.EJoker;
 
 /**
  * mvn exec:java -Dexec.mainClass=pro.jiefzz.ejoker.demo.simple.transfer.TransferApp
@@ -30,8 +31,6 @@ public class TransferN1 {
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 
 		eJokerFrameworkInitializer.initDomainEventPublisher();
-		eJokerFrameworkInitializer.initCommandService();
-		eJokerFrameworkInitializer.initDomainEventConsumer();
 		eJokerFrameworkInitializer.initCommandConsumer();
 
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
@@ -41,45 +40,32 @@ public class TransferN1 {
 
 		if(InMemoryEventStore.class.isAssignableFrom(eventStore.getClass())) {
 			InMemoryEventStore es = (InMemoryEventStore )eventStore;
-			new Thread(() -> {
-		
-				int x = 0;
-					
-					while(true) {
-						SleepWrapper.sleep(TimeUnit.SECONDS, 2l);
-
-						
-						long diff = es.getMax() - es.getMin();
-						if((diff/1000) <= 0) {
-
-							logger.error("... {}", x++);
-							continue;
-						}
-
-						logger.error("min timestamp: {} ms", es.getMin());
-						logger.error("max timestamp: {} ms", es.getMax());
-						logger.error("time use: {} ms", diff);
-						logger.error("amount of EventStream: {}", es.sizeOfMStore());
-						logger.error("ES queue hit: {}", es.getESAmount());
-						logger.error("avg: {}", es.getESAmount()/(diff/1000));
-						
-					}
-						
-			}).start();
+			final AtomicLong lastTotal = new AtomicLong(0);
+			scheduleService.startTask("afrqgqhersxx", () -> {
+				double milliDiff = es.getMax() - es.getMin();
+				double secondDiff = milliDiff/1000;
+				if(secondDiff <= 0) {
+					logger.error("... {}", x.getAndIncrement());
+					return;
+				}
+				DevUtils.moniterC();
+				long besAmount = es.getBESAmount();
+				long besDelta = besAmount - lastTotal.get();
+				lastTotal.set(besAmount);
+				double avg = besAmount/secondDiff;
+				logger.error(" time use: {} ms", milliDiff);
+//				logger.error(" amount of EventStream: {}", es.sizeOfMStore());
+//				logger.error(" ES queue hit: {}", es.getESQueueHit());
+				logger.error(" amount of fiber: {}", com.jiefzz.equasar.EJoker.getFiberAmount());
+				logger.error(" amount of business ES: {}, delta: {}", besAmount, besDelta);
+				logger.error(" avg: {}", avg);
+			}, 1000l, 1000l);
+			
 		}
-		
-		scheduleService.startTask("afrqgqhersxx", () -> {
-//			commandConsumer.d1();
-//			domainEventConsumer.d1();
-//			systemAsyncHelper.d1();
-//			DevUtils.moniter();
-		}, 1000l, 1000l);
 
-//		TimeUnit.SECONDS.sleep(20l);
-//		DevUtils.ttt();
-		
 		LockSupport.park();
 		eJokerFrameworkInitializer.discard();
 	}
 
+	private final static AtomicInteger x = new AtomicInteger(0);
 }

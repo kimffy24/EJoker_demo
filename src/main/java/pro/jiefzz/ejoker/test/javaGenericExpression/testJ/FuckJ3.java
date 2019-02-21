@@ -41,7 +41,6 @@ public class FuckJ3 {
 
 		@Override
 		public boolean hasKey(JSONObject source, Object key) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 		

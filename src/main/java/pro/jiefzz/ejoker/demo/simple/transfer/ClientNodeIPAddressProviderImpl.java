@@ -26,7 +26,7 @@ public class ClientNodeIPAddressProviderImpl implements IClientNodeIPAddressProv
         }
         
         if(null == eJokerNodeAddrTmp || "".equals(eJokerNodeAddrTmp)) {
-        	eJokerNodeAddrTmp = "192.168.1.10";
+        	eJokerNodeAddrTmp = "192.168.199.163";
         }
         
         EJokerNodeAddr = eJokerNodeAddrTmp;

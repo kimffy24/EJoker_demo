@@ -21,9 +21,10 @@ public class TransferFrontend {
 
 	public static void main(String[] args) throws Exception {
 
-		EJokerBootstrap eJokerFrameworkInitializer = new EJokerBootstrap();
+	}
 
-		
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+
 		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
 		
 		SyncHelper syncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SyncHelper.class);
