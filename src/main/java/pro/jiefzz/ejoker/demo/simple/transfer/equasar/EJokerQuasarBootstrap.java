@@ -8,6 +8,8 @@ import pro.jiefzz.ejoker.demo.simple.transfer.EJokerBootstrap;
 public class EJokerQuasarBootstrap extends EJokerBootstrap {
 
 	protected EJokerQuasarBootstrap() throws SuspendExecution {
+		// 这个类是 com.jiefzz.equasar.EJoker
+		// 而不是 com.jiefzz.ejoker.EJoker
 		super(EJoker.getInstance());
 	}
 

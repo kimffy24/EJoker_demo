@@ -1,9 +1,9 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +137,7 @@ public class BankAccount extends AbstractAggregateRoot<String> {
     @SuppressWarnings("unused")
 	private void handle(AccountCreatedEvent evt) {
 		this.owner = evt.getOwner();
-		transactionPreparations = new ConcurrentHashMap<>();
+		transactionPreparations = new HashMap<>();
 	}
 
     @SuppressWarnings("unused")

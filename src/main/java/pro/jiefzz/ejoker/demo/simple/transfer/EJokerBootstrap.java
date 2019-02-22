@@ -1,5 +1,8 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
+import java.util.List;
+
+import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
 
 import com.jiefzz.ejoker.EJoker;
@@ -14,6 +17,8 @@ import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 import com.jiefzz.ejoker.z.common.scavenger.Scavenger;
 import com.jiefzz.ejoker.z.common.system.functional.IFunction1;
+import com.jiefzz.ejoker.z.common.system.functional.IFunction3;
+import com.jiefzz.ejoker.z.common.system.helper.StringHelper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
 public class EJokerBootstrap {
@@ -35,6 +40,23 @@ public class EJokerBootstrap {
 	protected final Scavenger scavenger;
 	
 	protected final SystemAsyncHelper systemAsyncHelper;
+	
+	protected final IFunction3<MessageQueue, List<MessageQueue>, Message, Object> mqSelector = 
+			(mqs, msg, extObj) -> {
+				String keys = msg.getKeys();
+				int mqIndex = 0;
+				if(StringHelper.isNullOrWhiteSpace(keys)) {
+					mqIndex = (int )System.currentTimeMillis()%mqs.size();
+				} else {
+					byte[] bytes = keys.getBytes();
+					int total = 0;
+					for(int i = 0; i<bytes.length; i++) {
+						total += bytes[i];
+					}
+					mqIndex = total%mqs.size();
+				}
+				return mqs.get(mqIndex);
+			};
 
 	public EJokerBootstrap() {
 		this(EJoker.getInstance());
@@ -108,6 +130,7 @@ public class EJokerBootstrap {
 		{
 			DefaultMQProducer defaultMQProducer = new DefaultMQProducer("EjokerDomainEventProducerGroup");
 			defaultMQProducer.setNamesrvAddr(NameServAddr);
+			defaultMQProducer.configureMQSelector(this.mqSelector);
 			
 			domainEventPublisher.useProducer(defaultMQProducer).start();
 			scavenger.addFianllyJob(defaultMQProducer::shutdown);
@@ -151,6 +174,8 @@ public class EJokerBootstrap {
 		{
 			DefaultMQProducer defaultMQProducer = new DefaultMQProducer("EjokerCommandProducerGroup");
 			defaultMQProducer.setNamesrvAddr(NameServAddr);
+			defaultMQProducer.configureMQSelector(this.mqSelector);
+			
 			commandService.useProducer(defaultMQProducer).start();
 			scavenger.addFianllyJob(commandService::shutdown);
 		}

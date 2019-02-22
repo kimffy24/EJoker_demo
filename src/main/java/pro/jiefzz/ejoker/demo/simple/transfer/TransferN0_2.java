@@ -9,10 +9,7 @@ import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 
 /**
- * mvn exec:java -Dexec.mainClass=pro.jiefzz.ejoker.demo.simple.transfer.TransferApp
- * mvn exec:exec -Dexec.executable="java" -Dexec.args="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=7900,suspend=n -classpath %classpath pro.jiefzz.ejoker.demo.simple.transfer.TransferApp"
- * @author kimffy
- *
+ * 这是个 1/2 Q端 消费queueId为单数的队列
  */
 public class TransferN0_2 {
 	

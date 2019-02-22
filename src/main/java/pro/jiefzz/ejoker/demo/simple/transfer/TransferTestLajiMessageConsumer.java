@@ -2,6 +2,11 @@ package pro.jiefzz.ejoker.demo.simple.transfer;
 
 import java.util.concurrent.locks.LockSupport;
 
+/**
+ * 清理掉测试时遗留在队列中的信息
+ * @author kimffy
+ *
+ */
 public class TransferTestLajiMessageConsumer {
 
 	public static void main(String[] args) throws Exception {

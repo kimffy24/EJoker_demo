@@ -11,11 +11,11 @@ import com.jiefzz.ejoker.eventing.IEventStore;
 import com.jiefzz.ejoker.eventing.impl.InMemoryEventStore;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
-import com.jiefzz.equasar.EJoker;
 
 /**
- * mvn exec:java -Dexec.mainClass=pro.jiefzz.ejoker.demo.simple.transfer.TransferApp
- * mvn exec:exec -Dexec.executable="java" -Dexec.args="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=7900,suspend=n -classpath %classpath pro.jiefzz.ejoker.demo.simple.transfer.TransferApp"
+ * 这是一个C端的demo<br />
+ * <br />* env EJokerNodeAddr="192.168.199.123" mvn -Dmaven.test.skip=true clean compile exec:exec -Dexec.executable="java" -Dexec.args="-server -Xms4g -Xmx8g -Xmn3g -classpath %classpath pro.jiefzz.ejoker.demo.simple.transfer.TransferN2"
+ * <br />* 远程调试添加到exec.args中 -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=7900,suspend=n
  * @author kimffy
  *
  */
@@ -54,8 +54,6 @@ public class TransferN1 {
 				lastTotal.set(besAmount);
 				double avg = besAmount/secondDiff;
 				logger.error(" time use: {} ms", milliDiff);
-//				logger.error(" amount of EventStream: {}", es.sizeOfMStore());
-//				logger.error(" ES queue hit: {}", es.getESQueueHit());
 				logger.error(" amount of fiber: {}", com.jiefzz.equasar.EJoker.getFiberAmount());
 				logger.error(" amount of business ES: {}, delta: {}", besAmount, besDelta);
 				logger.error(" avg: {}", avg);
