@@ -15,6 +15,11 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainE
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferTransactionStartedEvent;
 
+/**
+ * 聚合根，表示一笔银行内账户之间的转账交易
+ * @author kimffy
+ *
+ */
 @AggregateRoot
 public class TransferTransaction extends AbstractAggregateRoot<String> {
 
@@ -27,6 +32,10 @@ public class TransferTransaction extends AbstractAggregateRoot<String> {
 	private boolean isTransferOutConfirmed;
 	private boolean isTransferInConfirmed;
 
+
+	public TransferTransaction() {
+	}
+	
 	/**
 	 * 构造函数
 	 * 
@@ -120,44 +129,54 @@ public class TransferTransaction extends AbstractAggregateRoot<String> {
 		applyEvent(new TransferTransactionCanceledEvent());
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferTransactionStartedEvent evnt) {
 		transactionInfo = evnt.getTransactionInfo();
 		status = TransactionStatus.Started;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(SourceAccountValidatePassedConfirmedEvent evnt) {
 		isSourceAccountValidatePassed = true;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TargetAccountValidatePassedConfirmedEvent evnt) {
 		isTargetAccountValidatePassed = true;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(AccountValidatePassedConfirmCompletedEvent evnt) {
 		status = TransactionStatus.AccountValidateCompleted;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferOutPreparationConfirmedEvent evnt) {
 		isTransferOutPreparationConfirmed = true;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferInPreparationConfirmedEvent evnt) {
 		isTransferInPreparationConfirmed = true;
 		status = TransactionStatus.PreparationCompleted;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferOutConfirmedEvent evnt) {
 		isTransferOutConfirmed = true;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferInConfirmedEvent evnt) {
 		isTransferInConfirmed = true;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferTransactionCompletedEvent evnt) {
 		status = TransactionStatus.Completed;
 	}
 
+	@SuppressWarnings("unused")
 	private void handle(TransferTransactionCanceledEvent evnt) {
 		status = TransactionStatus.Canceled;
 	}

@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.equasar;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferApp;
+import pro.jiefzz.ejoker.demo.simple.transfer.TransferNAll;
 
 /**
  * 
@@ -12,7 +12,7 @@ public class TransferAppQuasar {
 
 	public static void main(String[] args) throws Exception {
 		
-		TransferApp.start(new EJokerQuasarBootstrap());
+		TransferNAll.start(new EJokerQuasarBootstrap());
 		
 	}
 }

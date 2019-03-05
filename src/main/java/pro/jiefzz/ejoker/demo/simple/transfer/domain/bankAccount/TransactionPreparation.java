@@ -1,6 +1,7 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.TransactionType;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions.MismatchTransactionPreparationException;
 
 /**
  * 实体，表示账户聚合内的一笔预操作（如预存款、预取款、预转入、预转出）
@@ -39,12 +40,10 @@ public class TransactionPreparation {
 	
 	public TransactionPreparation(String accountId, String transactionId, TransactionType transactionType,
 			PreparationType preparationType, double amount) {
-		if (transactionType == TransactionType.DepositTransaction
-				&& preparationType != PreparationType.CreditPreparation) {
+		if (transactionType == TransactionType.DepositTransaction && !PreparationType.CreditPreparation.equals(preparationType)) {
 			throw new MismatchTransactionPreparationException(transactionType, preparationType);
 		}
-		if (transactionType == TransactionType.WithdrawTransaction
-				&& preparationType != PreparationType.DebitPreparation) {
+		if (transactionType == TransactionType.WithdrawTransaction && !PreparationType.DebitPreparation.equals(preparationType)) {
 			throw new MismatchTransactionPreparationException(transactionType, preparationType);
 		}
 		this.accountId = accountId;

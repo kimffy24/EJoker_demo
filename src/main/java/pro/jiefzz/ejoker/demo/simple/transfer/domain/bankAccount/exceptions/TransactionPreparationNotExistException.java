@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount;
+package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions;
 
 public class TransactionPreparationNotExistException extends RuntimeException {
 

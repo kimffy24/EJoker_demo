@@ -9,7 +9,9 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.Transfe
  */
 public class TransferInConfirmedEvent extends AbstractTransferTransactionEvent {
 
-	public TransferInConfirmedEvent() { }
+	public TransferInConfirmedEvent() {
+	}
+
 	public TransferInConfirmedEvent(TransferTransactionInfo transactionInfo) {
 		super(transactionInfo);
 	}

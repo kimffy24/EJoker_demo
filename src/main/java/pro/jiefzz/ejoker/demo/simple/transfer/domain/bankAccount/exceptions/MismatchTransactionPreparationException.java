@@ -1,6 +1,7 @@
-package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount;
+package pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.TransactionType;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.PreparationType;
 
 public class MismatchTransactionPreparationException extends RuntimeException {
 

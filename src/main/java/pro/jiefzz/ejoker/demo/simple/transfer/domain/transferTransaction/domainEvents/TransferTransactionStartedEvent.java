@@ -9,7 +9,9 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.Transfe
  */
 public class TransferTransactionStartedEvent extends AbstractTransferTransactionEvent {
 
-	public TransferTransactionStartedEvent() { }
+	public TransferTransactionStartedEvent() {
+	}
+	
 	public TransferTransactionStartedEvent(TransferTransactionInfo transactionInfo) {
 		super(transactionInfo);
 	}

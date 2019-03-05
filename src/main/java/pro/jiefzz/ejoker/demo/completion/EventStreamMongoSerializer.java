@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer.completion;
+package pro.jiefzz.ejoker.demo.completion;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,8 +15,8 @@ import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
 import com.jiefzz.ejoker.z.common.service.IJSONConverter;
 
-//@EService
-public class EventSerializerSupportMongo implements IEventSerializer {
+@EService
+public class EventStreamMongoSerializer implements IEventSerializer {
 
 	@Dependence
 	private IJSONConverter jsonSerializer;
@@ -28,7 +28,7 @@ public class EventSerializerSupportMongo implements IEventSerializer {
 	public Map<String, String> serializer(Collection<IDomainEvent<?>> events) {
 		Map<String, String> dict = new LinkedHashMap<String, String>();
 		for(IDomainEvent<?> event:events)
-			dict.put(event.getClass().getName().replaceAll("\\.", "_"), jsonSerializer.convert(event));
+			dict.put(typeNameProvider.getTypeName(event.getClass()).replaceAll("\\.", "_"), jsonSerializer.convert(event));
 		return dict;
 	}
 

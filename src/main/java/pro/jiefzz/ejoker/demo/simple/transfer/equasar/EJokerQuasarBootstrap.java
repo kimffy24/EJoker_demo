@@ -3,7 +3,7 @@ package pro.jiefzz.ejoker.demo.simple.transfer.equasar;
 import com.jiefzz.equasar.EJoker;
 
 import co.paralleluniverse.fibers.SuspendExecution;
-import pro.jiefzz.ejoker.demo.simple.transfer.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 
 public class EJokerQuasarBootstrap extends EJokerBootstrap {
 

@@ -16,12 +16,20 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.Ac
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationAddedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationCanceledEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationCommittedEvent;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions.InsufficientBalanceException;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions.TransactionPreparationNotExistException;
 
+/**
+ * 银行账户聚合根，封装银行账户余额变动的数据一致性
+ * @author kimffy
+ *
+ */
 @AggregateRoot
 public class BankAccount extends AbstractAggregateRoot<String> {
 
 	private final static Logger logger = LoggerFactory.getLogger(BankAccount.class);
 
+	@SuppressWarnings("unused")
 	private String owner;
 	
 	private double balance = 0d;
@@ -46,7 +54,7 @@ public class BankAccount extends AbstractAggregateRoot<String> {
     public void addTransactionPreparation(String transactionId, TransactionType transactionType, PreparationType preparationType, double amount) 
     {
     	double availableBalance = getAvailableBalance();
-        if (preparationType == PreparationType.DebitPreparation && availableBalance < amount)
+        if (PreparationType.DebitPreparation.equals(preparationType) && availableBalance < amount)
         {
             throw new InsufficientBalanceException(id, transactionId, transactionType, amount, balance, availableBalance);
         }
@@ -70,6 +78,7 @@ public class BankAccount extends AbstractAggregateRoot<String> {
         }
         applyEvent(new TransactionPreparationCommittedEvent(currentBalance, transactionPreparation));
     }
+    
     /**
      * 取消一笔预操作
      * @param transactionId
@@ -112,7 +121,6 @@ public class BankAccount extends AbstractAggregateRoot<String> {
             return balance;
         }
 
-    	double totalDebitTransactionPreparationAmount = 0D;
 //        foreach (double debitTransactionPreparation in _transactionPreparations.Values.Where(x => x.PreparationType == PreparationType.DebitPreparation))
 //        {
 //            totalDebitTransactionPreparationAmount += debitTransactionPreparation.Amount;
@@ -122,11 +130,13 @@ public class BankAccount extends AbstractAggregateRoot<String> {
 //		if(PreparationType.DebitPreparation.equals(transaction.getPreparationType()))
 //			totalDebitTransactionPreparationAmount += transaction.getAmount();
 //	});
+    	
+    	double totalDebitTransactionPreparationAmount = 0D;
     	Set<Entry<String, TransactionPreparation>> entrySet = transactionPreparations.entrySet();
     	for(Entry<String, TransactionPreparation> entry : entrySet) {
     		TransactionPreparation transaction = entry.getValue();
     		if(PreparationType.DebitPreparation.equals(transaction.getPreparationType()))
-			totalDebitTransactionPreparationAmount += transaction.getAmount();
+    			totalDebitTransactionPreparationAmount += transaction.getAmount();
     	}
 
         return balance - totalDebitTransactionPreparationAmount;

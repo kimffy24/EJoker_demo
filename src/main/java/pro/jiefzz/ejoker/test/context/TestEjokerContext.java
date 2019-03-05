@@ -26,7 +26,7 @@ public class TestEjokerContext {
 //				RegistCommandHandlerHelper.checkAndRegistCommandHandler(clazz);
 				RegistDomainEventHandlerHelper.checkAndRegistDomainEventHandler(clazz);
 			}
-			RegistMessageHandlerHelper.checkAndRegistMessageHandler(clazz);
+			RegistMessageHandlerHelper.checkAndRegistMessageHandler(context, clazz);
 		});
 
 		context.scanPackage("pro.jiefzz.ejoker.test.context");

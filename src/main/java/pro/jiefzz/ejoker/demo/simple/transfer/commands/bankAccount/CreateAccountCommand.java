@@ -7,7 +7,6 @@ public class CreateAccountCommand extends AbstractCommand {
 	private String owner;
 
 	public CreateAccountCommand() {
-		
 	}
 	
 	public CreateAccountCommand(String accountId, String owner) {

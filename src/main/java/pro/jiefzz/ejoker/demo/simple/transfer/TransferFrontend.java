@@ -21,6 +21,7 @@ import com.jiefzz.ejoker.z.common.service.IJSONConverter;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 
@@ -28,7 +29,9 @@ import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartD
  * 这是一个入口端的demo<br />
  * 主要用来创建账号和发送存款命令
  * <br />* env EJokerNodeAddr="192.168.199.123" mvn -Dmaven.test.skip=true clean compile exec:exec -Dexec.executable="java" -Dexec.args="-server -Xms2g -Xmx4g -Xmn3g -classpath %classpath pro.jiefzz.ejoker.demo.simple.transfer.TransferFrontend"
- * <br />* 远程调试添加到exec.args中 -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=7900,suspend=n
+ * <br />* 远程调试添加到exec.args中 
+
+
  * 
  * @author kimffy
  *
@@ -38,7 +41,7 @@ public class TransferFrontend {
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontend.class);
 
 	public static void main(String[] args) throws Exception {
-
+		start(TransferPrepare.prepare(new EJokerBootstrap()));
 	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
@@ -57,13 +60,12 @@ public class TransferFrontend {
 		System.out.println("====================== TransferAPP ======================");
 		System.out.println("");
 		
-		int accountLoop = 100000;
+		int accountLoop = 1;
 
 		String[] ids = new String[accountLoop];
 
 		for(int i=0; i<ids.length; i++) {
 			ids[i] = ObjectId.get().toHexString();
-			System.err.println(ids[i]);
 		}
 		
 		final SystemFutureWrapper[] sfws = new SystemFutureWrapper[accountLoop];
@@ -102,7 +104,7 @@ public class TransferFrontend {
 		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
-		int loop = 10;
+		int loop = 1;
 		int amount = loop*ids.length;
 		CountDownLatch cdl = new CountDownLatch(amount);
 		long t = System.currentTimeMillis();

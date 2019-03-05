@@ -1,135 +1,215 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.processManagers;
 
-import java.util.concurrent.atomic.AtomicLong;
+import static com.jiefzz.ejoker.z.common.system.extension.LangUtil.await;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.jiefzz.ejoker.commanding.ICommandService;
 import com.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.assemblies.MessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
+import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.helper.ForEachHelper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskStatus;
-import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
+import pro.jiefzz.ejoker.demo.simple.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
+import pro.jiefzz.ejoker.demo.simple.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.AddTransactionPreparationCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CommitTransactionPreparationCommand;
-import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.ConfirmDepositCommand;
-import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.ConfirmDepositPreparationCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.ValidateAccountCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.CancelTransferTransactionCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.ConfirmAccountValidatePassedCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.ConfirmTransferInCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.ConfirmTransferInPreparationCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.ConfirmTransferOutCommand;
+import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.ConfirmTransferOutPreparationCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.TransactionType;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.PreparationType;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.TransactionPreparation;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationAddedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationCommittedEvent;
-import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionPreparationCompletedEvent;
-import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionStartedEvent;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions.InsufficientBalanceException;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.TransferTransactionInfo;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.AccountValidatePassedConfirmCompletedEvent;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferInPreparationConfirmedEvent;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferOutPreparationConfirmedEvent;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferTransactionStartedEvent;
 
 @MessageHandler
 @EService
 public class DepositTransactionProcessManager extends AbstractMessageHandler {
-	
-	private final static Logger logger = LoggerFactory.getLogger(DepositTransactionProcessManager.class);
-
-	@Dependence
-	SystemAsyncHelper asyncHelper;
 
 	@Dependence
 	private ICommandService commandService;
-	
-	AtomicLong al1 = new AtomicLong(0);
-	AtomicLong al2 = new AtomicLong(0);
-	AtomicLong al3 = new AtomicLong(0);
-	AtomicLong al4 = new AtomicLong(0);
-	AtomicLong al5 = new AtomicLong(0);
-	AtomicLong al6 = new AtomicLong(0);
-	AtomicLong al7 = new AtomicLong(0);
-	AtomicLong al8 = new AtomicLong(0);
 
-	public void show1() {
-		logger.error("DepositTransactionStartedEvent hit: {}", al1.get());
-		logger.error("TransactionPreparationAddedEvent hit: {}", al2.get());
-		logger.error("DepositTransactionPreparationCompletedEvent hit: {}", al3.get());
-		logger.error("TransactionPreparationCommittedEvent hit: {}", al4.get());
-	}
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionStartedEvent evnt) {
+		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
 
-	public void show2() {
-		logger.error("AddTransactionPreparationCommand send: {}", al5.get());
-		logger.error("ConfirmDepositPreparationCommand send: {}", al6.get());
-		logger.error("CommitTransactionPreparationCommand send: {}", al7.get());
-		logger.error("ConfirmDepositCommand send: {} \n", al8.get());
-	}
+		ValidateAccountCommand validateSourceAccountCommand = new ValidateAccountCommand(
+				transactionInfo.getSourceAccountId(), evnt.getAggregateRootId());
+		validateSourceAccountCommand.setId(evnt.getId());
+		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync1 = commandService.sendAsync(validateSourceAccountCommand);
 
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionStartedEvent evnt) {
-		al1.getAndIncrement();
-		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(evnt.getAccountId(),
-				evnt.getAggregateRootId(), TransactionType.DepositTransaction, PreparationType.CreditPreparation,
-				evnt.getAmount());
-		cmd.setId(evnt.getId());
-		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync = commandService.sendAsync(cmd);
-		asyncHelper.submit(() -> {
-			AsyncTaskResult<Void> asyncTaskResult = sendAsync.get();
-			if(AsyncTaskStatus.Success.equals(asyncTaskResult.getStatus()))
-				al5.getAndIncrement();
-				;
+		ValidateAccountCommand validateTargetAccountCommand = new ValidateAccountCommand(
+				transactionInfo.getTargetAccountId(), evnt.getAggregateRootId());
+		validateTargetAccountCommand.setId(evnt.getId());
+		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync2 = commandService.sendAsync(validateTargetAccountCommand);
+
+		// 没用CompletableFuture，所以没有相关的串联的状态判断和等待
+		AsyncTaskResult<Void> r1 = await(sendAsync1);
+		AsyncTaskResult<Void> r2 = await(sendAsync2);
+
+		AtomicBoolean faild = new AtomicBoolean(false);
+		AtomicBoolean ioException = new AtomicBoolean(false);
+		StringBuffer eMessageSb = new StringBuffer();
+		ForEachHelper.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
+			if (AsyncTaskStatus.Failed.equals(r.getStatus())) {
+				faild.set(true);
+				eMessageSb.append(r.getErrorMessage());
+				eMessageSb.append("| ");
+			}
+			if (AsyncTaskStatus.IOException.equals(r.getStatus())) {
+				ioException.set(true);
+				eMessageSb.append(r.getErrorMessage());
+				eMessageSb.append("| ");
+			}
 		});
-		return sendAsync;
+		if (faild.get()) {
+			return new SystemFutureWrapper<>(
+					EJokerFutureTaskUtil.createFutureDirectly(AsyncTaskStatus.Failed, eMessageSb.toString()));
+		}
+		if (ioException.get()) {
+			return new SystemFutureWrapper<>(
+					EJokerFutureTaskUtil.createFutureDirectly(AsyncTaskStatus.IOException, eMessageSb.toString()));
+		}
+
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
+	}
+
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedMessage message) {
+		ConfirmAccountValidatePassedCommand cmd = new ConfirmAccountValidatePassedCommand(message.getTransactionId(),
+				message.getAccountId());
+		cmd.setId(message.getId());
+		return commandService.sendAsync(cmd);
+	}
+
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidateFailedMessage message) {
+		CancelTransferTransactionCommand cmd = new CancelTransferTransactionCommand(message.getTransactionId());
+		cmd.setId(message.getId());
+		return commandService.sendAsync(cmd);
+	}
+
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedConfirmCompletedEvent evnt) {
+		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(
+				evnt.getTransactionInfo().getSourceAccountId(), evnt.getAggregateRootId(),
+				TransactionType.TransferTransaction, PreparationType.DebitPreparation,
+				evnt.getTransactionInfo().getAmount());
+		cmd.setId(evnt.getId());
+		return commandService.sendAsync(cmd);
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
-		al2.getAndIncrement();
-		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
-				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
-			ConfirmDepositPreparationCommand command = new ConfirmDepositPreparationCommand(
-					evnt.getTransactionPreparation().getTransactionId());
-			command.setId(evnt.getId());
-			SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync = commandService.sendAsync(command);
-			asyncHelper.submit(() -> {
-				AsyncTaskResult<Void> asyncTaskResult = sendAsync.get();
-				if(AsyncTaskStatus.Success.equals(asyncTaskResult.getStatus()))
-					al6.getAndIncrement();
-					;
-			});
-			return sendAsync;
+		TransactionPreparation transactionPreparation = evnt.getTransactionPreparation();
+		if (TransactionType.TransferTransaction.equals(transactionPreparation.getTransactionType())) {
+			if (PreparationType.DebitPreparation.equals(transactionPreparation.getPreparationType())) {
+				ConfirmTransferOutPreparationCommand cmd = new ConfirmTransferOutPreparationCommand(
+						transactionPreparation.getTransactionId());
+				cmd.setId(evnt.getId());
+				return commandService.sendAsync(cmd);
+			} else if (PreparationType.CreditPreparation.equals(transactionPreparation.getPreparationType())) {
+				ConfirmTransferInPreparationCommand cmd = new ConfirmTransferInPreparationCommand(
+						transactionPreparation.getTransactionId());
+				cmd.setId(evnt.getId());
+				return commandService.sendAsync(cmd);
+			}
 		}
-		
-		return SystemFutureWrapperUtil.createCompleteFuture(null);
+
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
+
 	}
 
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionPreparationCompletedEvent evnt) {
-		al3.getAndIncrement();
-		CommitTransactionPreparationCommand cmd = new CommitTransactionPreparationCommand(evnt.getAccountId(),
-				evnt.getAggregateRootId());
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
+		if (TransactionType.TransferTransaction.equals(exception.getTransactionType())) {
+			CancelTransferTransactionCommand cmd = new CancelTransferTransactionCommand(exception.getTransactionId());
+			cmd.setId(exception.getId());
+			return commandService.sendAsync(cmd);
+		}
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
+	}
+
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferOutPreparationConfirmedEvent evnt) {
+		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(
+				evnt.getTransactionInfo().getTargetAccountId(), evnt.getAggregateRootId(),
+				TransactionType.TransferTransaction, PreparationType.CreditPreparation,
+				evnt.getTransactionInfo().getAmount());
 		cmd.setId(evnt.getId());
-		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync = commandService.sendAsync(cmd);
-		asyncHelper.submit(() -> {
-			AsyncTaskResult<Void> asyncTaskResult = sendAsync.get();
-			if(AsyncTaskStatus.Success.equals(asyncTaskResult.getStatus()))
-				al7.getAndIncrement();
-				;
+		return commandService.sendAsync(cmd);
+	}
+
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferInPreparationConfirmedEvent evnt) {
+
+		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
+
+		CommitTransactionPreparationCommand cmd1 = new CommitTransactionPreparationCommand(
+				transactionInfo.getSourceAccountId(), evnt.getAggregateRootId());
+		cmd1.setId(evnt.getId());
+		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync1 = commandService.sendAsync(cmd1);
+
+		CommitTransactionPreparationCommand cmd2 = new CommitTransactionPreparationCommand(
+				transactionInfo.getTargetAccountId(), evnt.getAggregateRootId());
+		cmd2.setId(evnt.getId());
+		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync2 = commandService.sendAsync(cmd2);
+
+		// 没用CompletableFuture，所以没有相关的串联的状态判断和等待
+		AsyncTaskResult<Void> r1 = await(sendAsync1);
+		AsyncTaskResult<Void> r2 = await(sendAsync2);
+
+		AtomicBoolean faild = new AtomicBoolean(false);
+		AtomicBoolean ioException = new AtomicBoolean(false);
+		StringBuffer eMessageSb = new StringBuffer();
+		ForEachHelper.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
+			if (AsyncTaskStatus.Failed.equals(r.getStatus())) {
+				faild.set(true);
+				eMessageSb.append(r.getErrorMessage());
+				eMessageSb.append("| ");
+			}
+			if (AsyncTaskStatus.IOException.equals(r.getStatus())) {
+				ioException.set(true);
+				eMessageSb.append(r.getErrorMessage());
+				eMessageSb.append("| ");
+			}
 		});
-		return sendAsync;
+		if (faild.get()) {
+			return new SystemFutureWrapper<>(
+					EJokerFutureTaskUtil.createFutureDirectly(AsyncTaskStatus.Failed, eMessageSb.toString()));
+		}
+		if (ioException.get()) {
+			return new SystemFutureWrapper<>(
+					EJokerFutureTaskUtil.createFutureDirectly(AsyncTaskStatus.IOException, eMessageSb.toString()));
+		}
+
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
+
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
-		al4.getAndIncrement();
-		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
-				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
-			ConfirmDepositCommand command = new ConfirmDepositCommand(
-					evnt.getTransactionPreparation().getTransactionId());
-			command.setId(evnt.getId());
-			SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync = commandService.sendAsync(command);
-			asyncHelper.submit(() -> {
-				AsyncTaskResult<Void> asyncTaskResult = sendAsync.get();
-				if(AsyncTaskStatus.Success.equals(asyncTaskResult.getStatus()))
-					al8.getAndIncrement();
-					;
-			});
-			return sendAsync;
+		TransactionPreparation transactionPreparation = evnt.getTransactionPreparation();
+		if (TransactionType.TransferTransaction.equals(transactionPreparation.getTransactionType())) {
+			if (PreparationType.DebitPreparation.equals(transactionPreparation.getPreparationType())) {
+				ConfirmTransferOutCommand cmd = new ConfirmTransferOutCommand(
+						transactionPreparation.getTransactionId());
+				cmd.setId(evnt.getId());
+				return commandService.sendAsync(cmd);
+			} else if (PreparationType.CreditPreparation.equals(transactionPreparation.getPreparationType())) {
+				ConfirmTransferInCommand cmd = new ConfirmTransferInCommand(transactionPreparation.getTransactionId());
+				cmd.setId(evnt.getId());
+				return commandService.sendAsync(cmd);
+			}
 		}
-
-		return SystemFutureWrapperUtil.createCompleteFuture(null);
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 }

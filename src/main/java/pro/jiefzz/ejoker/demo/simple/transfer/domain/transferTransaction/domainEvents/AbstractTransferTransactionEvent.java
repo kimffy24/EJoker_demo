@@ -8,7 +8,9 @@ public abstract class AbstractTransferTransactionEvent extends AbstractDomainEve
 
 	private TransferTransactionInfo transactionInfo;
 	
-    public AbstractTransferTransactionEvent() { }
+    public AbstractTransferTransactionEvent() {
+    }
+    
     public AbstractTransferTransactionEvent(TransferTransactionInfo transactionInfo) {
         this.transactionInfo = transactionInfo;
     }

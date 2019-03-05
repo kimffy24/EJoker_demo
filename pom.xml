@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>com.jiefzz</groupId>
 			<artifactId>ejoker</artifactId>
-			<version>0.3.3-SNAPSHOT</version>
+			<version>1.0.0-ALPHA</version>
 		</dependency>
 
 	</dependencies>

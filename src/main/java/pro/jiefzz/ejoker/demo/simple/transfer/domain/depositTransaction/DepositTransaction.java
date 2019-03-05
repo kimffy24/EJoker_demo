@@ -8,11 +8,17 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEv
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionPreparationCompletedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionStartedEvent;
 
+/**
+ * 聚合根，表示一笔银行存款交易
+ * @author kimffy
+ *
+ */
 @AggregateRoot
 public class DepositTransaction extends AbstractAggregateRoot<String> {
 
 	private String accountId;
 
+	@SuppressWarnings("unused")
 	private double amount;
 
 	private TransactionStatus status;

@@ -9,7 +9,9 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.Transfe
  */
 public class SourceAccountValidatePassedConfirmedEvent extends AbstractTransferTransactionEvent {
 
-	public SourceAccountValidatePassedConfirmedEvent() { }
+	public SourceAccountValidatePassedConfirmedEvent() {
+	}
+
 	public SourceAccountValidatePassedConfirmedEvent(TransferTransactionInfo transactionInfo) {
 		super(transactionInfo);
 	}

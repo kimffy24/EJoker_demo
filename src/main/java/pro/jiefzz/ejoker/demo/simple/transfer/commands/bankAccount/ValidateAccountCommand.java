@@ -4,7 +4,7 @@ import com.jiefzz.ejoker.commanding.AbstractCommand;
 
 public class ValidateAccountCommand extends AbstractCommand {
 
-	public String transactionId;
+	private String transactionId;
 
 	public ValidateAccountCommand() {
 	}

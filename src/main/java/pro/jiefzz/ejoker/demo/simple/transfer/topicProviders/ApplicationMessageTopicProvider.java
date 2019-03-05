@@ -6,12 +6,14 @@ import com.jiefzz.ejoker.infrastructure.varieties.applicationMessage.IApplicatio
 import com.jiefzz.ejoker.queue.ITopicProvider;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
 
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;
+
 @EService
 public class ApplicationMessageTopicProvider implements ITopicProvider<IApplicationMessage> {
 
 	@Override
 	public String getTopic(IApplicationMessage source) {
-		return "TopicEJokerApplicationMessage";
+		return TopicReference.ApplicationMessageTopic;
 	}
 
 	@Override

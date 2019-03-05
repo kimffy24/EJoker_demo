@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+
 /**
  * 这是个 1/2 Q端 消费queueId为单数的队列
  */
@@ -17,7 +19,7 @@ public class TransferN0_2 {
 	private final static  Logger logger = LoggerFactory.getLogger(TransferN0_2.class);
 
 	public static void main(String[] args) throws Exception {
-		start(new EJokerBootstrap());
+		start(TransferPrepare.prepare(new EJokerBootstrap()));
 	}
 	
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {

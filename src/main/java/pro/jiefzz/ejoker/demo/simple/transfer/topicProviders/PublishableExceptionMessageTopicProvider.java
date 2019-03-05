@@ -6,12 +6,14 @@ import com.jiefzz.ejoker.infrastructure.varieties.publishableExceptionMessage.IP
 import com.jiefzz.ejoker.queue.ITopicProvider;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
 
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;
+
 @EService
 public class PublishableExceptionMessageTopicProvider implements ITopicProvider<IPublishableException> {
 
 	@Override
 	public String getTopic(IPublishableException source) {
-		return "TopicEJokerPublishableException";
+		return TopicReference.ExceptionTopic;
 	}
 
 	@Override
