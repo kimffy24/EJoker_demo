@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.equasar;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferApp;
+import pro.jiefzz.ejoker.demo.simple.transfer.TransferAppPerformanceTest;
 import pro.jiefzz.ejoker.demo.simple.transfer.TransferPrepare;
 
 /**
@@ -9,11 +9,11 @@ import pro.jiefzz.ejoker.demo.simple.transfer.TransferPrepare;
  * @param args
  * @throws Exception
  */
-public class TransferAppQuasar {
+public class TransferAppPerformanceTestQuasar {
 
 	public static void main(String[] args) throws Exception {
 		
-		TransferApp.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
+		TransferAppPerformanceTest.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
 		
 	}
 }

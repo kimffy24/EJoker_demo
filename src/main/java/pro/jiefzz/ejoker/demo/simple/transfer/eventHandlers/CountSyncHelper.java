@@ -1,5 +1,7 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.eventHandlers;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
@@ -11,6 +13,8 @@ import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWra
 import com.jiefzz.ejoker.z.common.system.wrapper.CountDownLatchWrapper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 
+import co.paralleluniverse.fibers.Suspendable;
+import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
 
 @MessageHandler
@@ -20,11 +24,13 @@ public class CountSyncHelper extends AbstractMessageHandler {
 	private Object waitHandle = CountDownLatchWrapper.newCountDownLatch();
 	private int expectedCount;
 	private AtomicInteger currentCount = new AtomicInteger(0);
+	private Set<String> markBefore = new HashSet<>();
 
-	public void SetExpectedCount(int expectedCount) {
+	public void setExpectedCount(int expectedCount) {
 		this.expectedCount = expectedCount;
 	}
 
+	@Suspendable
 	public void waitOne() {
 		try {
 			CountDownLatchWrapper.await(waitHandle);
@@ -33,10 +39,23 @@ public class CountSyncHelper extends AbstractMessageHandler {
 		}
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent message) {
 		int currentCount = this.currentCount.incrementAndGet();
 		if (currentCount == expectedCount) {
 			CountDownLatchWrapper.countDown(waitHandle);
+		}
+		return SystemFutureWrapperUtil.createCompleteFutureTask();
+	}
+
+	@Suspendable
+	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
+		if(!markBefore.contains(message.getAggregateRootId())) {
+			markBefore.add(message.getAggregateRootId());
+			int currentCount = this.currentCount.incrementAndGet();
+			if (currentCount == expectedCount) {
+				CountDownLatchWrapper.countDown(waitHandle);
+			}
 		}
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}

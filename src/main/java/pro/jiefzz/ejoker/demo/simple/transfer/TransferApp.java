@@ -3,6 +3,8 @@ package pro.jiefzz.ejoker.demo.simple.transfer;
 import java.util.concurrent.TimeUnit;
 
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jiefzz.ejoker.commanding.CommandReturnType;
 import com.jiefzz.ejoker.queue.command.CommandService;
@@ -17,6 +19,8 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.Transfe
 import pro.jiefzz.ejoker.demo.simple.transfer.eventHandlers.SyncHelper;
 
 public class TransferApp {
+	
+	private final static Logger logger = LoggerFactory.getLogger(TransferApp.class);
 	
 	public static void main(String[] args) throws Exception {
 		start(TransferPrepare.prepare(new EJokerBootstrap()));
@@ -65,8 +69,8 @@ public class TransferApp {
         syncHelper.waitOne();
 
         SleepWrapper.sleep(TimeUnit.SECONDS, 1l);
-        
-        System.out.println("完成");
+
+        logger.info("All OK.");
 
 	}
 }

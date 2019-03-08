@@ -16,6 +16,7 @@ import com.jiefzz.ejoker.z.common.system.helper.ForEachHelper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskStatus;
 
+import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.demo.simple.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
 import pro.jiefzz.ejoker.demo.simple.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.AddTransactionPreparationCommand;
@@ -46,6 +47,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 	@Dependence
 	private ICommandService commandService;
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionStartedEvent evnt) {
 		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
 
@@ -90,6 +92,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedMessage message) {
 		ConfirmAccountValidatePassedCommand cmd = new ConfirmAccountValidatePassedCommand(message.getTransactionId(),
 				message.getAccountId());
@@ -97,12 +100,14 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 		return commandService.sendAsync(cmd);
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidateFailedMessage message) {
 		CancelTransferTransactionCommand cmd = new CancelTransferTransactionCommand(message.getTransactionId());
 		cmd.setId(message.getId());
 		return commandService.sendAsync(cmd);
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedConfirmCompletedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(
 				evnt.getTransactionInfo().getSourceAccountId(), evnt.getAggregateRootId(),
@@ -112,6 +117,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 		return commandService.sendAsync(cmd);
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
 		TransactionPreparation transactionPreparation = evnt.getTransactionPreparation();
 		if (TransactionType.TransferTransaction.equals(transactionPreparation.getTransactionType())) {
@@ -132,6 +138,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
 		if (TransactionType.TransferTransaction.equals(exception.getTransactionType())) {
 			CancelTransferTransactionCommand cmd = new CancelTransferTransactionCommand(exception.getTransactionId());
@@ -141,6 +148,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferOutPreparationConfirmedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(
 				evnt.getTransactionInfo().getTargetAccountId(), evnt.getAggregateRootId(),
@@ -150,6 +158,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 		return commandService.sendAsync(cmd);
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferInPreparationConfirmedEvent evnt) {
 
 		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
@@ -196,6 +205,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
 		TransactionPreparation transactionPreparation = evnt.getTransactionPreparation();
 		if (TransactionType.TransferTransaction.equals(transactionPreparation.getTransactionType())) {

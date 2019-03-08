@@ -9,6 +9,7 @@ import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWra
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 
+import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.AddTransactionPreparationCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CommitTransactionPreparationCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.ConfirmDepositCommand;
@@ -27,6 +28,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 	@Dependence
 	private ICommandService commandService;
 	
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionStartedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(evnt.getAccountId(),
 				evnt.getAggregateRootId(), TransactionType.DepositTransaction, PreparationType.CreditPreparation,
@@ -35,6 +37,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		return commandService.sendAsync(cmd);
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
 				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
@@ -46,6 +49,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionPreparationCompletedEvent evnt) {
 		CommitTransactionPreparationCommand cmd = new CommitTransactionPreparationCommand(evnt.getAccountId(),
 				evnt.getAggregateRootId());
@@ -53,6 +57,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		return commandService.sendAsync(cmd);
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
 				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {

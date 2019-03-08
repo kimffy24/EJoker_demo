@@ -1,5 +1,6 @@
-package pro.jiefzz.ejoker.demo.completion;
+package pro.jiefzz.ejoker.demo.completion.mongo.mongoSync;
 
+import static com.jiefzz.ejoker.z.common.system.extension.LangUtil.await;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
@@ -10,6 +11,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -20,17 +23,24 @@ import com.jiefzz.ejoker.eventing.EventAppendResult;
 import com.jiefzz.ejoker.eventing.IDomainEvent;
 import com.jiefzz.ejoker.eventing.IEventSerializer;
 import com.jiefzz.ejoker.eventing.IEventStore;
-import com.jiefzz.ejoker.infrastructure.ITypeNameProvider;
 import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
+import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoWriteException;
+import com.mongodb.bulk.BulkWriteError;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.BulkWriteOptions;
+import com.mongodb.client.model.InsertOneModel;
+import com.mongodb.client.model.WriteModel;
+
+import co.paralleluniverse.fibers.Suspendable;
 
 @EService
 public class MongoEventStore implements IEventStore {
@@ -62,40 +72,73 @@ public class MongoEventStore implements IEventStore {
 
 	@Override
 	public boolean isSupportBatchAppendEvent() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public void setSupportBatchAppendEvent(boolean supportBatchAppendEvent) {
-		;
 	}
 
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> batchAppendAsync(
 			LinkedHashSet<DomainEventStream> eventStreams) {
-		return null;
+		return SystemFutureWrapperUtil.createCompleteFutureTask(
+				await(
+						mongoProvider.submitWithInnerExector(
+								() -> batchAppend(eventStreams)
+								)
+						)
+				);
 	}
 
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> appendAsync(DomainEventStream eventStream) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(append(eventStream));
+		return SystemFutureWrapperUtil.createCompleteFutureTask(
+				await(
+						mongoProvider.submitWithInnerExector(
+								() -> append(eventStream)
+								)
+						)
+				);
 	}
 
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, long version) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(find(aggregateRootId, version));
+		return SystemFutureWrapperUtil.createCompleteFutureTask(
+				await(
+						mongoProvider.submitWithInnerExector(
+								() -> find(aggregateRootId, version)
+								)
+						)
+				);
 	}
 
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, String commandId) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(find(aggregateRootId, commandId));
+		return SystemFutureWrapperUtil.createCompleteFutureTask(
+				await(
+						mongoProvider.submitWithInnerExector(
+								() -> find(aggregateRootId, commandId)
+								)
+						)
+				);
 	}
 
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<Collection<DomainEventStream>>> queryAggregateEventsAsync(
 			String aggregateRootId, String aggregateRootTypeName, long minVersion, long maxVersion) {
-		Collection<DomainEventStream> queryAggregateEvents = queryAggregateEvents(aggregateRootId, aggregateRootTypeName, minVersion, maxVersion);
-		return SystemFutureWrapperUtil.createCompleteFutureTask(queryAggregateEvents);
+		return SystemFutureWrapperUtil.createCompleteFutureTask(
+				await(
+						mongoProvider.submitWithInnerExector(
+								() -> queryAggregateEvents(aggregateRootId, aggregateRootTypeName, minVersion, maxVersion)
+								)
+						)
+				);
 	}
 	
 	/* private BasicDBObject legacyConvert(DomainEventStream des) {
@@ -157,9 +200,36 @@ public class MongoEventStore implements IEventStore {
 				srcEvents,
 				(Map<String, String> )doc.get("items"));
 	}
-
-	private EventAppendResult batchAppend(LinkedHashSet<DomainEventStream> eventStreams) {
-		throw new RuntimeException("Unsupport!!!");
+	
+	private BulkWriteOptions defaultOptions = new BulkWriteOptions().ordered(false);
+	
+	private EventAppendResult batchAppend(Set<DomainEventStream> eventStreams) {
+		
+		List<WriteModel<? extends Document>> requests = new ArrayList<>();
+		
+		for(DomainEventStream es : eventStreams) {
+			requests.add(new InsertOneModel<Document>(convert(es)));
+		}
+		
+		MongoCollection<Document> collection = mongoProvider.getCollection(collectionNameOfEventStream);
+		try {
+			collection.bulkWrite(requests, defaultOptions);
+			return EventAppendResult.Success;
+		} catch(MongoBulkWriteException e) {
+			List<BulkWriteError> writeErrors = e.getWriteErrors();
+			String message = writeErrors.iterator().next().getMessage();
+			if(null != message && message.startsWith("E11000 duplicate key")) {
+				if(message.contains(commandIndexName))
+					return EventAppendResult.DuplicateCommand;
+				else if(message.contains(versionIndexName))
+					return EventAppendResult.DuplicateEvent;
+			}
+            logger.error("Batch append event has storage exception.", e);
+			throw e;
+		} catch (RuntimeException e) {
+            logger.error("Batch append event has unknown exception.", e);
+            throw e;
+		}
 	}
 
 	private EventAppendResult append(DomainEventStream eventStream) {

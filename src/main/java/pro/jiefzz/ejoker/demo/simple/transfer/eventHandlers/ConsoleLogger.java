@@ -14,6 +14,7 @@ import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWra
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 
+import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.demo.simple.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
 import pro.jiefzz.ejoker.demo.simple.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.TransactionType;
@@ -46,6 +47,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 	}
 	//// for debug
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountCreatedEvent message) {
 		logger.info("创建账号成功: 账户={}, 所有者={}, ", message.getAggregateRootId(), message.getOwner());
 		{ /// for debug
@@ -54,17 +56,20 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedMessage message) {
 		logger.info("账户验证已通过，交易ID：{}，账户：{}", message.getTransactionId(), message.getAccountId());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidateFailedMessage message) {
 		logger.info("无效的银行账户，交易ID：{}，账户：{}，理由：{}", message.getTransactionId(), message.getAccountId(),
 				message.getReason());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
 		if (TransactionType.TransferTransaction.equals(evnt.getTransactionPreparation().getTransactionType())) {
 			if (PreparationType.DebitPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
@@ -80,6 +85,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())) {
 			if (PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
@@ -103,6 +109,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionStartedEvent evnt) {
 		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
 		logger.info("转账交易已开始，交易ID：{}，源账户：{}，目标账户：{}，转账金额：{}", evnt.getAggregateRootId(),
@@ -111,27 +118,32 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferOutPreparationConfirmedEvent evnt) {
 		logger.info("预转出确认成功，交易ID：{}，账户：{}", evnt.getAggregateRootId(), evnt.getTransactionInfo().getSourceAccountId());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferInPreparationConfirmedEvent evnt) {
 		logger.info("预转入确认成功，交易ID：{}，账户：{}", evnt.getAggregateRootId(), evnt.getTransactionInfo().getTargetAccountId());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent evnt) {
 		logger.info("转账交易已完成，交易ID：{}", evnt.getAggregateRootId());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
 		logger.info("账户的余额不足，交易ID：{}，账户：{}，可用余额：{}，转出金额：{}", exception.getTransactionId(), exception.getAccountId(),
 				exception.getCurrentAvailableBalance(), exception.getAmount());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
+	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCanceledEvent evnt) {
 		logger.info("转账交易已取消，交易ID：{}", evnt.getAggregateRootId());
 		return SystemFutureWrapperUtil.createCompleteFutureTask();

@@ -1,11 +1,13 @@
-package pro.jiefzz.ejoker.demo.completion;
+package pro.jiefzz.ejoker.demo.completion.mongo.mongoSync;
 
+import static com.jiefzz.ejoker.z.common.system.extension.LangUtil.await;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import com.jiefzz.ejoker.z.common.io.IOExceptionOnRuntime;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.RipenFuture;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskStatus;
 import com.mongodb.MongoWriteException;
@@ -25,13 +28,15 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 
+import co.paralleluniverse.fibers.Suspendable;
+
 @EService
 public class MongoPublicedVersionStore implements IPublishedVersionStore {
 	
 	private final static Logger logger = LoggerFactory.getLogger(MongoPublicedVersionStore.class);
 
 	@Dependence
-	MongoProvider mongoProvider;
+	private MongoProvider mongoProvider;
 
 	/**
 	 * db.PublicedVersionStore.createIndex({"aggregateRootId":1, "processorName":1, "version":1}, {backgroud: true, unique:true})
@@ -40,12 +45,13 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 	private final String aggregateVersionIndexName = "aggregateRootId_1_processorName_1_version_1";
 	
 	private final String collectionNameOfPublishedVersionStore = "PublicedVersionStore";
-	
+
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<Void>> updatePublishedVersionAsync(String processorName,
 			String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
 		try {
-			updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion);
+			await(mongoProvider.submitWithInnerExector(() -> updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion)));
 			return SystemFutureWrapperUtil.createCompleteFutureTask();
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Void>> ripenFuture = new RipenFuture<>();
@@ -53,12 +59,13 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 			return new SystemFutureWrapper<>(ripenFuture);
 		}
 	}
-
+	
+	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<Long>> getPublishedVersionAsync(String processorName,
 			String aggregateRootTypeName, String aggregateRootId) {
 		try {
-			long r = getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId);
+			long r = await(mongoProvider.submitWithInnerExector(() -> getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId)));
 			return SystemFutureWrapperUtil.createCompleteFutureTask(r);
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Long>> ripenFuture = new RipenFuture<>();
@@ -66,7 +73,7 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 			return new SystemFutureWrapper<>(ripenFuture);
 		}
 	}
-
+	
 	private void updatePublishedVersion(String processorName, String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
 //		
 //		DBCollection legacyCollection = mongoProvider.getLegacyCollection(getCollectionName(aggregateRootTypeName, processorName));
@@ -143,7 +150,7 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 		}
 		
 	}
-
+	
 	private long getPublishedVersion(String processorName, String aggregateRootTypeName, String aggregateRootId) {
 		long r = 0;
 //		{

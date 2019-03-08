@@ -71,11 +71,19 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>3.8.1</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-async -->
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-async</artifactId>
+			<version>3.8.2</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>com.jiefzz</groupId>
 			<artifactId>ejoker</artifactId>
-			<version>1.0.0-ALPHA</version>
+			<version>1.0.0-BETA</version>
 		</dependency>
 
 	</dependencies>

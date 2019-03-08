@@ -32,8 +32,8 @@ public class EJokerBootstrap {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(EJokerBootstrap.class);
 
-//	protected final static String EJokerDefaultImplPackage = "com.jiefzz.eDefaultImpl";
-	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion";
+	protected final static String EJokerDefaultImplPackage = "com.jiefzz.eDefaultImpl";
+//	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
