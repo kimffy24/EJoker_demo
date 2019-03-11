@@ -61,7 +61,7 @@ public class PullConsumer2 {
 					if(System.currentTimeMillis()%5 == 0)
 						contextQueue.offer(currentTuple);
 					else
-						currentTuple.currentContext.onMessageHandled(currentTuple.message);
+						currentTuple.currentContext.onMessageHandled();
 				}
 			}
 		}).start();
