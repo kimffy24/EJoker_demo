@@ -14,10 +14,10 @@ public class TestConsumer {
 		DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(
                 "rmq-group");
 
-        consumer.setNamesrvAddr("192.168.1.232:9876");
-        consumer.setClientIP("192.168.1.36");
+        consumer.setNamesrvAddr("test_sit_1:9876;test_rocketmq_2:9876");
+        consumer.setClientIP("192.168.199.163");
         consumer.setInstanceName("rmq-instance");
-        consumer.subscribe("TopicA-test", "TagA");
+        consumer.subscribe("ZTopicA-test", "TagA");
 
         consumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override

@@ -2,12 +2,17 @@ package pro.jiefzz.ejoker.demo.simple.transfer.commandHandlers;
 
 import static com.jiefzz.ejoker.z.common.system.extension.LangUtil.await;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jiefzz.ejoker.commanding.AbstractCommandHandler;
 import com.jiefzz.ejoker.commanding.ICommandContext;
 import com.jiefzz.ejoker.infrastructure.varieties.applicationMessage.AbstractApplicationMessage;
 import com.jiefzz.ejoker.infrastructure.varieties.applicationMessage.IApplicationMessage;
 import com.jiefzz.ejoker.z.common.context.annotation.assemblies.CommandHandler;
+import com.jiefzz.ejoker.z.common.context.annotation.context.Dependence;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
+import com.jiefzz.ejoker.z.common.service.IJSONConverter;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
@@ -25,6 +30,11 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.BankAccount;
 @CommandHandler
 public class BankAccountCommandHandler extends AbstractCommandHandler {
 
+	private final static  Logger logger = LoggerFactory.getLogger(BankAccountCommandHandler.class);
+			
+	@Dependence
+	IJSONConverter jsonConverter;
+	
 	@Suspendable
 	public void handle(ICommandContext context, CreateAccountCommand command) {
 		context.add(new BankAccount(command.getAggregateRootId(), command.getOwner()));
@@ -46,6 +56,9 @@ public class BankAccountCommandHandler extends AbstractCommandHandler {
 	@Suspendable
 	public void handle(ICommandContext context, AddTransactionPreparationCommand command) {
 		BankAccount account = await(context.getAsync(command.getAggregateRootId(), BankAccount.class));
+		if(null == account) {
+			logger.error("account == null, command: {}", jsonConverter.convert(command));
+		}
 		account.addTransactionPreparation(command.getTransactionId(), command.getTransactionType(),
 				command.getPreparationType(), command.getAmount());
 	}

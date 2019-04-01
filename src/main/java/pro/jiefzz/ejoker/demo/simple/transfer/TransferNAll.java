@@ -1,4 +1,9 @@
+
+
 package pro.jiefzz.ejoker.demo.simple.transfer;
+
+import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
+import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 
@@ -16,7 +21,15 @@ public class TransferNAll {
 	}
 	
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
-		TransferN0.start(eJokerFrameworkInitializer);
-		TransferN1.start(eJokerFrameworkInitializer);
+
+		eJokerFrameworkInitializer.initAll();
+		
+		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
+		IScheduleService scheduleService = eJokerContext.get(IScheduleService.class);
+
+		scheduleService.startTask("afrqgqhersxxzz", () -> {
+			DevUtils.moniterQ();
+		}, 1000l, 1000l);
+		
 	}
 }

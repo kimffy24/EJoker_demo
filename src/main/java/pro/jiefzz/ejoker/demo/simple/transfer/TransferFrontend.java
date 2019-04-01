@@ -60,7 +60,7 @@ public class TransferFrontend {
 		System.out.println("====================== TransferAPP ======================");
 		System.out.println("");
 		
-		int accountLoop = 1;
+		int accountLoop = 50000;
 
 		String[] ids = new String[accountLoop];
 
@@ -104,7 +104,7 @@ public class TransferFrontend {
 		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
-		int loop = 1;
+		int loop = 2;
 		int amount = loop*ids.length;
 		CountDownLatch cdl = new CountDownLatch(amount);
 		long t = System.currentTimeMillis();

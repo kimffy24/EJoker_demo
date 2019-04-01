@@ -16,6 +16,7 @@ import com.jiefzz.ejoker.queue.command.CommandResultProcessor;
 import com.jiefzz.ejoker.queue.command.CommandService;
 import com.jiefzz.ejoker.queue.completation.DefaultMQConsumer;
 import com.jiefzz.ejoker.queue.completation.DefaultMQProducer;
+import com.jiefzz.ejoker.queue.completation.MQInstanceHelper;
 import com.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
 import com.jiefzz.ejoker.queue.domainEvent.DomainEventPublisher;
 import com.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionConsumer;
@@ -23,7 +24,6 @@ import com.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionPublish
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 import com.jiefzz.ejoker.z.common.scavenger.Scavenger;
-import com.jiefzz.ejoker.z.common.system.functional.IFunction1;
 import com.jiefzz.ejoker.z.common.system.functional.IFunction3;
 import com.jiefzz.ejoker.z.common.system.helper.StringHelper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
@@ -37,7 +37,7 @@ public class EJokerBootstrap {
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
-	public final static String NameServAddr = "192.168.199.94:9876;192.168.199.123:9876";
+	public final static String NameServAddr = "test_rocketmq_2:9876;test_sit_1:9876";
 	
 	public final static String EJokerDomainEventConsumerGroup = "EjokerDomainEventConsumerGroup";
 	public final static String EJokerDomainEventProducerGroup = "EjokerDomainEventProducerGroup";
@@ -60,26 +60,6 @@ public class EJokerBootstrap {
 	
 	protected final SystemAsyncHelper systemAsyncHelper;
 	
-	protected final IFunction3<MessageQueue, List<MessageQueue>, Message, Object> mqSelector = 
-			(mqs, msg, extObj) -> {
-				String keys = msg.getKeys();
-				int mqIndex = 0;
-				if(StringHelper.isNullOrWhiteSpace(keys)) {
-					// 按时间选择
-					mqIndex = (int )System.currentTimeMillis()%mqs.size();
-				} else {
-					// 按哈希取模选择
-					// 这个位置可以按需要使用一致性哈希的选择逻辑
-					byte[] bytes = keys.getBytes();
-					int total = 0;
-					for(int i = 0; i<bytes.length; i++) {
-						total += bytes[i];
-					}
-					mqIndex = total%mqs.size();
-				}
-				return mqs.get(mqIndex);
-			};
-
 	protected final AtomicBoolean[] cTables = new AtomicBoolean[] {
 			new AtomicBoolean(false),	// 0 domain event consumer
 			new AtomicBoolean(false),	// 1 domain event producer
@@ -138,10 +118,7 @@ public class EJokerBootstrap {
 
 		// 启动命令跟踪反馈控制对象
 		CommandResultProcessor commandResultProcessor = eJokerContext.get(CommandResultProcessor.class);
-		{
-			commandResultProcessor.start();
-			scavenger.addFianllyJob(commandResultProcessor::shutdown);
-		}
+		commandResultProcessor.start();
 		return commandResultProcessor;
 		
 	}
@@ -149,21 +126,14 @@ public class EJokerBootstrap {
 	/* ========================= */
 	
 	public DomainEventConsumer initDomainEventConsumer() throws Exception {
-		return initDomainEventConsumer(mq -> true);
-	}
-
-	public DomainEventConsumer initDomainEventConsumer(IFunction1<Boolean, MessageQueue> queueMatcher) throws Exception {
 
 		// 启动领域事件消费者
 		DomainEventConsumer domainEventConsumer = eJokerContext.get(DomainEventConsumer.class);
 		if(cTables[0].compareAndSet(false, true)) {
-			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerDomainEventConsumerGroup);
-			defaultMQConsumer.setNamesrvAddr(NameServAddr);
-			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
-			defaultMQConsumer.useQueueSelector(queueMatcher);
-			
-			domainEventConsumer.useConsumer(defaultMQConsumer).subscribe(TopicReference.DomainEventTopic).start();
-			scavenger.addFianllyJob(domainEventConsumer::shutdown);
+			domainEventConsumer
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerDomainEventConsumerGroup, NameServAddr, eJokerContext))
+				.subscribe(TopicReference.DomainEventTopic)
+				.start();
 		}
 		return domainEventConsumer;
 		
@@ -174,12 +144,9 @@ public class EJokerBootstrap {
 		// 启动领域事件发布者
 		DomainEventPublisher domainEventPublisher = eJokerContext.get(DomainEventPublisher.class);
 		if(cTables[1].compareAndSet(false, true)) {
-			DefaultMQProducer defaultMQProducer = new DefaultMQProducer(EJokerDomainEventProducerGroup);
-			defaultMQProducer.setNamesrvAddr(NameServAddr);
-			defaultMQProducer.configureMQSelector(this.mqSelector);
-			
-			domainEventPublisher.useProducer(defaultMQProducer).start();
-			scavenger.addFianllyJob(defaultMQProducer::shutdown);
+			domainEventPublisher
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerDomainEventProducerGroup, NameServAddr, eJokerContext))
+				.start();
 		}
 		return domainEventPublisher;
 		
@@ -188,28 +155,14 @@ public class EJokerBootstrap {
 	/* ========================= */
 
 	public CommandConsumer initCommandConsumer() throws Exception {
-		return initCommandConsumer(mq -> true);
-	}
-	
-	public CommandConsumer initCommandConsumer(IFunction1<Boolean, MessageQueue> queueMatcher) throws Exception {
 
 		// 启动命令消费者
 		CommandConsumer commandConsumer = eJokerContext.get(CommandConsumer.class);
 		if(cTables[2].compareAndSet(false, true)) {
-			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerCommandConsumerGroup);
-			defaultMQConsumer.setNamesrvAddr(NameServAddr);
-			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
-			defaultMQConsumer.useQueueSelector(queueMatcher);
-			
-//			defaultMQConsumer.configureFlowControl(true);
-//			defaultMQConsumer.useFlowControlSwitch((mq, amount, loopCount) -> {
-//				if(amount - 75000 > 0)
-//					return true;
-//				return false;
-//			});
-			
-			commandConsumer.useConsumer(defaultMQConsumer).subscribe(TopicReference.CommandTopic).start();
-			scavenger.addFianllyJob(commandConsumer::shutdown);
+			commandConsumer
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerCommandConsumerGroup, NameServAddr, eJokerContext))
+				.subscribe(TopicReference.CommandTopic)
+				.start();
 		}
 		return commandConsumer;
 		
@@ -219,15 +172,10 @@ public class EJokerBootstrap {
 		// 启动命令服务
 		CommandService commandService = eJokerContext.get(CommandService.class);
 		if(cTables[3].compareAndSet(false, true)) {
-
 			initCommandResultProcessor();
-			
-			DefaultMQProducer defaultMQProducer = new DefaultMQProducer(EJokerCommandProducerGroup);
-			defaultMQProducer.setNamesrvAddr(NameServAddr);
-			defaultMQProducer.configureMQSelector(this.mqSelector);
-			
-			commandService.useProducer(defaultMQProducer).start();
-			scavenger.addFianllyJob(commandService::shutdown);
+			commandService
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerCommandProducerGroup, NameServAddr, eJokerContext))
+				.start();
 		}
 		return commandService;
 	}
@@ -235,21 +183,14 @@ public class EJokerBootstrap {
 	/* ========================= */
 
 	public ApplicationMessageConsumer initApplicationMessageConsumer() throws Exception {
-		return initApplicationMessageConsumer(mq -> true);
-	}
-
-	public ApplicationMessageConsumer initApplicationMessageConsumer(IFunction1<Boolean, MessageQueue> queueMatcher) throws Exception {
 
 		// 启动应用信息消费者
 		ApplicationMessageConsumer applicationMessageConsumer = eJokerContext.get(ApplicationMessageConsumer.class);
 		if(cTables[4].compareAndSet(false, true)) {
-			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerApplicationMessageConsumerGroup);
-			defaultMQConsumer.setNamesrvAddr(NameServAddr);
-			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
-			defaultMQConsumer.useQueueSelector(queueMatcher);
-			
-			applicationMessageConsumer.useConsumer(defaultMQConsumer).subscribe(TopicReference.ApplicationMessageTopic).start();
-			scavenger.addFianllyJob(applicationMessageConsumer::shutdown);
+			applicationMessageConsumer
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerApplicationMessageConsumerGroup, NameServAddr, eJokerContext))
+				.subscribe(TopicReference.ApplicationMessageTopic)
+				.start();
 		}
 		return applicationMessageConsumer;
 		
@@ -259,12 +200,9 @@ public class EJokerBootstrap {
 		// 启动应用信息生产者
 		ApplicationMessagePublisher applicationMessageProducer = eJokerContext.get(ApplicationMessagePublisher.class);
 		if(cTables[5].compareAndSet(false, true)) {
-			DefaultMQProducer defaultMQProducer = new DefaultMQProducer(EJokerApplicationMessageProducerGroup);
-			defaultMQProducer.setNamesrvAddr(NameServAddr);
-			defaultMQProducer.configureMQSelector(this.mqSelector);
-			
-			applicationMessageProducer.useProducer(defaultMQProducer).start();
-			scavenger.addFianllyJob(applicationMessageProducer::shutdown);
+			applicationMessageProducer
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerApplicationMessageProducerGroup, NameServAddr, eJokerContext))
+				.start();
 		}
 		return applicationMessageProducer;
 	}
@@ -272,21 +210,14 @@ public class EJokerBootstrap {
 	/* ========================= */
 
 	public PublishableExceptionConsumer initPublishableExceptionConsumer() throws Exception {
-		return initPublishableExceptionConsumer(mq -> true);
-	}
-
-	public PublishableExceptionConsumer initPublishableExceptionConsumer(IFunction1<Boolean, MessageQueue> queueMatcher) throws Exception {
 
 		// 启动可发布异常消费者
 		PublishableExceptionConsumer publishableExceptionConsumer = eJokerContext.get(PublishableExceptionConsumer.class);
 		if(cTables[6].compareAndSet(false, true)) {
-			DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer(EJokerPublishableExceptionConsumerGroup);
-			defaultMQConsumer.setNamesrvAddr(NameServAddr);
-			defaultMQConsumer.useSubmiter(vf -> systemAsyncHelper.submit(vf::trigger));
-			defaultMQConsumer.useQueueSelector(queueMatcher);
-			
-			publishableExceptionConsumer.useConsumer(defaultMQConsumer).subscribe(TopicReference.ExceptionTopic).start();
-			scavenger.addFianllyJob(publishableExceptionConsumer::shutdown);
+			publishableExceptionConsumer
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerPublishableExceptionConsumerGroup, NameServAddr, eJokerContext))
+				.subscribe(TopicReference.ExceptionTopic)
+				.start();
 		}
 		return publishableExceptionConsumer;
 		
@@ -296,13 +227,11 @@ public class EJokerBootstrap {
 		// 启动可发布异常生产者
 		PublishableExceptionPublisher publishableExceptionProducer = eJokerContext.get(PublishableExceptionPublisher.class);
 		if(cTables[7].compareAndSet(false, true)) {
-			DefaultMQProducer defaultMQProducer = new DefaultMQProducer(EJokerPublishableExceptionProducerGroup);
-			defaultMQProducer.setNamesrvAddr(NameServAddr);
-			defaultMQProducer.configureMQSelector(this.mqSelector);
-			
-			publishableExceptionProducer.useProducer(defaultMQProducer).start();
-			scavenger.addFianllyJob(publishableExceptionProducer::shutdown);
+			publishableExceptionProducer
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerPublishableExceptionProducerGroup, NameServAddr, eJokerContext))
+				.start();
 		}
 		return publishableExceptionProducer;
 	}
+	
 }

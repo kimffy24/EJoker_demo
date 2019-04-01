@@ -24,7 +24,7 @@ import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.Confir
 
  * 
  * @author kimffy
- *
+ * 测试saga过程中断后，通过主动补偿执行在中断处的命令，让过程继续。
  */
 public class TransferFrontendCompensation {
 	

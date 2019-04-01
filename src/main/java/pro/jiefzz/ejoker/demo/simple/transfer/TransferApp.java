@@ -1,17 +1,24 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.common.message.MessageQueue;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jiefzz.ejoker.commanding.CommandReturnType;
+import com.jiefzz.ejoker.queue.command.CommandConsumer;
 import com.jiefzz.ejoker.queue.command.CommandService;
+import com.jiefzz.ejoker.queue.completation.DefaultMQConsumer;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
+import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.transferTransaction.StartTransferTransactionCommand;
@@ -30,6 +37,23 @@ public class TransferApp {
 		eJokerFrameworkInitializer.initAll();
 		
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
+		
+//		{
+//			IScheduleService scheduleService = eJokerContext.get(IScheduleService.class);
+//			CommandConsumer commandConsumer = eJokerContext.get(CommandConsumer.class);
+//			final DefaultMQConsumer deeplyConsumer = (DefaultMQConsumer )commandConsumer.getDeeplyConsumer();
+//			scheduleService.startTask("testRebalance", () -> {
+//				try {
+//					Set<MessageQueue> fetchMessageQueuesInBalance = deeplyConsumer.fetchMessageQueuesInBalance(TopicReference.CommandTopic);
+//					System.err.println("fetchMessageQueuesInBalance.hash(): " + fetchMessageQueuesInBalance.hashCode());
+//				} catch (MQClientException e) {
+//					e.printStackTrace();
+//				}
+//				
+//			}, 5000l, 1000l);
+//			
+//		}
+		
 		
 		CommandService commandService = eJokerContext.get(CommandService.class);
 		SyncHelper syncHelper = eJokerContext.get(SyncHelper.class);

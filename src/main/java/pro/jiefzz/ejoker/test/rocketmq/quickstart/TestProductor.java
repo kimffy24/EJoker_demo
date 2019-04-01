@@ -8,15 +8,17 @@ import org.apache.rocketmq.common.message.Message;
 public class TestProductor {
 
 	public static void main(String[] args) throws Exception {
-		DefaultMQProducer producer = new DefaultMQProducer("rmq-group");
-		producer.setNamesrvAddr("192.168.1.232:9876");
-		producer.setClientIP("192.168.1.36");
-		producer.setInstanceName("rmq-instance");
+		DefaultMQProducer producer = new DefaultMQProducer("rmq-group-p");
+
+		producer.setNamesrvAddr("test_sit_1:9876;test_rocketmq_2:9876");
+		producer.setClientIP("192.168.199.163");
+		producer.setInstanceName("rmq-instance-p");
+        
 		producer.start();
 		System.out.println("ClientIP: " +producer.getClientIP());
 		try {
 			for (int i = 0; i < 3; i++) {
-				Message msg = new Message("TopicA-test", // topic
+				Message msg = new Message("ZTopicA-test", // topic
 						"TagA", // tag
 						(new Date() + "Hello RocketMQ ,QuickStart" + i).getBytes()// body
 				);
