@@ -1,13 +1,11 @@
 package pro.jiefzz.ejoker.demo.simple.transfer;
 
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
-import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
-import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
-import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
-import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
+import org.apache.rocketmq.common.message.MessageQueue;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;
@@ -22,10 +20,10 @@ public class TransferTestLajiMessageConsumer {
 	public static void main(String[] args) throws Exception {
 		
 		String[][] tuples = new String [][] {
-			new String[] {EJokerBootstrap.EJokerDomainEventConsumerGroup, TopicReference.DomainEventTopic},
-			new String[] {EJokerBootstrap.EJokerCommandConsumerGroup, TopicReference.CommandTopic},
-			new String[] {EJokerBootstrap.EJokerApplicationMessageConsumerGroup, TopicReference.ApplicationMessageTopic},
-			new String[] {EJokerBootstrap.EJokerPublishableExceptionConsumerGroup, TopicReference.ExceptionTopic},
+			new String[] {EJokerBootstrap.EJokerDomainEventGroup, TopicReference.DomainEventTopic},
+			new String[] {EJokerBootstrap.EJokerCommandGroup, TopicReference.CommandTopic},
+			new String[] {EJokerBootstrap.EJokerApplicationMessageGroup, TopicReference.ApplicationMessageTopic},
+			new String[] {EJokerBootstrap.EJokerPublishableExceptionGroup, TopicReference.ExceptionTopic},
 		};
 		
 		for(String[] tuple : tuples) {
@@ -43,22 +41,19 @@ public class TransferTestLajiMessageConsumer {
 	}
 
 	public static void xx(String group, String topic) throws Exception {
-		DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(group);
-
-        consumer.setNamesrvAddr(EJokerBootstrap.NameServAddr);
-
-        consumer.registerMessageListener(new MessageListenerConcurrently() {
-            @Override
-            public ConsumeConcurrentlyStatus consumeMessage(
-                    List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
-                for (MessageExt msg : msgs) {
-                    System.out.println(new String(msg.getBody()));
-                }
-                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-            }
-
-        });
-        consumer.subscribe(topic, "*");
-        consumer.start();
+		AtomicLong yy = new AtomicLong(0);
+		DefaultMQPullConsumer c = new DefaultMQPullConsumer(group);
+        c.setNamesrvAddr(EJokerBootstrap.NameServAddr);
+        c.start();
+		Set<MessageQueue> fetchSubscribeMessageQueues = c.fetchSubscribeMessageQueues(topic);
+		
+		for(MessageQueue mq : fetchSubscribeMessageQueues) {
+			long maxOffset = c.maxOffset(mq);
+			yy.addAndGet(maxOffset);
+			c.updateConsumeOffset(mq, maxOffset);
+		}
+		
+		c.getOffsetStore().persistAll(fetchSubscribeMessageQueues);
+		System.err.println(String.format("%s: %d", topic, yy.get()));
 	}
 }

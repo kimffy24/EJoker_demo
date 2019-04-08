@@ -3,7 +3,6 @@ package pro.jiefzz.ejoker.demo.simple.transfer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.LockSupport;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -14,11 +13,11 @@ import com.jiefzz.ejoker.commanding.ICommand;
 import com.jiefzz.ejoker.commanding.ICommandRoutingKeyProvider;
 import com.jiefzz.ejoker.queue.ITopicProvider;
 import com.jiefzz.ejoker.queue.command.CommandService;
-import com.jiefzz.ejoker.utils.EObjectId;
+import com.jiefzz.ejoker.utils.MObjectId;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.service.IJSONConverter;
-import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
+import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
@@ -37,6 +36,10 @@ import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartD
  *
  */
 public class TransferFrontend {
+	
+	public final static int accountAmount = 200000;
+
+	public final static int transferLoop = 6;
 	
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontend.class);
 
@@ -60,66 +63,64 @@ public class TransferFrontend {
 		System.out.println("====================== TransferAPP ======================");
 		System.out.println("");
 		
-		int accountLoop = 50000;
+		
 
-		String[] ids = new String[accountLoop];
+		String[] ids = new String[accountAmount];
 
 		for(int i=0; i<ids.length; i++) {
+			if(i > 0 && 0 == i % 10000)
+				SleepWrapper.sleep(TimeUnit.SECONDS, 1l);;
 			ids[i] = ObjectId.get().toHexString();
 		}
 		
-		final SystemFutureWrapper[] sfws = new SystemFutureWrapper[accountLoop];
 		final AtomicInteger cursor = new AtomicInteger(0);
+		final CountDownLatch cdlx = new CountDownLatch(accountAmount);
 		for(int i=0; i<ids.length; i++) {
 			systemAsyncHelper.submit(() -> {
 				int index = cursor.getAndIncrement();
-				CreateAccountCommand createAccountCommand = new CreateAccountCommand(ids[index], "owner_" + index);
-				sfws[index] = commandService.executeAsync(createAccountCommand, CommandReturnType.EventHandled);
-//				sfws[index] = commandService.sendAsync(createAccountCommand);
+				ioHelper.tryAsyncAction2(
+						"TestCreate_" + index,
+						() -> commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled),
+						r -> cdlx.countDown(),
+						() -> "",
+						e -> e.printStackTrace(),
+						true);
+				
 			});
 			System.err.println("send No." + i);
 		}
 		System.err.println("send ok.");
-
-		while(true) {
-			boolean ok = true;
-			for(int i=0; i<sfws.length; i++) {
-				if(null != sfws[i] && sfws[i].isDone()) {
-					ok &= true;
-				} else {
-					ok &= false;
-					System.err.println("task " + i + " is still on running ... ");
-					System.err.println(sfws[i]);
-				}
-			}
-			if(ok)
-				break;
-			System.err.println();
-			TimeUnit.MILLISECONDS.sleep(500l);
-			
-		}
 		
 //		System.exit(0);
 		
 		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
-		int loop = 2;
-		int amount = loop*ids.length;
+		int amount = transferLoop*ids.length;
 		CountDownLatch cdl = new CountDownLatch(amount);
 		long t = System.currentTimeMillis();
-		for(int j=0; j<loop; j++) {
+		for(int j=0; j<transferLoop; j++) {
 			for(int i=0; i<ids.length; i++) {
 				final int index = (j*ids.length)+i;
-				StartDepositTransactionCommand startDepositTransactionCmd = new StartDepositTransactionCommand(EObjectId.generateHexStringId(), ids[i], i%2==0?110:240);
+				StartDepositTransactionCommand startDepositTransactionCmd = new StartDepositTransactionCommand(MObjectId.get().toHexString(), ids[i], i%2==0?110:240);
 				systemAsyncHelper.submit(() -> {
-					ioHelper.tryAsyncAction2(
-							"TestSend_" + index,
-							() -> commandService.sendAsync(startDepositTransactionCmd),
-							r -> cdl.countDown(),
-							() -> "",
-							e -> e.printStackTrace(),
-							true);
+					if(index == amount - 1) {
+						ioHelper.tryAsyncAction2(
+								"TestSend_" + index,
+								() -> commandService.executeAsync(startDepositTransactionCmd, CommandReturnType.EventHandled),
+								r -> { cdl.countDown(); logger.error("actually complete at: {}", System.currentTimeMillis());},
+								() -> "",
+								e -> e.printStackTrace(),
+								true);
+					} else {
+						ioHelper.tryAsyncAction2(
+								"TestSend_" + index,
+								() -> commandService.sendAsync(startDepositTransactionCmd),
+								r -> cdl.countDown(),
+								() -> "",
+								e -> e.printStackTrace(),
+								true);
+					}
 				});
 			}
 		}
@@ -135,7 +136,6 @@ public class TransferFrontend {
 //		ioHelper.d1();
 //		systemAsyncHelper.d1();
 
-		LockSupport.park();
 		eJokerFrameworkInitializer.discard();
 	}
 }

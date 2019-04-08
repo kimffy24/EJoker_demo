@@ -9,10 +9,10 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 
-import com.jiefzz.ejoker.queue.completation.DefaultMQConsumer;
-import com.jiefzz.ejoker.queue.completation.EJokerQueueMessage;
-import com.jiefzz.ejoker.queue.completation.IEJokerQueueMessageContext;
+import com.jiefzz.ejoker.queue.aware.EJokerQueueMessage;
+import com.jiefzz.ejoker.queue.aware.IEJokerQueueMessageContext;
 import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
+import com.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 

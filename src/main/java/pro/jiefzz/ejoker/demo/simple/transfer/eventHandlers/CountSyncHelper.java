@@ -17,8 +17,8 @@ import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
 
-@MessageHandler
-@EService
+// @MessageHandler
+// @EService
 public class CountSyncHelper extends AbstractMessageHandler {
 
 	private Object waitHandle = CountDownLatchWrapper.newCountDownLatch();

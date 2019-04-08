@@ -8,7 +8,7 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.bson.types.ObjectId;
 
-import com.jiefzz.ejoker.queue.completation.DefaultMQProducer;
+import com.jiefzz.ejoker_support.rocketmq.DefaultMQProducer;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 

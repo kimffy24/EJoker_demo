@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.equasar;
 
-import com.jiefzz.equasar.EJoker;
+import com.jiefzz.ejoker_support.equasar.EJoker;
 
 import co.paralleluniverse.fibers.SuspendExecution;
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;

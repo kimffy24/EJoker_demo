@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.jiefzz.ejoker.commanding.CommandReturnType;
 import com.jiefzz.ejoker.queue.command.CommandConsumer;
 import com.jiefzz.ejoker.queue.command.CommandService;
-import com.jiefzz.ejoker.queue.completation.DefaultMQConsumer;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
+import com.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;

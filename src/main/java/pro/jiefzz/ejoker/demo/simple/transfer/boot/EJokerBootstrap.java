@@ -1,10 +1,7 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.boot;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.rocketmq.common.message.Message;
-import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +11,6 @@ import com.jiefzz.ejoker.queue.applicationMessage.ApplicationMessagePublisher;
 import com.jiefzz.ejoker.queue.command.CommandConsumer;
 import com.jiefzz.ejoker.queue.command.CommandResultProcessor;
 import com.jiefzz.ejoker.queue.command.CommandService;
-import com.jiefzz.ejoker.queue.completation.DefaultMQConsumer;
-import com.jiefzz.ejoker.queue.completation.DefaultMQProducer;
-import com.jiefzz.ejoker.queue.completation.MQInstanceHelper;
 import com.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
 import com.jiefzz.ejoker.queue.domainEvent.DomainEventPublisher;
 import com.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionConsumer;
@@ -24,32 +18,27 @@ import com.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionPublish
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 import com.jiefzz.ejoker.z.common.scavenger.Scavenger;
-import com.jiefzz.ejoker.z.common.system.functional.IFunction3;
-import com.jiefzz.ejoker.z.common.system.helper.StringHelper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
+import com.jiefzz.ejoker_support.rocketmq.MQInstanceHelper;
 
 public class EJokerBootstrap {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(EJokerBootstrap.class);
 
-	protected final static String EJokerDefaultImplPackage = "com.jiefzz.eDefaultImpl";
+	protected final static String EJokerDefaultImplPackage = "com.jiefzz.ejoker_support.defaultMemoryImpl";
 //	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
 	public final static String NameServAddr = "test_rocketmq_2:9876;test_sit_1:9876";
 	
-	public final static String EJokerDomainEventConsumerGroup = "EjokerDomainEventConsumerGroup";
-	public final static String EJokerDomainEventProducerGroup = "EjokerDomainEventProducerGroup";
+	public final static String EJokerDomainEventGroup = "EjokerDomainEventGroup";
 	
-	public final static String EJokerCommandConsumerGroup = "EjokerCommandConsumerGroup";
-	public final static String EJokerCommandProducerGroup = "EjokerCommandProducerGroup";
+	public final static String EJokerCommandGroup = "EjokerCommandGroup";
 
-	public final static String EJokerApplicationMessageConsumerGroup = "EjokerApplicationMessageConsumerGroup";
-	public final static String EJokerApplicationMessageProducerGroup = "EjokerApplicationMessageProducerGroup";
+	public final static String EJokerApplicationMessageGroup = "EjokerApplicationMessageGroup";
 
-	public final static String EJokerPublishableExceptionConsumerGroup = "EjokerPublishableExceptionConsumerGroup";
-	public final static String EJokerPublishableExceptionProducerGroup = "EjokerPublishableExceptionProducerGroup";
+	public final static String EJokerPublishableExceptionGroup = "EjokerPublishableExceptionGroup";
 	
 	
 	public final static long BatchDelay = 10000l;
@@ -131,7 +120,7 @@ public class EJokerBootstrap {
 		DomainEventConsumer domainEventConsumer = eJokerContext.get(DomainEventConsumer.class);
 		if(cTables[0].compareAndSet(false, true)) {
 			domainEventConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerDomainEventConsumerGroup, NameServAddr, eJokerContext))
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerDomainEventGroup, NameServAddr, eJokerContext))
 				.subscribe(TopicReference.DomainEventTopic)
 				.start();
 		}
@@ -145,7 +134,7 @@ public class EJokerBootstrap {
 		DomainEventPublisher domainEventPublisher = eJokerContext.get(DomainEventPublisher.class);
 		if(cTables[1].compareAndSet(false, true)) {
 			domainEventPublisher
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerDomainEventProducerGroup, NameServAddr, eJokerContext))
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerDomainEventGroup, NameServAddr, eJokerContext))
 				.start();
 		}
 		return domainEventPublisher;
@@ -160,7 +149,7 @@ public class EJokerBootstrap {
 		CommandConsumer commandConsumer = eJokerContext.get(CommandConsumer.class);
 		if(cTables[2].compareAndSet(false, true)) {
 			commandConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerCommandConsumerGroup, NameServAddr, eJokerContext))
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerCommandGroup, NameServAddr, eJokerContext))
 				.subscribe(TopicReference.CommandTopic)
 				.start();
 		}
@@ -174,7 +163,7 @@ public class EJokerBootstrap {
 		if(cTables[3].compareAndSet(false, true)) {
 			initCommandResultProcessor();
 			commandService
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerCommandProducerGroup, NameServAddr, eJokerContext))
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerCommandGroup, NameServAddr, eJokerContext))
 				.start();
 		}
 		return commandService;
@@ -188,7 +177,7 @@ public class EJokerBootstrap {
 		ApplicationMessageConsumer applicationMessageConsumer = eJokerContext.get(ApplicationMessageConsumer.class);
 		if(cTables[4].compareAndSet(false, true)) {
 			applicationMessageConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerApplicationMessageConsumerGroup, NameServAddr, eJokerContext))
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerApplicationMessageGroup, NameServAddr, eJokerContext))
 				.subscribe(TopicReference.ApplicationMessageTopic)
 				.start();
 		}
@@ -201,7 +190,7 @@ public class EJokerBootstrap {
 		ApplicationMessagePublisher applicationMessageProducer = eJokerContext.get(ApplicationMessagePublisher.class);
 		if(cTables[5].compareAndSet(false, true)) {
 			applicationMessageProducer
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerApplicationMessageProducerGroup, NameServAddr, eJokerContext))
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerApplicationMessageGroup, NameServAddr, eJokerContext))
 				.start();
 		}
 		return applicationMessageProducer;
@@ -215,7 +204,7 @@ public class EJokerBootstrap {
 		PublishableExceptionConsumer publishableExceptionConsumer = eJokerContext.get(PublishableExceptionConsumer.class);
 		if(cTables[6].compareAndSet(false, true)) {
 			publishableExceptionConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerPublishableExceptionConsumerGroup, NameServAddr, eJokerContext))
+				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerPublishableExceptionGroup, NameServAddr, eJokerContext))
 				.subscribe(TopicReference.ExceptionTopic)
 				.start();
 		}
@@ -228,7 +217,7 @@ public class EJokerBootstrap {
 		PublishableExceptionPublisher publishableExceptionProducer = eJokerContext.get(PublishableExceptionPublisher.class);
 		if(cTables[7].compareAndSet(false, true)) {
 			publishableExceptionProducer
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerPublishableExceptionProducerGroup, NameServAddr, eJokerContext))
+				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerPublishableExceptionGroup, NameServAddr, eJokerContext))
 				.start();
 		}
 		return publishableExceptionProducer;
