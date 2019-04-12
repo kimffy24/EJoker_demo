@@ -37,7 +37,6 @@ public class TransferTestLajiMessageConsumer {
 			}).start();
 		}
 		
-		LockSupport.park();
 	}
 
 	public static void xx(String group, String topic) throws Exception {
@@ -55,5 +54,6 @@ public class TransferTestLajiMessageConsumer {
 		
 		c.getOffsetStore().persistAll(fetchSubscribeMessageQueues);
 		System.err.println(String.format("%s: %d", topic, yy.get()));
+		c.shutdown();
 	}
 }

@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>com.jiefzz</groupId>
 			<artifactId>ejoker</artifactId>
-			<version>1.0.0-release</version>
+			<version>1.0.0-release-1</version>
 		</dependency>
 
 	</dependencies>

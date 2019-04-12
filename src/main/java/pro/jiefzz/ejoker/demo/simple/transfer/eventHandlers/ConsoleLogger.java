@@ -49,7 +49,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountCreatedEvent message) {
-		logger.info("创建账号成功: 账户={}, 所有者={}, ", message.getAggregateRootId(), message.getOwner());
+		logger.info("创建账号成功: 账户={}, 所有者={}, 当前时间戳={}", message.getAggregateRootId(), message.getOwner(), System.currentTimeMillis());
 		{ /// for debug
 			accountAmount.incrementAndGet();
 		}

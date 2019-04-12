@@ -1,14 +1,20 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.debug;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jiefzz.ejoker.commanding.CommandResult;
 import com.jiefzz.ejoker.commanding.ICommandProcessor;
 import com.jiefzz.ejoker.commanding.ProcessingCommand;
 import com.jiefzz.ejoker.commanding.ProcessingCommandMailbox;
@@ -39,6 +45,7 @@ import com.jiefzz.ejoker.z.common.io.IOHelper;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import com.jiefzz.ejoker.z.common.system.helper.MapHelper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 import com.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
@@ -90,40 +97,154 @@ public class DebugHelper extends AbstractMessageHandler {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DebugHelper.class);
 
-	static final Field declaredField;
-	static final Field declaredField2;
-	static final Field declaredField3;
+	static final Field declaredField_InMemoryPublishedVersionStore_versionDict;
+	static final Field declaredField_DefaultMQConsumer_dashboards;
+	static final Field declaredField_InMemoryEventStore_mStorage;
 	static final Field declaredField_DefaultCommandProcessor_mailboxDict;
 	static final Field declaredField_DefaultEventService_eventMailboxDict;
 	static final Field declaredField_AbstractDefaultMessageProcessor_mailboxDict;
+	static final Field declaredField_ProcessingMessageMailbox_waitingMessageDict;
+	static final Field declaredField_ProcessingMessageMailbox_routingKey;
+	static final Field declaredField_ProcessingMessageMailbox_messageQueue;
+	static final Field declaredField_ProcessingMessageMailbox_lastActiveTime;
 	
+	static final Field declaredField_ProcessingCommandMailbox_messageDict;
+	static final Field declaredField_ProcessingCommandMailbox_requestToCompleteCommandDict;
+	static final Field declaredField_ProcessingCommandMailbox_enqueueLock;
+	static final Field declaredField_ProcessingCommandMailbox_asyncLock;
+	static final Field declaredField_ProcessingCommandMailbox_nextSequence;
+	static final Field declaredField_ProcessingCommandMailbox_consumingSequence;
+	static final Field declaredField_ProcessingCommandMailbox_consumedSequence;
+	static final Field declaredField_ProcessingCommandMailbox_lastActiveTime;
+	static final Field declaredField_EventMailBox_messageQueue;
 	
 	
 	static {
 		try {
-			declaredField = InMemoryPublishedVersionStore.class.getDeclaredField("versionDict");
-			declaredField2 = DefaultMQConsumer.class.getDeclaredField("dashboards");
-			declaredField3 = InMemoryEventStore.class.getDeclaredField("mStorage");
+			declaredField_InMemoryPublishedVersionStore_versionDict = InMemoryPublishedVersionStore.class.getDeclaredField("versionDict");
+			declaredField_DefaultMQConsumer_dashboards = DefaultMQConsumer.class.getDeclaredField("dashboards");
+			declaredField_InMemoryEventStore_mStorage = InMemoryEventStore.class.getDeclaredField("mStorage");
 			declaredField_DefaultCommandProcessor_mailboxDict = DefaultCommandProcessor.class.getDeclaredField("mailboxDict");
 			declaredField_DefaultEventService_eventMailboxDict = DefaultEventService.class.getDeclaredField("eventMailboxDict");
 			declaredField_AbstractDefaultMessageProcessor_mailboxDict = AbstractDefaultMessageProcessor.class.getDeclaredField("mailboxDict");
+			declaredField_ProcessingMessageMailbox_waitingMessageDict = ProcessingMessageMailbox.class.getDeclaredField("waitingMessageDict");
+			declaredField_ProcessingMessageMailbox_routingKey = ProcessingMessageMailbox.class.getDeclaredField("routingKey");
+			declaredField_ProcessingMessageMailbox_messageQueue = ProcessingMessageMailbox.class.getDeclaredField("messageQueue");
+			declaredField_ProcessingMessageMailbox_lastActiveTime = ProcessingMessageMailbox.class.getDeclaredField("lastActiveTime");
+
+			declaredField_ProcessingCommandMailbox_messageDict = ProcessingCommandMailbox.class.getDeclaredField("messageDict");
+			declaredField_ProcessingCommandMailbox_requestToCompleteCommandDict = ProcessingCommandMailbox.class.getDeclaredField("requestToCompleteCommandDict");
+			declaredField_ProcessingCommandMailbox_enqueueLock = ProcessingCommandMailbox.class.getDeclaredField("enqueueLock");
+			declaredField_ProcessingCommandMailbox_asyncLock = ProcessingCommandMailbox.class.getDeclaredField("asyncLock");
+			declaredField_ProcessingCommandMailbox_nextSequence = ProcessingCommandMailbox.class.getDeclaredField("nextSequence");
+			declaredField_ProcessingCommandMailbox_consumingSequence = ProcessingCommandMailbox.class.getDeclaredField("consumingSequence");
+			declaredField_ProcessingCommandMailbox_consumedSequence = ProcessingCommandMailbox.class.getDeclaredField("consumedSequence");
+			declaredField_ProcessingCommandMailbox_lastActiveTime = ProcessingCommandMailbox.class.getDeclaredField("lastActiveTime");
+			declaredField_EventMailBox_messageQueue = EventMailBox.class.getDeclaredField("messageQueue");
+
 		} catch (NoSuchFieldException|SecurityException e) {
 			throw new RuntimeException(e);
 		}
-		declaredField.setAccessible(true);
-		declaredField2.setAccessible(true);
-		declaredField3.setAccessible(true);
+		declaredField_InMemoryPublishedVersionStore_versionDict.setAccessible(true);
+		declaredField_DefaultMQConsumer_dashboards.setAccessible(true);
+		declaredField_InMemoryEventStore_mStorage.setAccessible(true);
 		declaredField_DefaultCommandProcessor_mailboxDict.setAccessible(true);
 		declaredField_DefaultEventService_eventMailboxDict.setAccessible(true);
 		declaredField_AbstractDefaultMessageProcessor_mailboxDict.setAccessible(true);
+		declaredField_ProcessingMessageMailbox_waitingMessageDict.setAccessible(true);
+		declaredField_ProcessingMessageMailbox_routingKey.setAccessible(true);
+		declaredField_ProcessingMessageMailbox_messageQueue.setAccessible(true);
+		declaredField_ProcessingMessageMailbox_lastActiveTime.setAccessible(true);
+		declaredField_EventMailBox_messageQueue.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_messageDict.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_requestToCompleteCommandDict.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_enqueueLock.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_asyncLock.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_nextSequence.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_consumingSequence.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_consumedSequence.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_lastActiveTime.setAccessible(true);
+		declaredField_ProcessingCommandMailbox_asyncLock.setAccessible(true);
+		
 	}
+	
+	private void probe() {
+		
+		if(null ==  getEvtConsumer() || null == getCmdConsumer())
+			return;
+		
+		try {
+			DevUtils.moniterQ();
+			
+			logger.error("InMemoryPublishedVersionStore.versionDict.size = {}", versionDict.size());
+			
+			if(1+1 == 2)
+				return;
+			
+			final Map<String, AtomicLong> dict = new ConcurrentHashMap<>();
+			versionDict.entrySet().parallelStream().map(e -> {
+				return e.getValue();
+			}).mapToLong(l -> MapHelper.getOrAddConcurrent(dict, "" + l, AtomicLong::new).incrementAndGet()).sum();
+			logger.error("version statistics: {}", dict.toString());
+			
+			fetchCmdDashboards().entrySet().forEach(e -> {
+				ControlStruct value = e.getValue();
+
+				// 这里不使用并行流，普通流就行了。
+				value.aheadCompletion.keySet().stream().sorted().reduce(value.offsetConsumedLocal.get(), (a, b) -> {
+					if(0l < a) {
+						if(a + 1 == b) {
+							;
+						} else {
+							logger.error("前值: {}, 后值: {}, 队列: {}", a, b, e.getKey().toString());
+						}
+					}
+					return b;
+				});
+			});
+
+			// 这里不使用并行流，普通流就行了。
+			fetchEvtDashboards().entrySet().forEach(e -> {
+				ControlStruct value = e.getValue();
+	
+				value.aheadCompletion.keySet().stream().sorted().reduce(value.offsetConsumedLocal.get(), (a, b) -> {
+					if(0l < a) {
+						if(a + 1 == b) {
+							;
+						} else {
+							logger.error("前值: {}, 后值: {}, 队列: {}", a, b, e.getKey().toString());
+						}
+					}
+					return b;
+				});
+			});
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private DefaultMQConsumer getEvtConsumer() {
+		Object deeplyConsumer = eventConsumer.getDeeplyConsumer();
+		if(null != deeplyConsumer)
+			return (DefaultMQConsumer )deeplyConsumer;
+		return null;
+	}
+	
+	private DefaultMQConsumer getCmdConsumer() {
+		Object deeplyConsumer = commandConsumer.getDeeplyConsumer();
+		if(null != deeplyConsumer)
+			return (DefaultMQConsumer )deeplyConsumer;
+		return null;
+	}
+	
 	
 	private Map<MessageQueue, ControlStruct> fetchEvtDashboards() {
 			Object object3;
 			{
-		
 				try {
-					object3 = declaredField2.get(eventConsumer.getDeeplyConsumer());
+					object3 = declaredField_DefaultMQConsumer_dashboards.get(eventConsumer.getDeeplyConsumer());
 				} catch (IllegalArgumentException|IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
@@ -135,7 +256,7 @@ public class DebugHelper extends AbstractMessageHandler {
 			Object object2;
 			{
 				try {
-					object2 = declaredField2.get(commandConsumer.getDeeplyConsumer());
+					object2 = declaredField_DefaultMQConsumer_dashboards.get(commandConsumer.getDeeplyConsumer());
 				} catch (IllegalArgumentException|IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
@@ -190,7 +311,7 @@ public class DebugHelper extends AbstractMessageHandler {
 		{
 	
 			try {
-				object4 = declaredField3.get(eventStore);
+				object4 = declaredField_InMemoryEventStore_mStorage.get(eventStore);
 			} catch (IllegalArgumentException|IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -201,29 +322,55 @@ public class DebugHelper extends AbstractMessageHandler {
 		Object object;
 		{
 			try {
-				object = declaredField.get(inMemoryPublishedVersionStore);
+				object = declaredField_InMemoryPublishedVersionStore_versionDict.get(inMemoryPublishedVersionStore);
 			} catch (IllegalArgumentException|IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		versionDict = (Map<String, Long> )object;
 
+		scheduleService.startTask("DebugHelper_probe", this::probe, 5000l, 5000l);
 	}
 	
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DebugMessage dm) {
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
 	}
 
-	
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DebugMessage2 dm) {
 		
 		final String aggregateRootId = dm.aId;
 		
 		getCommandMailBoxDict().entrySet().parallelStream().forEach(e -> {
 			if(aggregateRootId.equals(e.getKey())) {
+				
 				ProcessingCommandMailbox box = e.getValue();
-				Set<Long> keySet = box.messageDict.keySet();
-				Set<Long> keySet2 = box.requestToCompleteCommandDict.keySet();
+
+				long consumingSequence;
+				long consumedSequence;
+				Map<Long, ProcessingCommand> messageDict;
+				Map<Long, CommandResult> requestToCompleteCommandDict;
+				Object enqueueLock;
+				Object asyncLock;
+				long nextSequence;
+				long lastActiveTime;
+				try {
+					messageDict = (Map<Long, ProcessingCommand> )declaredField_ProcessingCommandMailbox_messageDict.get(box);
+					requestToCompleteCommandDict = (Map<Long, CommandResult> )declaredField_ProcessingCommandMailbox_requestToCompleteCommandDict.get(box);
+					enqueueLock = declaredField_ProcessingCommandMailbox_enqueueLock.get(box);
+					asyncLock = declaredField_ProcessingCommandMailbox_asyncLock.get(box);
+					nextSequence = (long )declaredField_ProcessingCommandMailbox_nextSequence.get(box);
+					consumingSequence = (long )declaredField_ProcessingCommandMailbox_consumingSequence.get(box);
+					consumedSequence = (long )declaredField_ProcessingCommandMailbox_consumedSequence.get(box);
+					lastActiveTime = (long )declaredField_ProcessingCommandMailbox_lastActiveTime.get(box);
+				} catch (IllegalArgumentException | IllegalAccessException e1) {
+					logger.error("ProcessingCommandMailbox[aggregateRootId={}] cannot be probe!!!", aggregateRootId);
+					logger.error("", e1);
+					throw new RuntimeException(e1);
+				}
+				
+				
+				Set<Long> keySet = messageDict.keySet();
+				Set<Long> keySet2 = requestToCompleteCommandDict.keySet();
 				logger.error("processingCommandMailbox: \n\tenqueueLock: {}, "
 						+ "\n\tasyncLock: {},"
 						+ "\n\tmessageDict.keys: {},"
@@ -235,9 +382,9 @@ public class DebugHelper extends AbstractMessageHandler {
 						+ "\n\tonPaused.get(): {},"
 						+ "\n\tonProcessing.get(): {},"
 						+ "\n\tlastActiveTime: {}",
-						box.enqueueLock, box.asyncLock, keySet.toString(), keySet2.toString(),
-						box.nextSequence, box.consumingSequence, box.consumedSequence, box.onRunning(),
-						box.onPaused.get(), box.onProcessingFlag().get(), box.lastActiveTime
+						enqueueLock, asyncLock, keySet.toString(), keySet2.toString(),
+						nextSequence, consumingSequence, consumedSequence, box.onRunning(),
+						box.onProcessingFlag().get(), box.onProcessingFlag().get(), lastActiveTime
 						);
 			}
 		});
@@ -245,8 +392,18 @@ public class DebugHelper extends AbstractMessageHandler {
 		getEventMailBoxDict().entrySet().parallelStream().forEach(e -> {
 			if(aggregateRootId.equals(e.getKey())) {
 				EventMailBox box = e.getValue();
+				
+				Queue<EventCommittingContext> messageQueue;
+				try {
+					messageQueue = (Queue<EventCommittingContext> )declaredField_EventMailBox_messageQueue.get(box);
+				} catch (IllegalArgumentException | IllegalAccessException e1) {
+					logger.error("EventMailBox[aggregateRoot={} cannot be probe!!!", aggregateRootId);
+					logger.error("", e1);
+					throw new RuntimeException(e1);
+				}
+				
 				String nextCommandInfo = null;
-				EventCommittingContext cxt = box.messageQueue.peek();
+				EventCommittingContext cxt = messageQueue.peek();
 				if(null != cxt) {
 					ProcessingCommand processingCommand = cxt.getProcessingCommand();
 					nextCommandInfo = String.format("cmdId: %s, cmdSequence: %d", processingCommand.getMessage().getId(), processingCommand.getSequence());
@@ -255,7 +412,7 @@ public class DebugHelper extends AbstractMessageHandler {
 						+ "\n\tnextCommandInfo: {},"
 						+ "\n\tonRunning.get(): {},"
 						+ "\n\tlastActiveTime: {}",
-						box.messageQueue.size(), nextCommandInfo, box.isRunning(), box.getLastActiveTime()
+						messageQueue.size(), nextCommandInfo, box.isRunning(), box.getLastActiveTime()
 						);
 			}
 		});
@@ -264,16 +421,29 @@ public class DebugHelper extends AbstractMessageHandler {
 			if(aggregateRootId.equals(e.getKey())) {
 				ProcessingMessageMailbox<ProcessingDomainEventStreamMessage,DomainEventStreamMessage> value = e.getValue();
 				Set<Long> keySet;
-				if(null != value.waitingMessageDict)
-					keySet = value.waitingMessageDict.keySet();
+				Map<Long, ProcessingDomainEventStreamMessage> map = getWaitingMessageDict(value);
+				String routingKey = getRroutingKey(value);
+				Queue<ProcessingDomainEventStreamMessage> messageQueue = getMessageQueue(value);
+				if(null != map)
+					keySet = map.keySet();
 				else
 					keySet = new HashSet<>();
+
+				long lastActiveTime;
+				try {
+					lastActiveTime = (long )declaredField_ProcessingMessageMailbox_lastActiveTime.get(value);
+				} catch (IllegalArgumentException | IllegalAccessException e1) {
+					logger.error("ProcessingCommandMailbox[aggregateRootId={}] cannot be probe!!!", aggregateRootId);
+					logger.error("", e1);
+					throw new RuntimeException(e1);
+				}
+				
 				logger.error("processingMessageMailBox: \n\troutingKey: {}, "
 						+ "\n\tmessageQueue.size():, {}"
 						+ "\n\twaitingMessageDict: {}, "
 						+ "\n\tonRunning.get(): {}, "
 						+ "\n\tlastActiveTime: {}",
-						value.routingKey, value.messageQueue.size(), keySet.toString(), value.onRunning.get(), value.lastActiveTime
+						routingKey, messageQueue.size(), keySet.toString(), value.onRunning(), lastActiveTime
 						);
 			}
 		});
@@ -288,25 +458,52 @@ public class DebugHelper extends AbstractMessageHandler {
 	}
 
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DebugMessage3 dm) {
-		
-		getProcessingMessageMailBoxDict().entrySet().parallelStream().forEach(e -> {
-			ProcessingMessageMailbox<ProcessingDomainEventStreamMessage,DomainEventStreamMessage> value = e.getValue();
-			processingMessageScheduler.scheduleMailbox(value);
-		});
-		
-		getEventMailBoxDict().entrySet().parallelStream().forEach(e -> {
-			EventMailBox value = e.getValue();
-			value.tryRun();
-		});
-		
-		getCommandMailBoxDict().entrySet().parallelStream().forEach(e -> {
-			ProcessingCommandMailbox value = e.getValue();
-			value.tryRun();
-		});
-		
-		logger.error("===================================================================================================== ok !!!!");
-		
+//		
+//		getProcessingMessageMailBoxDict().entrySet().parallelStream().forEach(e -> {
+//			ProcessingMessageMailbox<ProcessingDomainEventStreamMessage,DomainEventStreamMessage> value = e.getValue();
+//			processingMessageScheduler.scheduleMailbox(value);
+//		});
+//		
+//		getEventMailBoxDict().entrySet().parallelStream().forEach(e -> {
+//			EventMailBox value = e.getValue();
+//			value.tryRun();
+//		});
+//		
+//		getCommandMailBoxDict().entrySet().parallelStream().forEach(e -> {
+//			ProcessingCommandMailbox value = e.getValue();
+//			value.tryRun();
+//		});
+//		
+//		logger.error("===================================================================================================== ok !!!!");
+//		
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
+	}
+	
+	private Map<Long, ProcessingDomainEventStreamMessage> getWaitingMessageDict(ProcessingMessageMailbox<ProcessingDomainEventStreamMessage,DomainEventStreamMessage> target) {
+		try {
+			return (Map<Long, ProcessingDomainEventStreamMessage> )declaredField_ProcessingMessageMailbox_waitingMessageDict.get(target);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return new HashMap<>();
+		}
+	}
+	
+	private String getRroutingKey(ProcessingMessageMailbox<ProcessingDomainEventStreamMessage,DomainEventStreamMessage> target) {
+		try {
+			return (String )declaredField_ProcessingMessageMailbox_routingKey.get(target);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+	
+	private Queue<ProcessingDomainEventStreamMessage> getMessageQueue(ProcessingMessageMailbox<ProcessingDomainEventStreamMessage,DomainEventStreamMessage> target) {
+		try {
+			return (Queue<ProcessingDomainEventStreamMessage> )declaredField_ProcessingMessageMailbox_messageQueue.get(target);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return new LinkedBlockingQueue<>();
+		}
 	}
 	
 }

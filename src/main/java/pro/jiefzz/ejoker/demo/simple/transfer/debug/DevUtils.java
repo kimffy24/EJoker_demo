@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.debug;
 
 import com.jiefzz.ejoker.EJoker;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;

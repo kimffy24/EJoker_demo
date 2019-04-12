@@ -37,9 +37,9 @@ import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartD
  */
 public class TransferFrontend {
 	
-	public final static int accountAmount = 200000;
+	public final static int accountAmount = 40000;
 
-	public final static int transferLoop = 6;
+	public final static int transferLoop = 5;
 	
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontend.class);
 
@@ -68,8 +68,6 @@ public class TransferFrontend {
 		String[] ids = new String[accountAmount];
 
 		for(int i=0; i<ids.length; i++) {
-			if(i > 0 && 0 == i % 10000)
-				SleepWrapper.sleep(TimeUnit.SECONDS, 1l);;
 			ids[i] = ObjectId.get().toHexString();
 		}
 		
@@ -85,14 +83,13 @@ public class TransferFrontend {
 						() -> "",
 						e -> e.printStackTrace(),
 						true);
-				
 			});
 			System.err.println("send No." + i);
 		}
 		System.err.println("send ok.");
-		
+		cdlx.await();
+		System.err.println("all account ok.");
 //		System.exit(0);
-		
 		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		

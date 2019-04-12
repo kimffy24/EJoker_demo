@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.assemblies.MessageHandler;
 import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
-import com.jiefzz.ejoker.z.common.system.extension.AsyncWrapperException;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
 import com.jiefzz.ejoker.z.common.system.wrapper.CountDownLatchWrapper;
@@ -27,25 +26,23 @@ public class SyncHelper extends AbstractMessageHandler {
 
 	AtomicLong al1 = new AtomicLong(0);
 
-	public void show() {
-		logger.error("DepositTransactionCompletedEvent hit: {}", al1.get());
+	AtomicLong alt = new AtomicLong(0);
 
+	public void show() {
+		logger.error("DepositTransactionCompletedEvent hit: {}, last event hit: {}ms", al1.get(), alt.get());
 	}
 
 	private Object waitHandle = CountDownLatchWrapper.newCountDownLatch();
 
 	@Suspendable
 	public void waitOne() {
-		try {
-			CountDownLatchWrapper.await(waitHandle);
-		} catch (AsyncWrapperException e) {
-			e.printStackTrace();
-		}
+		CountDownLatchWrapper.await(waitHandle);
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
 		al1.getAndIncrement();
+		alt.set(System.currentTimeMillis());
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
 		return SystemFutureWrapperUtil.createCompleteFutureTask();
