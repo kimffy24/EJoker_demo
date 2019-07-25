@@ -52,7 +52,7 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 			String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
 		try {
 			await(mongoProvider.submitWithInnerExector(() -> updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion)));
-			return SystemFutureWrapperUtil.createCompleteFutureTask();
+			return SystemFutureWrapperUtil.completeFutureTask();
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Void>> ripenFuture = new RipenFuture<>();
 			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));
@@ -66,7 +66,7 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 			String aggregateRootTypeName, String aggregateRootId) {
 		try {
 			long r = await(mongoProvider.submitWithInnerExector(() -> getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId)));
-			return SystemFutureWrapperUtil.createCompleteFutureTask(r);
+			return SystemFutureWrapperUtil.completeFutureTask(r);
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Long>> ripenFuture = new RipenFuture<>();
 			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));

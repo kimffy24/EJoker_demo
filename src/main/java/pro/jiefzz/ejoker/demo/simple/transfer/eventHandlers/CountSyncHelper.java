@@ -45,7 +45,7 @@ public class CountSyncHelper extends AbstractMessageHandler {
 		if (currentCount == expectedCount) {
 			CountDownLatchWrapper.countDown(waitHandle);
 		}
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
@@ -57,6 +57,6 @@ public class CountSyncHelper extends AbstractMessageHandler {
 				CountDownLatchWrapper.countDown(waitHandle);
 			}
 		}
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 }

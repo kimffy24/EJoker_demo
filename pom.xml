@@ -18,6 +18,20 @@
 		<version.jetty>9.4.3.v20170317</version.jetty>
 		<version.jackson>2.7.5</version.jackson>
 	</properties>
+	
+	<repositories>
+		<repository>
+			<id>minimal-maven-repository</id>
+			<url>file:///${project.basedir}/minimal-maven-repository</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -82,7 +96,7 @@
 		<dependency>
 			<groupId>com.jiefzz</groupId>
 			<artifactId>ejoker</artifactId>
-			<version>1.0.0-release-1</version>
+			<version>1.1.0-alpha-2</version>
 		</dependency>
 
 	</dependencies>

@@ -1,7 +1,7 @@
-package pro.jiefzz.ejoker.demo.simple.transfer.equasar;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp.quasar;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferNAll;
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferPrepare;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp.TransferApp;
 
 /**
  * 
@@ -9,11 +9,11 @@ import pro.jiefzz.ejoker.demo.simple.transfer.TransferPrepare;
  * @param args
  * @throws Exception
  */
-public class TransferNAllQuasar {
+public class TransferAppQuasar {
 
 	public static void main(String[] args) throws Exception {
 		
-		TransferNAll.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
+		TransferApp.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
 		
 	}
 }

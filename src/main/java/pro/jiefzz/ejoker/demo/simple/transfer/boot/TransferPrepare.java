@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,14 +7,13 @@ import com.jiefzz.ejoker.infrastructure.ITypeNameProvider;
 import com.jiefzz.ejoker.infrastructure.ITypeNameProvider.IDecorator;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.BankAccount;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.DepositTransaction;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.TransferTransaction;
 
 public class TransferPrepare {
 
-	public static EJokerBootstrap prepare(EJokerBootstrap eJokerBootstrap) {
+	public static AbstractEJokerBootstrap prepare(AbstractEJokerBootstrap eJokerBootstrap) {
 
 		IEJokerSimpleContext eJokerContext = eJokerBootstrap.getEJokerContext();
 		ITypeNameProvider typeNameProvider = eJokerContext.get(ITypeNameProvider.class);

@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.jiefzz.ejoker.EJoker;
 import com.jiefzz.ejoker.queue.applicationMessage.ApplicationMessageConsumer;
 import com.jiefzz.ejoker.queue.applicationMessage.ApplicationMessagePublisher;
+import com.jiefzz.ejoker.queue.aware.IConsumerWrokerAware;
+import com.jiefzz.ejoker.queue.aware.IProducerWrokerAware;
 import com.jiefzz.ejoker.queue.command.CommandConsumer;
 import com.jiefzz.ejoker.queue.command.CommandResultProcessor;
 import com.jiefzz.ejoker.queue.command.CommandService;
@@ -19,18 +21,15 @@ import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 import com.jiefzz.ejoker.z.common.scavenger.Scavenger;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
-import com.jiefzz.ejoker_support.rocketmq.MQInstanceHelper;
 
-public class EJokerBootstrap {
+public abstract class AbstractEJokerBootstrap {
 	
-	private final static  Logger logger = LoggerFactory.getLogger(EJokerBootstrap.class);
+	private final static  Logger logger = LoggerFactory.getLogger(AbstractEJokerBootstrap.class);
 
 	protected final static String EJokerDefaultImplPackage = "com.jiefzz.ejoker_support.defaultMemoryImpl";
 //	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
-	
-	public final static String NameServAddr = "test_rocketmq_2:9876;test_sit_1:9876";
 	
 	public final static String EJokerDomainEventGroup = "EjokerDomainEventGroup";
 	
@@ -39,7 +38,6 @@ public class EJokerBootstrap {
 	public final static String EJokerApplicationMessageGroup = "EjokerApplicationMessageGroup";
 
 	public final static String EJokerPublishableExceptionGroup = "EjokerPublishableExceptionGroup";
-	
 	
 	public final static long BatchDelay = 10000l;
 	
@@ -60,11 +58,11 @@ public class EJokerBootstrap {
 			new AtomicBoolean(false),	// 7 publishable exception producer
 	};
 
-	public EJokerBootstrap() {
+	public AbstractEJokerBootstrap() {
 		this(EJoker.getInstance());
 	}
 	
-	protected EJokerBootstrap(EJoker eJokerInstance) {
+	protected AbstractEJokerBootstrap(EJoker eJokerInstance) {
 
 		logger.info("====================== EJokerFramework ======================");
 		logger.info("eJoker context initializing ... ");
@@ -108,6 +106,10 @@ public class EJokerBootstrap {
 		// 启动命令跟踪反馈控制对象
 		CommandResultProcessor commandResultProcessor = eJokerContext.get(CommandResultProcessor.class);
 		commandResultProcessor.start();
+		//哪里开的就哪里关闭。
+		scavenger.addFianllyJob(() -> {
+			commandResultProcessor.shutdown();
+		});
 		return commandResultProcessor;
 		
 	}
@@ -120,9 +122,13 @@ public class EJokerBootstrap {
 		DomainEventConsumer domainEventConsumer = eJokerContext.get(DomainEventConsumer.class);
 		if(cTables[0].compareAndSet(false, true)) {
 			domainEventConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerDomainEventGroup, NameServAddr, eJokerContext))
+				.useConsumer(createDefaultMQConsumer(EJokerDomainEventGroup, eJokerContext))
 				.subscribe(TopicReference.DomainEventTopic)
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				domainEventConsumer.shutdown();
+			});
 		}
 		return domainEventConsumer;
 		
@@ -134,8 +140,12 @@ public class EJokerBootstrap {
 		DomainEventPublisher domainEventPublisher = eJokerContext.get(DomainEventPublisher.class);
 		if(cTables[1].compareAndSet(false, true)) {
 			domainEventPublisher
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerDomainEventGroup, NameServAddr, eJokerContext))
+				.useProducer(createDefaultMQProducer(EJokerDomainEventGroup, eJokerContext))
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				domainEventPublisher.shutdown();
+			});
 		}
 		return domainEventPublisher;
 		
@@ -149,9 +159,13 @@ public class EJokerBootstrap {
 		CommandConsumer commandConsumer = eJokerContext.get(CommandConsumer.class);
 		if(cTables[2].compareAndSet(false, true)) {
 			commandConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerCommandGroup, NameServAddr, eJokerContext))
+				.useConsumer(createDefaultMQConsumer(EJokerCommandGroup, eJokerContext))
 				.subscribe(TopicReference.CommandTopic)
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				commandConsumer.shutdown();
+			});
 		}
 		return commandConsumer;
 		
@@ -163,8 +177,12 @@ public class EJokerBootstrap {
 		if(cTables[3].compareAndSet(false, true)) {
 			initCommandResultProcessor();
 			commandService
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerCommandGroup, NameServAddr, eJokerContext))
+				.useProducer(createDefaultMQProducer(EJokerCommandGroup, eJokerContext))
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				commandService.shutdown();
+			});
 		}
 		return commandService;
 	}
@@ -177,9 +195,13 @@ public class EJokerBootstrap {
 		ApplicationMessageConsumer applicationMessageConsumer = eJokerContext.get(ApplicationMessageConsumer.class);
 		if(cTables[4].compareAndSet(false, true)) {
 			applicationMessageConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerApplicationMessageGroup, NameServAddr, eJokerContext))
+				.useConsumer(createDefaultMQConsumer(EJokerApplicationMessageGroup, eJokerContext))
 				.subscribe(TopicReference.ApplicationMessageTopic)
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				applicationMessageConsumer.shutdown();
+			});
 		}
 		return applicationMessageConsumer;
 		
@@ -190,8 +212,12 @@ public class EJokerBootstrap {
 		ApplicationMessagePublisher applicationMessageProducer = eJokerContext.get(ApplicationMessagePublisher.class);
 		if(cTables[5].compareAndSet(false, true)) {
 			applicationMessageProducer
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerApplicationMessageGroup, NameServAddr, eJokerContext))
+				.useProducer(createDefaultMQProducer(EJokerApplicationMessageGroup, eJokerContext))
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				applicationMessageProducer.shutdown();
+			});
 		}
 		return applicationMessageProducer;
 	}
@@ -204,9 +230,13 @@ public class EJokerBootstrap {
 		PublishableExceptionConsumer publishableExceptionConsumer = eJokerContext.get(PublishableExceptionConsumer.class);
 		if(cTables[6].compareAndSet(false, true)) {
 			publishableExceptionConsumer
-				.useConsumer(MQInstanceHelper.createDefaultMQConsumer(EJokerPublishableExceptionGroup, NameServAddr, eJokerContext))
+				.useConsumer(createDefaultMQConsumer(EJokerPublishableExceptionGroup, eJokerContext))
 				.subscribe(TopicReference.ExceptionTopic)
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				publishableExceptionConsumer.shutdown();
+			});
 		}
 		return publishableExceptionConsumer;
 		
@@ -217,10 +247,17 @@ public class EJokerBootstrap {
 		PublishableExceptionPublisher publishableExceptionProducer = eJokerContext.get(PublishableExceptionPublisher.class);
 		if(cTables[7].compareAndSet(false, true)) {
 			publishableExceptionProducer
-				.useProducer(MQInstanceHelper.createDefaultMQProducer(EJokerPublishableExceptionGroup, NameServAddr, eJokerContext))
+				.useProducer(createDefaultMQProducer(EJokerPublishableExceptionGroup, eJokerContext))
 				.start();
+			//哪里开的就哪里关闭。
+			scavenger.addFianllyJob(() -> {
+				publishableExceptionProducer.shutdown();
+			});
 		}
 		return publishableExceptionProducer;
 	}
 	
+	protected abstract IConsumerWrokerAware createDefaultMQConsumer(String groupName, IEJokerSimpleContext eContext);
+	
+	protected abstract IProducerWrokerAware createDefaultMQProducer(String groupName, IEJokerSimpleContext eContext);
 }

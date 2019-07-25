@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
 
 /**
  * 这是一个C端和Q端一起的demo<br />
@@ -23,7 +24,7 @@ public class TransferNAll {
 		start(TransferPrepare.prepare(new EJokerBootstrap()));
 	}
 	
-	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 
 		eJokerFrameworkInitializer.initAll();
 		

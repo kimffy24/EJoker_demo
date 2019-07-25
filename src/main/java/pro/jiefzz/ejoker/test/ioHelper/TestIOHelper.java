@@ -56,7 +56,7 @@ public class TestIOHelper {
 								AsyncTaskStatus.Success, EventAppendResult.Success);
 
 					}
-					return SystemFutureWrapperUtil.createCompleteFuture(actualTaskResult); },
+					return SystemFutureWrapperUtil.completeFuture(actualTaskResult); },
 				actualResule -> {
 					System.out.println("finishAction() was invoked!");
 					EventAppendResult status = actualResule;

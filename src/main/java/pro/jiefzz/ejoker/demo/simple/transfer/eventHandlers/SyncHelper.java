@@ -45,20 +45,20 @@ public class SyncHelper extends AbstractMessageHandler {
 		alt.set(System.currentTimeMillis());
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent message) {
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCanceledEvent message) {
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 }

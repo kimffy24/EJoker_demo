@@ -10,14 +10,12 @@ import org.bson.types.ObjectId;
 
 import com.jiefzz.ejoker_support.rocketmq.DefaultMQProducer;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
-
 public class TestProducer {
 
 	public static void main(String[] args) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
 		
 		DefaultMQProducer defaultMQProducer = new DefaultMQProducer("ZTestPGroup");
-		defaultMQProducer.setNamesrvAddr(EJokerBootstrap.NameServAddr);
+		defaultMQProducer.setNamesrvAddr("test_rocketmq_2:9876;test_sit_1:9876");
 		defaultMQProducer.start();
 		
 		

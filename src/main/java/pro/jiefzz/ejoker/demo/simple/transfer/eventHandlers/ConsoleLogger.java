@@ -43,7 +43,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 	private AtomicInteger accountAmount = new AtomicInteger(0);
 
 	public void show() {
-		logger.error("账号总数: {}", accountAmount.get());
+		logger.error("账号收到的账户创建事件的总数: {}", accountAmount.get());
 	}
 	//// for debug
 
@@ -53,20 +53,20 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		{ /// for debug
 			accountAmount.incrementAndGet();
 		}
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedMessage message) {
 		logger.info("账户验证已通过，交易ID：{}，账户：{}", message.getTransactionId(), message.getAccountId());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidateFailedMessage message) {
 		logger.info("无效的银行账户，交易ID：{}，账户：{}，理由：{}", message.getTransactionId(), message.getAccountId(),
 				message.getReason());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
@@ -82,7 +82,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 			}
 		}
 
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
@@ -106,7 +106,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 			}
 		}
 
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
@@ -115,37 +115,37 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		logger.info("转账交易已开始，交易ID：{}，源账户：{}，目标账户：{}，转账金额：{}", evnt.getAggregateRootId(),
 				transactionInfo.getSourceAccountId(), transactionInfo.getTargetAccountId(),
 				transactionInfo.getAmount());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferOutPreparationConfirmedEvent evnt) {
 		logger.info("预转出确认成功，交易ID：{}，账户：{}", evnt.getAggregateRootId(), evnt.getTransactionInfo().getSourceAccountId());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferInPreparationConfirmedEvent evnt) {
 		logger.info("预转入确认成功，交易ID：{}，账户：{}", evnt.getAggregateRootId(), evnt.getTransactionInfo().getTargetAccountId());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent evnt) {
 		logger.info("转账交易已完成，交易ID：{}", evnt.getAggregateRootId());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
 		logger.info("账户的余额不足，交易ID：{}，账户：{}，可用余额：{}，转出金额：{}", exception.getTransactionId(), exception.getAccountId(),
 				exception.getCurrentAvailableBalance(), exception.getAmount());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 
 	@Suspendable
 	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCanceledEvent evnt) {
 		logger.info("转账交易已取消，交易ID：{}", evnt.getAggregateRootId());
-		return SystemFutureWrapperUtil.createCompleteFutureTask();
+		return SystemFutureWrapperUtil.completeFutureTask();
 	}
 }

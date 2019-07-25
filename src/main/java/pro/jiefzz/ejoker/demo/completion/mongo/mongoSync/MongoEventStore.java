@@ -83,7 +83,7 @@ public class MongoEventStore implements IEventStore {
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> batchAppendAsync(
 			LinkedHashSet<DomainEventStream> eventStreams) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(
+		return SystemFutureWrapperUtil.completeFutureTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> batchAppend(eventStreams)
@@ -95,7 +95,7 @@ public class MongoEventStore implements IEventStore {
 	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> appendAsync(DomainEventStream eventStream) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(
+		return SystemFutureWrapperUtil.completeFutureTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> append(eventStream)
@@ -107,7 +107,7 @@ public class MongoEventStore implements IEventStore {
 	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, long version) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(
+		return SystemFutureWrapperUtil.completeFutureTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> find(aggregateRootId, version)
@@ -119,7 +119,7 @@ public class MongoEventStore implements IEventStore {
 	@Suspendable
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, String commandId) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(
+		return SystemFutureWrapperUtil.completeFutureTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> find(aggregateRootId, commandId)
@@ -132,7 +132,7 @@ public class MongoEventStore implements IEventStore {
 	@Override
 	public SystemFutureWrapper<AsyncTaskResult<Collection<DomainEventStream>>> queryAggregateEventsAsync(
 			String aggregateRootId, String aggregateRootTypeName, long minVersion, long maxVersion) {
-		return SystemFutureWrapperUtil.createCompleteFutureTask(
+		return SystemFutureWrapperUtil.completeFutureTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> queryAggregateEvents(aggregateRootId, aggregateRootTypeName, minVersion, maxVersion)

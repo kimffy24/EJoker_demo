@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp;
 
 import java.util.List;
 import java.util.Set;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jiefzz.ejoker.queue.aware.EJokerQueueMessage;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;
 
 /**
@@ -29,7 +29,7 @@ public class TransferTestLajiMessageConsumer2 {
 	public static void main(String[] args) throws Exception {
 		
 		String[][] tuples = new String [][] {
-			new String[] {EJokerBootstrap.EJokerDomainEventGroup, TopicReference.DomainEventTopic},
+			new String[] {AbstractEJokerBootstrap.EJokerDomainEventGroup, TopicReference.DomainEventTopic},
 //			new String[] {EJokerBootstrap.EJokerCommandGroup, TopicReference.CommandTopic},
 //			new String[] {EJokerBootstrap.EJokerApplicationMessageGroup, TopicReference.ApplicationMessageTopic},
 //			new String[] {EJokerBootstrap.EJokerPublishableExceptionGroup, TopicReference.ExceptionTopic},

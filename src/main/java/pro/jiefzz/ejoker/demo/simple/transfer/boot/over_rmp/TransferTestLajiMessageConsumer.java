@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -7,7 +7,7 @@ import java.util.concurrent.locks.LockSupport;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.common.message.MessageQueue;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker.demo.simple.transfer.boot.TopicReference;
 
 /**
@@ -20,10 +20,10 @@ public class TransferTestLajiMessageConsumer {
 	public static void main(String[] args) throws Exception {
 		
 		String[][] tuples = new String [][] {
-			new String[] {EJokerBootstrap.EJokerDomainEventGroup, TopicReference.DomainEventTopic},
-			new String[] {EJokerBootstrap.EJokerCommandGroup, TopicReference.CommandTopic},
-			new String[] {EJokerBootstrap.EJokerApplicationMessageGroup, TopicReference.ApplicationMessageTopic},
-			new String[] {EJokerBootstrap.EJokerPublishableExceptionGroup, TopicReference.ExceptionTopic},
+			new String[] {AbstractEJokerBootstrap.EJokerDomainEventGroup, TopicReference.DomainEventTopic},
+			new String[] {AbstractEJokerBootstrap.EJokerCommandGroup, TopicReference.CommandTopic},
+			new String[] {AbstractEJokerBootstrap.EJokerApplicationMessageGroup, TopicReference.ApplicationMessageTopic},
+			new String[] {AbstractEJokerBootstrap.EJokerPublishableExceptionGroup, TopicReference.ExceptionTopic},
 		};
 		
 		for(String[] tuple : tuples) {

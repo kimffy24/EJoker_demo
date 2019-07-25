@@ -1,7 +1,7 @@
-package pro.jiefzz.ejoker.demo.simple.transfer.equasar;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp.quasar;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferAppPerformanceTest;
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferPrepare;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp.TransferAppPerformanceTest;
 
 /**
  * 

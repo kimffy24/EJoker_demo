@@ -50,7 +50,7 @@ public class BankAccountCommandHandler extends AbstractCommandHandler {
         } else {
             applicationMessage = new AccountValidatePassedMessage(command.getAggregateRootId(), command.getTransactionId());
         }
-		return SystemFutureWrapperUtil.createCompleteFutureTask(applicationMessage);
+		return SystemFutureWrapperUtil.completeFutureTask(applicationMessage);
 	}
 
 	@Suspendable

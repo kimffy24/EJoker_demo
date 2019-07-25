@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -22,7 +22,8 @@ import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.DepositTransaction;
@@ -37,7 +38,7 @@ public class TransferAppPerformanceTest {
 		start(TransferPrepare.prepare(new EJokerBootstrap()));
 	}
 
-	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		eJokerFrameworkInitializer.initAll();
 		
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();

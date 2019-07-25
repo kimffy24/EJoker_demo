@@ -55,7 +55,7 @@ public class GenericType <L extends List<String>, T extends C<String, Double> & 
 		}
 
 		@Override
-		public void acceptChanges(long newVersion) {
+		public void acceptChanges() {
 			
 		}
 

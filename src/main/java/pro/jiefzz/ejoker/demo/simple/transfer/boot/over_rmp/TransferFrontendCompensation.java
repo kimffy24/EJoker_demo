@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,8 @@ import com.jiefzz.ejoker.queue.command.CommandService;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.ConfirmDepositPreparationCommand;
 
 /**
@@ -34,7 +35,7 @@ public class TransferFrontendCompensation {
 		start(TransferPrepare.prepare(new EJokerBootstrap()));
 	}
 
-	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 
 		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
 		SystemAsyncHelper systemAsyncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SystemAsyncHelper.class);

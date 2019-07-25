@@ -14,14 +14,12 @@ import com.jiefzz.ejoker.queue.aware.IEJokerQueueMessageContext;
 import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
-
 public class TestConsumer {
 
 	public static void main(String[] args) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
 		
 		DefaultMQConsumer defaultMQConsumer = new DefaultMQConsumer("ZTestCGroup");
-		defaultMQConsumer.setNamesrvAddr(EJokerBootstrap.NameServAddr);
+		defaultMQConsumer.setNamesrvAddr("test_rocketmq_2:9876;test_sit_1:9876");
 		defaultMQConsumer.subscribe("ZTestTopic", null);
 
 		defaultMQConsumer.registerEJokerCallback(TestConsumer::handle);

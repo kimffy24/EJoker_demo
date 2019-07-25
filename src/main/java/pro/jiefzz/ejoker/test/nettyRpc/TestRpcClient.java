@@ -7,14 +7,14 @@ import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 import com.jiefzz.ejoker.z.common.rpc.IRPCService;
 import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.TransferPrepare;
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
 
 public class TestRpcClient {
 
 	public static void main(String[] args) {
 		
-		EJokerBootstrap ejb = TransferPrepare.prepare(new EJokerBootstrap());
+		AbstractEJokerBootstrap ejb = TransferPrepare.prepare(new EJokerBootstrap());
 		
 		IEJokerSimpleContext eJokerContext = ejb.getEJokerContext();
 		

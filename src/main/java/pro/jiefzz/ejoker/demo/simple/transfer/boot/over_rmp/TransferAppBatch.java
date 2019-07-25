@@ -1,8 +1,9 @@
-package pro.jiefzz.ejoker.demo.simple.transfer;
+package pro.jiefzz.ejoker.demo.simple.transfer.boot.over_rmp;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -17,38 +18,25 @@ import com.jiefzz.ejoker.utils.MObjectId;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
 import com.jiefzz.ejoker.z.common.schedule.IScheduleService;
 import com.jiefzz.ejoker.z.common.service.IJSONConverter;
-import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker.z.common.task.context.SystemAsyncHelper;
 
-import pro.jiefzz.ejoker.demo.simple.transfer.boot.EJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 
-/**
- * 这是一个入口端的demo<br />
- * 主要用来创建账号和发送存款命令
- * <br />* env EJokerNodeAddr="192.168.199.123" mvn -Dmaven.test.skip=true clean compile exec:exec -Dexec.executable="java" -Dexec.args="-server -Xms2g -Xmx4g -Xmn3g -classpath %classpath pro.jiefzz.ejoker.demo.simple.transfer.TransferFrontend"
- * <br />* 远程调试添加到exec.args中 
-
-
- * 
- * @author kimffy
- *
- */
-public class TransferFrontend {
+public class TransferAppBatch {
 	
-	public final static int accountAmount = 40000;
-
-	public final static int transferLoop = 5;
-	
-	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontend.class);
+	private final static  Logger logger = LoggerFactory.getLogger(TransferAppBatch.class);
 
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()));
+		start(TransferPrepare.prepare(new EJokerBootstrap()), 400, 20);
 	}
 
-	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer, int accountAmount, int transferLoop) throws Exception {
 
+		eJokerFrameworkInitializer.initAll();
+		
 		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
 		
 		IJSONConverter jsonConverter = eJokerFrameworkInitializer.getEJokerContext().get(IJSONConverter.class);
@@ -78,7 +66,8 @@ public class TransferFrontend {
 				int index = cursor.getAndIncrement();
 				ioHelper.tryAsyncAction2(
 						"TestCreate_" + index,
-						() -> commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled),
+//						() -> commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled),
+						() -> commandService.sendAsync(new CreateAccountCommand(ids[index], "owner_" + index)),
 						r -> cdlx.countDown(),
 						() -> "",
 						e -> e.printStackTrace(),
@@ -88,9 +77,9 @@ public class TransferFrontend {
 		}
 		System.err.println("send ok.");
 		cdlx.await();
-		System.err.println("all account ok.");
+		System.err.println("all account ok. ");
 //		System.exit(0);
-		TimeUnit.MILLISECONDS.sleep(EJokerBootstrap.BatchDelay);
+		TimeUnit.MILLISECONDS.sleep(20000l);
 		System.out.println("Start batch deposit... ");
 		
 		int amount = transferLoop*ids.length;
@@ -127,12 +116,9 @@ public class TransferFrontend {
 		System.err.println(msg);
 		
 		
-//		TimeUnit.SECONDS.sleep(20l);
-//		DevUtils.ttt();
-//		DevUtils.moniter();
-//		ioHelper.d1();
-//		systemAsyncHelper.d1();
+		TimeUnit.SECONDS.sleep(20l);
 
 		eJokerFrameworkInitializer.discard();
+//		LockSupport.park();
 	}
 }

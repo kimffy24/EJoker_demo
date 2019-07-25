@@ -1,10 +1,14 @@
 package pro.jiefzz.ejoker.test.nettyRpc;
 
 import com.jiefzz.ejoker.EJoker;
+import com.jiefzz.ejoker.queue.aware.IConsumerWrokerAware;
+import com.jiefzz.ejoker.queue.aware.IProducerWrokerAware;
 import com.jiefzz.ejoker.z.common.context.dev2.IEJokerSimpleContext;
 import com.jiefzz.ejoker.z.common.context.dev2.IEjokerContextDev2;
 
-public class EJokerBootstrap {
+import pro.jiefzz.ejoker.demo.simple.transfer.boot.AbstractEJokerBootstrap;
+
+public class EJokerBootstrap extends AbstractEJokerBootstrap {
 
 	private final static String EJokerDefaultImplPackage = "com.jiefzz.ejokerDefaultImpl";
 	
@@ -32,13 +36,25 @@ public class EJokerBootstrap {
 		}
 	}
 
+	@Override
 	public IEJokerSimpleContext getEJokerContext() {
 		return eJokerContext;
 	}
 
+	@Override
 	public void discard() {
 		IEjokerContextDev2 eJokerFullContext = (IEjokerContextDev2 )eJokerContext;
 		eJokerFullContext.discard();
+	}
+
+	@Override
+	protected IConsumerWrokerAware createDefaultMQConsumer(String groupName, IEJokerSimpleContext eContext) {
+		return null;
+	}
+
+	@Override
+	protected IProducerWrokerAware createDefaultMQProducer(String groupName, IEJokerSimpleContext eContext) {
+		return null;
 	}
 	
 }
