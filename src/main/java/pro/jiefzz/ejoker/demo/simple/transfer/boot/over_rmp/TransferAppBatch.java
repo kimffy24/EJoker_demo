@@ -116,9 +116,9 @@ public class TransferAppBatch {
 		System.err.println(msg);
 		
 		
-		TimeUnit.SECONDS.sleep(20l);
-
-		eJokerFrameworkInitializer.discard();
-//		LockSupport.park();
+//		TimeUnit.SECONDS.sleep(20l);
+//
+//		eJokerFrameworkInitializer.discard();
+		LockSupport.park();
 	}
 }
