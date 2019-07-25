@@ -72,7 +72,7 @@ public class TransferApp {
         SleepWrapper.sleep(TimeUnit.SECONDS, 1l);
 
         logger.info("All OK.");
-        TimeUnit.SECONDS.sleep(5l);
+        TimeUnit.SECONDS.sleep(15l);
         eJokerFrameworkInitializer.discard();
 
 	}
