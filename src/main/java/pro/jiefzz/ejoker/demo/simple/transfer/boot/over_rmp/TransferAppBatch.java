@@ -28,9 +28,21 @@ import pro.jiefzz.ejoker.demo.simple.transfer.commands.depositTransaction.StartD
 public class TransferAppBatch {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(TransferAppBatch.class);
+	
+	public final static int accountAmount = 5000;
+
+	public final static int depositLoop = 10;
 
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()), 5000, 10);
+		start(TransferPrepare.prepare(new EJokerBootstrap()), getAccountAmount(), getDepositLoop());
+	}
+	
+	public final static int getAccountAmount() {
+		return accountAmount;
+	}
+	
+	public final static int getDepositLoop() {
+		return depositLoop;
 	}
 
 	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer, int accountAmount, int transferLoop) throws Exception {
