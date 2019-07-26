@@ -29,7 +29,7 @@ public class TransferAppBatch {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(TransferAppBatch.class);
 	
-	public final static int accountAmount = 50000;
+	public final static int accountAmount = 20000;
 
 	public final static int depositLoop = 10;
 
