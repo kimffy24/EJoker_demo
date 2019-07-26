@@ -12,7 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ import com.jiefzz.ejoker.z.common.context.annotation.context.EService;
 import com.jiefzz.ejoker.z.common.io.IOHelper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapper;
 import com.jiefzz.ejoker.z.common.system.extension.acrossSupport.SystemFutureWrapperUtil;
-import com.jiefzz.ejoker.z.common.system.wrapper.SleepWrapper;
 import com.jiefzz.ejoker.z.common.task.AsyncTaskResult;
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoWriteException;
@@ -233,6 +231,9 @@ public class MongoEventStore implements IEventStore {
 	}
 
 	private EventAppendResult append(DomainEventStream eventStream) {
+		
+		if(1 > 0)
+			throw new RuntimeException();
 		
 		{
 //			BasicDBObject dbo = legacyConvert(eventStream);
