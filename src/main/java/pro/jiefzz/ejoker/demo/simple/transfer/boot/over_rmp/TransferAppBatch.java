@@ -80,11 +80,14 @@ public class TransferAppBatch {
 		System.err.println("all account ok. ");
 //		System.exit(0);
 		TimeUnit.MILLISECONDS.sleep(20000l);
-		System.out.println("Start batch deposit... ");
+
+		long t = System.currentTimeMillis();
+		String msgp = String.format("Start batch deposit, batch start at: %d ... ", t);
+		System.err.println(msgp);
+		logger.error(msgp);
 		
 		int amount = transferLoop*ids.length;
 		CountDownLatch cdl = new CountDownLatch(amount);
-		long t = System.currentTimeMillis();
 		for(int j=0; j<transferLoop; j++) {
 			for(int i=0; i<ids.length; i++) {
 				final int index = (j*ids.length)+i;
@@ -112,8 +115,8 @@ public class TransferAppBatch {
 		}
 		cdl.await();
 		String msg = String.format("batch start at: %d, time use: %d ms", t, System.currentTimeMillis() - t);
-		logger.error(msg);
 		System.err.println(msg);
+		logger.error(msg);
 		
 		
 //		TimeUnit.SECONDS.sleep(20l);
