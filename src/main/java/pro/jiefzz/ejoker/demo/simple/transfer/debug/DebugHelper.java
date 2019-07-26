@@ -505,7 +505,7 @@ public class DebugHelper extends AbstractMessageHandler {
 		
 		// 输出内存中记录量(如果使用内存版本库)
 		if("InMemoryPublishedVersionStore".equals(inMemoryPublishedVersionStore.getClass().getSimpleName())) {
-			logger.error("size of InMemoryPublishedVersionStore{}", versionDict.size());
+			logger.error("size of InMemoryPublishedVersionStore: {}", versionDict.size());
 			final Map<String, AtomicLong> dict = new ConcurrentHashMap<>();
 			versionDict.entrySet().parallelStream().map(e -> {
 				return e.getValue();
