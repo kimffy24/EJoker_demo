@@ -48,7 +48,7 @@ public class MongoProvider {
 
 		MongoClientOptions.Builder build = new MongoClientOptions.Builder();
 		build.connectionsPerHost(200); // 与目标数据库能够建立的最大connection数量为50
-		build.threadsAllowedToBlockForConnectionMultiplier(Integer.MAX_VALUE); // 如果当前所有的connection都在使用中，则每个connection上可以有50个线程排队等待
+		build.threadsAllowedToBlockForConnectionMultiplier(1024); // 如果当前所有的connection都在使用中，则每个connection上可以有50个线程排队等待
 		/*
 		 * 一个线程访问数据库的时候，在成功获取到一个可用数据库连接之前的最长等待时间为2分钟
 		 * 这里比较危险，如果超过maxWaitTime都没有获取到这个连接的话，该线程就会抛出Exception
