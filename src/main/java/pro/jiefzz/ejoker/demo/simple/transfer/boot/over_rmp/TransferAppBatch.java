@@ -30,7 +30,7 @@ public class TransferAppBatch {
 	private final static  Logger logger = LoggerFactory.getLogger(TransferAppBatch.class);
 
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()), 4000, 10);
+		start(TransferPrepare.prepare(new EJokerBootstrap()), 5000, 10);
 	}
 
 	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer, int accountAmount, int transferLoop) throws Exception {

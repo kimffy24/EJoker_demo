@@ -29,7 +29,7 @@ public class SyncHelper extends AbstractMessageHandler {
 	AtomicLong alt = new AtomicLong(0);
 
 	public void show() {
-		logger.error("DepositTransactionCompletedEvent hit: {}, last event hit: {}ms", al1.get(), alt.get());
+		logger.error("DepositTransactionCompletedEvent hit: {}, last event hit: {} ms", al1.get(), alt.get());
 	}
 
 	private Object waitHandle = CountDownLatchWrapper.newCountDownLatch();

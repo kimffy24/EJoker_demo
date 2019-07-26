@@ -42,12 +42,10 @@ public class ConsoleLogger extends AbstractMessageHandler {
 
 	//// for debug
 	private AtomicInteger accountCreatedEventHit = new AtomicInteger(0);
-	private AtomicInteger depositTransactionCompletedEventHit = new AtomicInteger(0);
 	private AtomicInteger transferTransactionCompletedEventHit = new AtomicInteger(0);
 
 	public void show() {
 		logger.error("收到的账户成功创建事件的总数: {}", accountCreatedEventHit.get());
-		logger.error("收到的存款完成事件事件的总数: {}", depositTransactionCompletedEventHit.get());
 		logger.error("收到的转账完成事件事件的总数: {}", transferTransactionCompletedEventHit.get());
 	}
 	//// for debug
@@ -57,14 +55,6 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		logger.info("创建账号成功: 账户={}, 所有者={}, 当前时间戳={}", message.getAggregateRootId(), message.getOwner(), System.currentTimeMillis());
 		{ /// for debug
 			accountCreatedEventHit.incrementAndGet();
-		}
-		return SystemFutureWrapperUtil.completeFutureTask();
-	}
-	
-	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
-		{ /// for debug
-			depositTransactionCompletedEventHit.incrementAndGet();
 		}
 		return SystemFutureWrapperUtil.completeFutureTask();
 	}
