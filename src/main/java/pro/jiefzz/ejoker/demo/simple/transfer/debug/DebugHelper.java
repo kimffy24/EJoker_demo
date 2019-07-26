@@ -520,8 +520,10 @@ public class DebugHelper extends AbstractMessageHandler {
 	
 	@EInitialize
 	private void init() {
-		mStorage = getDomainEventMemoryStore();
-		versionDict = getInMemoryPublishedVersionDict();
+		try {
+			mStorage = getDomainEventMemoryStore();
+			versionDict = getInMemoryPublishedVersionDict();
+		} catch (RuntimeException ex) {}
 
 		scheduleService.startTask("DebugHelper_probe", this::probe, 5000l, 5000l);
 	}
