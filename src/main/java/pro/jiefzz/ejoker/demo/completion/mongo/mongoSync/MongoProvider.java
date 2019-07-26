@@ -58,14 +58,12 @@ public class MongoProvider {
 		build.connectTimeout(1000 * 60 * 1); // 与数据库建立连接的timeout设置为1分钟
 		build.socketTimeout(1000 * 60 * 1);
 
-		MongoClientOptions myOptions = build.build();
-
 		List<ServerAddress> serverList = new ArrayList<>();
 		serverList.add(new ServerAddress("test_sit_1", 27017));
 
 		try {
 			// 数据库连接实例
-			mongoClient = new MongoClient(serverList, myOptions);
+			mongoClient = new MongoClient(serverList, build.build());
 		} catch (MongoException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
