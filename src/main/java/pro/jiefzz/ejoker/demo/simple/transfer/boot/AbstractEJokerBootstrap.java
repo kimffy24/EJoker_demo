@@ -26,8 +26,8 @@ public abstract class AbstractEJokerBootstrap {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(AbstractEJokerBootstrap.class);
 
-	protected final static String EJokerDefaultImplPackage = "com.jiefzz.ejoker_support.defaultMemoryImpl";
-//	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
+//	protected final static String EJokerDefaultImplPackage = "com.jiefzz.ejoker_support.defaultMemoryImpl";
+	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
