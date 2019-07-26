@@ -334,13 +334,15 @@ public class MongoEventStore implements IEventStore {
 				r.add(revert(mongoCursor.next()));
 			}
 		}
-		logger.error("==> aggregateRootId: {}, aggregateRootTypeName: {}, minVersion: {}, maxVersion: {}, Collection<DomainEventStream>.size(): {}",
-				aggregateRootId,
-				aggregateRootTypeName,
-				minVersion,
-				maxVersion,
-				r.size()
-				);
+//		logger.error("==> aggregateRootId: {}, aggregateRootTypeName: {}, minVersion: {}, maxVersion: {}, Collection<DomainEventStream>.size(): {}",
+//				aggregateRootId,
+//				aggregateRootTypeName,
+//				minVersion,
+//				maxVersion,
+//				r.size()
+//				);
+		if(1>0)
+			throw new RuntimeException("x");
 		return r;
 	}
 }
