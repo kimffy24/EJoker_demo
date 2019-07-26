@@ -79,7 +79,7 @@ public class TransferAppBatch {
 		cdlx.await();
 		System.err.println("all account ok. ");
 //		System.exit(0);
-		TimeUnit.MILLISECONDS.sleep(20000l);
+		TimeUnit.MILLISECONDS.sleep(40000l);
 
 		long t = System.currentTimeMillis();
 		String msgp = String.format("Start batch deposit, batch start at: %d ... ", t);
