@@ -24,6 +24,7 @@ public class SyncHelper extends AbstractMessageHandler {
 
 	private final static Logger logger = LoggerFactory.getLogger(SyncHelper.class);
 
+	// for debug
 	AtomicLong al1 = new AtomicLong(0);
 
 	AtomicLong alt = new AtomicLong(0);
@@ -31,7 +32,13 @@ public class SyncHelper extends AbstractMessageHandler {
 	public void show() {
 		logger.error("DepositTransactionCompletedEvent hit: {}, last event hit: {} ms", al1.get(), alt.get());
 	}
+	
+	public long getLastHitTimestamp() {
+		return alt.get();
+	}
 
+	// for debug
+	
 	private Object waitHandle = CountDownLatchWrapper.newCountDownLatch();
 
 	@Suspendable

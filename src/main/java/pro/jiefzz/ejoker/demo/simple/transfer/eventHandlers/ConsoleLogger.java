@@ -23,7 +23,6 @@ import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.Ac
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationAddedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.domainEvents.TransactionPreparationCommittedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.bankAccount.exceptions.InsufficientBalanceException;
-import pro.jiefzz.ejoker.demo.simple.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.TransferTransactionInfo;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferInPreparationConfirmedEvent;
 import pro.jiefzz.ejoker.demo.simple.transfer.domain.transferTransaction.domainEvents.TransferOutPreparationConfirmedEvent;
@@ -43,6 +42,10 @@ public class ConsoleLogger extends AbstractMessageHandler {
 	//// for debug
 	private AtomicInteger accountCreatedEventHit = new AtomicInteger(0);
 	private AtomicInteger transferTransactionCompletedEventHit = new AtomicInteger(0);
+	
+	public int getAccountHit() {
+		return accountCreatedEventHit.get();
+	}
 
 	public void show() {
 		logger.error("收到的账户成功创建事件的总数: {}", accountCreatedEventHit.get());

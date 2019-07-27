@@ -1,5 +1,7 @@
 package pro.jiefzz.ejoker.demo.simple.transfer.boot;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -26,8 +28,9 @@ public abstract class AbstractEJokerBootstrap {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(AbstractEJokerBootstrap.class);
 
+	protected final static String EJokerDefaultImplPackage;
 //	protected final static String EJokerDefaultImplPackage = "com.jiefzz.ejoker_support.defaultMemoryImpl";
-	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
+//	protected final static String EJokerDefaultImplPackage = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
 	
 	protected final static String BusinessPackage = "pro.jiefzz.ejoker.demo.simple.transfer";
 	
@@ -260,4 +263,37 @@ public abstract class AbstractEJokerBootstrap {
 	protected abstract IConsumerWrokerAware createDefaultMQConsumer(String groupName, IEJokerSimpleContext eContext);
 	
 	protected abstract IProducerWrokerAware createDefaultMQProducer(String groupName, IEJokerSimpleContext eContext);
+
+	static {
+		String ES = null;
+		boolean isWindows = System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") != -1;
+		
+		String envKey1 = "ES";
+		if(isWindows) {
+			// All environment propertie's name will represent by upper case.
+			envKey1 = envKey1.toUpperCase();
+		}
+		
+		Map<String, String> map = System.getenv();
+        for (Iterator<String> it = map.keySet().iterator(); it.hasNext(); ){
+            String key = it.next();
+            String value = map.get(key);
+            if(envKey1.equals(key))
+            	ES = value;
+        }
+        if(null == ES)
+        	ES="";
+        switch(ES) {
+        case "mongosync":
+        case "mongo_sync":
+        	ES = "pro.jiefzz.ejoker.demo.completion.mongo.mongoSync";
+        	break;
+        case "":
+        default :
+        	ES =  "com.jiefzz.ejoker_support.defaultMemoryImpl";
+            break;
+        }
+        logger.info("Detect ES: {}.", ES);
+        EJokerDefaultImplPackage = ES;
+	}
 }
