@@ -293,7 +293,7 @@ public abstract class AbstractEJokerBootstrap {
         	ES =  "com.jiefzz.ejoker_support.defaultMemoryImpl";
             break;
         }
-        logger.info("Detect ES: {}.", ES);
+        logger.info("Detect ES: {} .", ES);
         EJokerDefaultImplPackage = ES;
 	}
 }

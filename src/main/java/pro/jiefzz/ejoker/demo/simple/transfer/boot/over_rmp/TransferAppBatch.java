@@ -195,8 +195,8 @@ public class TransferAppBatch {
         if(null == ELoop || "".equals(ELoop)) {
         	ELoop = "10";
         }
-        logger.info("Detect EAmount: {}.", EAmount);
-        logger.info("Detect ELoop: {}.", ELoop);
+        logger.info("Detect EAmount: {} .", EAmount);
+        logger.info("Detect ELoop: {} .", ELoop);
         accountAmount = Integer.parseInt(EAmount);
         depositLoop = Integer.parseInt(ELoop);
 	}
