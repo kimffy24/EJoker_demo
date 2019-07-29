@@ -71,7 +71,7 @@ public class TransferAppBatch {
 		
 		scheduleService.startTask("ProformanceStatistics_1", () -> {
 			try {
-				BigDecimal totalProcess = new BigDecimal("10")
+				BigDecimal totalProcess = new BigDecimal("5")
 						.multiply(new BigDecimal("" + accountAmount))
 						.multiply(new BigDecimal("" + transferLoop))
 						.divide(
