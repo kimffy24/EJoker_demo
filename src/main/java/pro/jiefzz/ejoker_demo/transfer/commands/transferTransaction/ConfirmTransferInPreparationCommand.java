@@ -1,0 +1,18 @@
+package pro.jiefzz.ejoker_demo.transfer.commands.transferTransaction;
+
+import pro.jiefzz.ejoker.commanding.AbstractCommand;
+
+/**
+ * 确认预转入
+ * @author kimffy
+ *
+ */
+public class ConfirmTransferInPreparationCommand extends AbstractCommand {
+	
+	public ConfirmTransferInPreparationCommand() {
+	}
+	
+    public ConfirmTransferInPreparationCommand(String transactionId) {
+    	super(transactionId);
+    }
+}
