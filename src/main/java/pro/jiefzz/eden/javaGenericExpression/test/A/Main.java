@@ -4,15 +4,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import pro.jiefzz.ejoker.z.utils.GenericTypeUtil;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 		
-		ObjectMapper om = new ObjectMapper();
 		
 		Class<?>[] clazzs = new Class<?>[] {
 			D0.class,
