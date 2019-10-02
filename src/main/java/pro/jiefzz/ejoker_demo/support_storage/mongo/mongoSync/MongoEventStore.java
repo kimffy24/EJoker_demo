@@ -7,25 +7,18 @@ import static com.mongodb.client.model.Filters.lt;
 import static pro.jiefzz.ejoker.z.system.extension.LangUtil.await;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.Future;
 
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.MongoBulkWriteException;
-import com.mongodb.MongoWriteException;
-import com.mongodb.bulk.BulkWriteError;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.BulkWriteOptions;
-import com.mongodb.client.model.InsertOneModel;
-import com.mongodb.client.model.WriteModel;
 
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.eventing.DomainEventStream;
@@ -36,8 +29,7 @@ import pro.jiefzz.ejoker.eventing.IEventStore;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.io.IOHelper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 
 @EService
@@ -68,20 +60,11 @@ public class MongoEventStore implements IEventStore {
 	
 	private final String collectionNameOfEventStream = "EventStream";
 
-	@Override
-	public boolean isSupportBatchAppendEvent() {
-		return true;
-	}
-
-	@Override
-	public void setSupportBatchAppendEvent(boolean supportBatchAppendEvent) {
-	}
-
 	@Suspendable
 	@Override
-	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> batchAppendAsync(
-			LinkedHashSet<DomainEventStream> eventStreams) {
-		return SystemFutureWrapperUtil.completeFutureTask(
+	public Future<AsyncTaskResult<EventAppendResult>> batchAppendAsync(
+			List<DomainEventStream> eventStreams) {
+		return EJokerFutureTaskUtil.completeTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> batchAppend(eventStreams)
@@ -92,20 +75,8 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public SystemFutureWrapper<AsyncTaskResult<EventAppendResult>> appendAsync(DomainEventStream eventStream) {
-		return SystemFutureWrapperUtil.completeFutureTask(
-				await(
-						mongoProvider.submitWithInnerExector(
-								() -> append(eventStream)
-								)
-						)
-				);
-	}
-
-	@Suspendable
-	@Override
-	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, long version) {
-		return SystemFutureWrapperUtil.completeFutureTask(
+	public Future<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, long version) {
+		return EJokerFutureTaskUtil.completeTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> find(aggregateRootId, version)
@@ -116,8 +87,8 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public SystemFutureWrapper<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, String commandId) {
-		return SystemFutureWrapperUtil.completeFutureTask(
+	public Future<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, String commandId) {
+		return EJokerFutureTaskUtil.completeTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> find(aggregateRootId, commandId)
@@ -128,9 +99,9 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public SystemFutureWrapper<AsyncTaskResult<Collection<DomainEventStream>>> queryAggregateEventsAsync(
+	public Future<AsyncTaskResult<List<DomainEventStream>>> queryAggregateEventsAsync(
 			String aggregateRootId, String aggregateRootTypeName, long minVersion, long maxVersion) {
-		return SystemFutureWrapperUtil.completeFutureTask(
+		return EJokerFutureTaskUtil.completeTask(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> queryAggregateEvents(aggregateRootId, aggregateRootTypeName, minVersion, maxVersion)
@@ -194,84 +165,41 @@ public class MongoEventStore implements IEventStore {
 				doc.getString("aggregateRootId"),
 				doc.getString("aggregateRootTypeName"),
 				doc.getLong("version"),
-				doc.getLong("timestamp"),
 				srcEvents,
 				(Map<String, String> )doc.get("items"));
 	}
 	
 	private BulkWriteOptions defaultOptions = new BulkWriteOptions().ordered(false);
 	
-	private EventAppendResult batchAppend(Set<DomainEventStream> eventStreams) {
+	private EventAppendResult batchAppend(List<DomainEventStream> eventStreams) {
 		
-		List<WriteModel<? extends Document>> requests = new ArrayList<>();
-		
-		for(DomainEventStream es : eventStreams) {
-			requests.add(new InsertOneModel<Document>(convert(es)));
-		}
-		
-		MongoCollection<Document> collection = mongoProvider.getCollection(collectionNameOfEventStream);
-		try {
-			collection.bulkWrite(requests, defaultOptions);
-			return EventAppendResult.Success;
-		} catch(MongoBulkWriteException e) {
-			List<BulkWriteError> writeErrors = e.getWriteErrors();
-			String message = writeErrors.iterator().next().getMessage();
-			if(null != message && message.startsWith("E11000 duplicate key")) {
-				if(message.contains(commandIndexName))
-					return EventAppendResult.DuplicateCommand;
-				else if(message.contains(versionIndexName))
-					return EventAppendResult.DuplicateEvent;
-			}
-            logger.error("Batch append event has storage exception.", e);
-			throw e;
-		} catch (RuntimeException e) {
-            logger.error("Batch append event has unknown exception.", e);
-            throw e;
-		}
-	}
-
-	private EventAppendResult append(DomainEventStream eventStream) {
-		
-		if(1 > 0)
-			throw new RuntimeException();
-		
-		{
-//			BasicDBObject dbo = legacyConvert(eventStream);
-//			DBCollection legacyCollection = mongoProvider.getLegacyCollection(collectionNameOfEventStream);
-//			try {
-//				WriteResult update = legacyCollection.update(new BasicDBObject("aggregateRootId", eventStream.getAggregateRootId())
-//						.append("version", eventStream.getVersion()), dbo, true, false);
-//				if(update.getN() == 1)
-//					return EventAppendResult.Success;
-//				else {
-//					throw new RuntimeException("不被期望的意外.");
-//				}
-//			} catch (DuplicateKeyException ex) {
-//				return EventAppendResult.DuplicateEvent;
+		return new EventAppendResult();
+//		
+//		List<WriteModel<? extends Document>> requests = new ArrayList<>();
+//		
+//		for(DomainEventStream es : eventStreams) {
+//			requests.add(new InsertOneModel<Document>(convert(es)));
+//		}
+//		
+//		MongoCollection<Document> collection = mongoProvider.getCollection(collectionNameOfEventStream);
+//		try {
+//			collection.bulkWrite(requests, defaultOptions);
+//			return EventAppendResult.Success;
+//		} catch(MongoBulkWriteException e) {
+//			List<BulkWriteError> writeErrors = e.getWriteErrors();
+//			String message = writeErrors.iterator().next().getMessage();
+//			if(null != message && message.startsWith("E11000 duplicate key")) {
+//				if(message.contains(commandIndexName))
+//					return EventAppendResult.DuplicateCommand;
+//				else if(message.contains(versionIndexName))
+//					return EventAppendResult.DuplicateEvent;
 //			}
-		}
-		{
-			Document document = convert(eventStream);
-			MongoCollection<Document> collection = mongoProvider.getCollection(collectionNameOfEventStream);
-			try {
-				collection.insertOne(document);
-				return EventAppendResult.Success;
-			} catch(MongoWriteException e) {
-				String message = e.getMessage();
-				if(null != message && message.startsWith("E11000 duplicate key")) {
-					if(message.contains(commandIndexName))
-						return EventAppendResult.DuplicateCommand;
-					else if(message.contains(versionIndexName))
-						return EventAppendResult.DuplicateEvent;
-				}
-
-                logger.error(String.format("Append event has storage exception, eventStream: %s", eventStream.toString()), e);
-				throw e;
-			} catch (RuntimeException e) {
-                logger.error(String.format("Append event has unknown exception, eventStream: %s", eventStream.toString()), e);
-                throw e;
-			}
-		}
+//            logger.error("Batch append event has storage exception.", e);
+//			throw e;
+//		} catch (RuntimeException e) {
+//            logger.error("Batch append event has unknown exception.", e);
+//            throw e;
+//		}
 	}
 
 	private DomainEventStream find(String aggregateRootId, long version) {
@@ -302,10 +230,10 @@ public class MongoEventStore implements IEventStore {
 		return revert(target);
 	}
 
-	private Collection<DomainEventStream> queryAggregateEvents(String aggregateRootId, String aggregateRootTypeName,
+	private List<DomainEventStream> queryAggregateEvents(String aggregateRootId, String aggregateRootTypeName,
 			long minVersion, long maxVersion) {
 
-		Collection<DomainEventStream> r = new ArrayList<>();
+		List<DomainEventStream> r = new ArrayList<>();
 //		{
 //			DBCollection legacyCollection = mongoProvider.getLegacyCollection("EventStream");
 //			DBCursor cursor = legacyCollection.find(new BasicDBObject("aggregateRootId", aggregateRootId)

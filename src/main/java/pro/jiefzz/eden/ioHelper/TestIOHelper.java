@@ -7,7 +7,7 @@ import java.util.concurrent.locks.LockSupport;
 
 import pro.jiefzz.ejoker.eventing.EventAppendResult;
 import pro.jiefzz.ejoker.z.io.IOHelper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureUtil;
 import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker.z.task.AsyncTaskStatus;
 
@@ -52,35 +52,25 @@ public class TestIOHelper {
 						System.out.println("testList.get()  ==> " + testList.get(j.get()));
 						System.out.println("***** 任务完成");
 
-						actualTaskResult = new AsyncTaskResult<EventAppendResult>(
-								AsyncTaskStatus.Success, EventAppendResult.Success);
+						actualTaskResult = new AsyncTaskResult<EventAppendResult>(new EventAppendResult());
 
 					}
-					return SystemFutureWrapperUtil.completeFuture(actualTaskResult); },
+					return EJokerFutureUtil.completeFuture(actualTaskResult); },
 				actualResule -> {
 					System.out.println("finishAction() was invoked!");
-					EventAppendResult status = actualResule;
-					switch (status) {
-					case Success:
-						System.out.println("  AsyncAction completed!");
-						System.out.println("  Resulr status = " + status.toString());
-						System.out.println("  cursor = " + i.get());
 
-						System.out.println("=========== 标记一次异步任务完成 ==========");
-						
-						j.incrementAndGet();
-						if(j.get() > 3)
-							break;
-						i.set(0);
-						
-						break;
-					case Failed:
-					default:
-						System.out.println("  AsyncAction completed!");
-						System.out.println("  Resulr status = " + status.toString());
-						System.out.println("  cursor = " + i.get());
-						break;
-					} },
+					System.out.println("  AsyncAction completed!");
+					System.out.println("  Resulr status = ok");
+					System.out.println("  cursor = " + i.get());
+
+					System.out.println("=========== 标记一次异步任务完成 ==========");
+					
+					j.incrementAndGet();
+					if(j.get() > 3)
+						return;
+					i.set(0);
+					
+				},
 				() -> "testContextInfo",
 				ex -> System.out.println("faildAction() was invoked! pass: " + ex.getMessage())
 				);

@@ -2,7 +2,7 @@ package pro.jiefzz.ejoker_demo.transfer.commands.bankAccount;
 
 import pro.jiefzz.ejoker.commanding.AbstractCommand;
 
-public class CreateAccountCommand extends AbstractCommand {
+public class CreateAccountCommand extends AbstractCommand<String> {
 
 	private String owner;
 

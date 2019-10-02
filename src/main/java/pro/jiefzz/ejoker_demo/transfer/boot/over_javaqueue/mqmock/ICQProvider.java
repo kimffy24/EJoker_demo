@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
-import pro.jiefzz.ejoker.queue.aware.EJokerQueueMessage;
+import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
 
 public interface ICQProvider {
 

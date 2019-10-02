@@ -4,7 +4,7 @@ import pro.jiefzz.ejoker.commanding.AbstractCommand;
 import pro.jiefzz.ejoker_demo.transfer.domain.TransactionType;
 import pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.PreparationType;
 
-public class AddTransactionPreparationCommand extends AbstractCommand {
+public class AddTransactionPreparationCommand extends AbstractCommand<String> {
 
 	private String transactionId;
 

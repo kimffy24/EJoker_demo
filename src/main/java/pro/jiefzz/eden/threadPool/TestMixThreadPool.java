@@ -1,6 +1,7 @@
 package pro.jiefzz.eden.threadPool;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -9,12 +10,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import pro.jiefzz.ejoker.EJokerEnvironment;
+import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker.z.system.wrapper.MixedThreadPoolExecutor;
 
 public class TestMixThreadPool {
 
 	
-	public static void main(String[] args) throws Exception {
+	private final static AtomicInteger activeCounter = new AtomicInteger(0);
+	
+	public static void main(String[] args) {
 		
 
 		ThreadPoolExecutor threadPoolExecutor = new MixedThreadPoolExecutor(
@@ -46,15 +50,49 @@ public class TestMixThreadPool {
 						return t;
 					}
 
-				});
+				}) {
+
+
+			@Override
+			protected void beforeExecute(Thread t, Runnable r) {
+				activeCounter.incrementAndGet();
+				super.beforeExecute(t, r);
+			}
+
+			@Override
+			protected void afterExecute(Runnable r, Throwable t) {
+				super.afterExecute(r, t);
+				activeCounter.decrementAndGet();
+			}
+			
+		};
+//		
+//		Future<Object> handle = threadPoolExecutor.submit(() -> { throw new IOException("sb"); });
+//		
+//		
+//		
+//		try {
+//			handle.get();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (ExecutionException e) {
+//			e.printStackTrace();
+//		}
+//		
+
+		threadPoolExecutor.submit(() -> { DiscardWrapper.sleepInterruptable(5000l); });
+		threadPoolExecutor.submit(() -> { DiscardWrapper.sleepInterruptable(5000l); });
+		threadPoolExecutor.submit(() -> { DiscardWrapper.sleepInterruptable(5000l); });
 		
-		Future<Object> handle = threadPoolExecutor.submit(() -> { throw new IOException("sb"); });
+		while(true) {
+			
+			System.out.println(activeCounter.get());
+			
+			if(0==activeCounter.get())
+			break;
+		}
 		
-		
-		handle.get();
-		
-		
-		threadPoolExecutor.shutdown();
+		threadPoolExecutor.shutdownNow();
 		
 	}
 }

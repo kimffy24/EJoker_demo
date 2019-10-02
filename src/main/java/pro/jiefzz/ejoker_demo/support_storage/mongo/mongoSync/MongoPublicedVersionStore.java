@@ -7,7 +7,7 @@ import static com.mongodb.client.model.Updates.set;
 import static pro.jiefzz.ejoker.z.system.extension.LangUtil.await;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -19,14 +19,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 
 import co.paralleluniverse.fibers.Suspendable;
-import pro.jiefzz.ejoker.infrastructure.IPublishedVersionStore;
+import pro.jiefzz.ejoker.eventing.qeventing.IPublishedVersionStore;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.io.IOExceptionOnRuntime;
+import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.RipenFuture;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapperUtil;
-import pro.jiefzz.ejoker.z.system.wrapper.SleepWrapper;
 import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker.z.task.AsyncTaskStatus;
 
@@ -48,60 +46,33 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 
 	@Suspendable
 	@Override
-	public SystemFutureWrapper<AsyncTaskResult<Void>> updatePublishedVersionAsync(String processorName,
+	public Future<AsyncTaskResult<Void>> updatePublishedVersionAsync(String processorName,
 			String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
 		try {
 			await(mongoProvider.submitWithInnerExector(() -> updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion)));
-			return SystemFutureWrapperUtil.completeFutureTask();
+			return EJokerFutureTaskUtil.completeTask();
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Void>> ripenFuture = new RipenFuture<>();
 			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));
-			return new SystemFutureWrapper<>(ripenFuture);
+			return ripenFuture;
 		}
 	}
 	
 	@Suspendable
 	@Override
-	public SystemFutureWrapper<AsyncTaskResult<Long>> getPublishedVersionAsync(String processorName,
+	public Future<AsyncTaskResult<Long>> getPublishedVersionAsync(String processorName,
 			String aggregateRootTypeName, String aggregateRootId) {
 		try {
 			long r = await(mongoProvider.submitWithInnerExector(() -> getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId)));
-			return SystemFutureWrapperUtil.completeFutureTask(r);
+			return EJokerFutureTaskUtil.completeTask(r);
 		} catch (Exception e) {
 			RipenFuture<AsyncTaskResult<Long>> ripenFuture = new RipenFuture<>();
 			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));
-			return new SystemFutureWrapper<>(ripenFuture);
+			return ripenFuture;
 		}
 	}
 	
 	private void updatePublishedVersion(String processorName, String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
-//		
-//		DBCollection legacyCollection = mongoProvider.getLegacyCollection(getCollectionName(aggregateRootTypeName, processorName));
-//		if(0 == 1 - publishedVersion) {
-//			
-//		}
-//		
-//		
-//		WriteResult writeResult;
-//		if(publishedVersion - 1l == 0) {
-//			writeResult = legacyCollection.update(
-//				new BasicDBObject("id", aggregateRootId),
-//				new BasicDBObject("$set", new BasicDBObject("version", publishedVersion)),
-//				true,
-//				false
-//				);
-//		} else {
-//			writeResult = legacyCollection.update(
-//				new BasicDBObject("id", aggregateRootId).append("version", publishedVersion-1l),
-//				new BasicDBObject("$inc", new BasicDBObject("version", 1)),
-//				false,
-//				false
-//				);
-//		}
-//		if(writeResult.getN() - 1 != 0) {
-//			// 抛错？
-//		}
-		
 		MongoCollection<Document> collection = mongoProvider.getCollection(collectionNameOfPublishedVersionStore);
 		long currentTimeMillis = System.currentTimeMillis();
 		if(0 == 1 - publishedVersion) {

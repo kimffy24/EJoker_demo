@@ -2,7 +2,7 @@ package pro.jiefzz.ejoker_demo.transfer.topicProviders;
 
 import java.util.Set;
 
-import pro.jiefzz.ejoker.infrastructure.varieties.applicationMessage.IApplicationMessage;
+import pro.jiefzz.ejoker.infrastructure.messaging.varieties.applicationMessage.IApplicationMessage;
 import pro.jiefzz.ejoker.queue.ITopicProvider;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker_demo.transfer.boot.TopicReference;

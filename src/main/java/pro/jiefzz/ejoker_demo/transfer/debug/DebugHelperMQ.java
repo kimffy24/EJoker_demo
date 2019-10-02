@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import pro.jiefzz.ejoker.queue.command.CommandConsumer;
 import pro.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.z.context.annotation.context.EInitialize;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
-import pro.jiefzz.ejoker.z.schedule.IScheduleService;
 import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer.ControlStruct;
 
@@ -21,9 +19,6 @@ public class DebugHelperMQ {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DebugHelperMQ.class);
 
-	@Dependence
-	IScheduleService scheduleService;
-	
 	@Dependence
 	CommandConsumer commandConsumer;
 	
@@ -83,7 +78,7 @@ public class DebugHelperMQ {
 			return (Map<MessageQueue, ControlStruct> )object;
 	}
 	
-	private void probe() {
+	public void probe() {
 
 		try {
 			
@@ -126,10 +121,5 @@ public class DebugHelperMQ {
 			e.printStackTrace();
 		}
 		
-	}
-	
-	@EInitialize
-	private void init() {
-		scheduleService.startTask("DebugHelperMQ_probe", this::probe, 5000l, 5000l);
 	}
 }

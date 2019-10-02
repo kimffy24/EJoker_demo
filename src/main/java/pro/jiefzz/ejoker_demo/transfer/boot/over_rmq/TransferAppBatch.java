@@ -1,35 +1,30 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.jiefzz.ejoker.commanding.CommandReturnType;
-import pro.jiefzz.ejoker.commanding.ICommand;
-import pro.jiefzz.ejoker.commanding.ICommandRoutingKeyProvider;
-import pro.jiefzz.ejoker.queue.ITopicProvider;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.utils.MObjectId;
 import pro.jiefzz.ejoker.z.io.IOHelper;
-import pro.jiefzz.ejoker.z.schedule.IScheduleService;
-import pro.jiefzz.ejoker.z.service.IJSONConverter;
+import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker.z.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.StartDepositTransactionCommand;
+import pro.jiefzz.ejoker_demo.transfer.debug.Console;
 import pro.jiefzz.ejoker_demo.transfer.eventHandlers.ConsoleLogger;
-import pro.jiefzz.ejoker_demo.transfer.eventHandlers.SyncHelper;
 
 public class TransferAppBatch {
 	
@@ -55,40 +50,18 @@ public class TransferAppBatch {
 
 		eJokerFrameworkInitializer.initAll();
 		
-		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
-		
-		IJSONConverter jsonConverter = eJokerFrameworkInitializer.getEJokerContext().get(IJSONConverter.class);
-		ITopicProvider<ICommand> topicProvider = eJokerFrameworkInitializer.getEJokerContext().get(ITopicProvider.class, ICommand.class);
-		ICommandRoutingKeyProvider commandRoutingKeyProvider = eJokerFrameworkInitializer.getEJokerContext().get(ICommandRoutingKeyProvider.class);
 		SystemAsyncHelper systemAsyncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SystemAsyncHelper.class);
-		IScheduleService scheduleService = eJokerFrameworkInitializer.getEJokerContext().get(IScheduleService.class);
 		IOHelper ioHelper = eJokerFrameworkInitializer.getEJokerContext().get(IOHelper.class);
-		SyncHelper syncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SyncHelper.class);
 		ConsoleLogger consoleLogger = eJokerFrameworkInitializer.getEJokerContext().get(ConsoleLogger.class);
 		
-		AtomicLong t = new AtomicLong(System.currentTimeMillis());
-		
-		scheduleService.startTask("ProformanceStatistics_1", () -> {
-			try {
-				BigDecimal totalProcess = new BigDecimal("5")
-						.multiply(new BigDecimal("" + accountAmount))
-						.multiply(new BigDecimal("" + transferLoop))
-						.divide(
-								new BigDecimal("" + (new Long(syncHelper.getLastHitTimestamp() - t.get()).intValue())).divide(new BigDecimal("1000")),
-								RoundingMode.HALF_UP)
-						;
-				logger.error("message handled per second: {}", totalProcess.toPlainString());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}, 5000l, 5000l);
-		
+		Console console = eJokerFrameworkInitializer.getEJokerContext().get(Console.class);
+
 		TimeUnit.SECONDS.sleep(1l);
 		System.out.println("");
 		System.out.println("====================== TransferAPP ======================");
 		System.out.println("");
-		
-		
+
+		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
 
 		String[] ids = new String[accountAmount];
 
@@ -97,13 +70,24 @@ public class TransferAppBatch {
 		}
 		
 		final AtomicInteger cursor = new AtomicInteger(0);
+
+		// ++++++++++++++ switch 1 : 通过 commandService.executeAsync
+		
+//		for(int i=0; i<ids.length; i++) {
+//			int index = cursor.getAndIncrement();
+//			LangUtil.await(commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled));
+//		}
+//		System.err.println("send ok.");
+
+		// ++++++++++++++ switch 2 : 通过 commandService.sendAsync
+		
 		final CountDownLatch cdlx = new CountDownLatch(accountAmount);
 		for(int i=0; i<ids.length; i++) {
+			
 			systemAsyncHelper.submit(() -> {
 				int index = cursor.getAndIncrement();
 				ioHelper.tryAsyncAction2(
 						"TestCreate_" + index,
-//						() -> commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled),
 						() -> commandService.sendAsync(new CreateAccountCommand(ids[index], "owner_" + index)),
 						r -> cdlx.countDown(),
 						() -> "",
@@ -114,49 +98,55 @@ public class TransferAppBatch {
 		}
 		System.err.println("send ok.");
 		cdlx.await();
-		System.err.println("all account ok. ");
-//		System.exit(0);
-		if(consoleLogger.getAccountHit() < accountAmount)
-			TimeUnit.MILLISECONDS.sleep(1000l);
 		
-
-		t.set(System.currentTimeMillis());
-		String msgp = String.format("Start batch deposit, batch start at: %d ... ", t.get());
-		System.err.println(msgp);
-		logger.error(msgp);
+		// ++++++++++++++
+		
+		while(consoleLogger.getAccountHit() < accountAmount)
+			DiscardWrapper.sleepInterruptable(100l);
+		System.err.println("all account ok. ");
+		
+		console.sepOnce();
+		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
 		
 		int amount = transferLoop*ids.length;
+		AtomicBoolean exit = new AtomicBoolean(false);
 		CountDownLatch cdl = new CountDownLatch(amount);
+		Queue<StartDepositTransactionCommand> waitQ = new ConcurrentLinkedQueue<>();
+		for(int tx = 0; tx<6; tx++)
+			new Thread(() -> {
+				while(true) {
+					StartDepositTransactionCommand cmdx = waitQ.poll();
+					if(null == cmdx) {
+						DiscardWrapper.sleepInterruptable(1l);
+						if(exit.get())
+							break;
+						continue;
+					}
+					ioHelper.tryAsyncAction2(
+							"TestSend_" + cmdx.getAggregateRootId(),
+							() -> commandService.sendAsync(cmdx),
+							r -> cdl.countDown(),
+							() -> "",
+							e -> e.printStackTrace(),
+							true);
+				}
+			}).start();
+
+		long batchStartAt = System.currentTimeMillis();
+		logger.error("deposit's cmd send task started.");
 		for(int j=0; j<transferLoop; j++) {
 			for(int i=0; i<ids.length; i++) {
-				final int index = (j*ids.length)+i;
-				StartDepositTransactionCommand startDepositTransactionCmd = new StartDepositTransactionCommand(MObjectId.get().toHexString(), ids[i], i%2==0?110:240);
-				systemAsyncHelper.submit(() -> {
-					if(index == amount - 1) {
-						ioHelper.tryAsyncAction2(
-								"TestSend_" + index,
-								() -> commandService.executeAsync(startDepositTransactionCmd, CommandReturnType.EventHandled),
-								r -> { cdl.countDown(); logger.error("actually complete at: {}", System.currentTimeMillis());},
-								() -> "",
-								e -> e.printStackTrace(),
-								true);
-					} else {
-						ioHelper.tryAsyncAction2(
-								"TestSend_" + index,
-								() -> commandService.sendAsync(startDepositTransactionCmd),
-								r -> cdl.countDown(),
-								() -> "",
-								e -> e.printStackTrace(),
-								true);
-					}
-				});
+				StartDepositTransactionCommand cmd = new StartDepositTransactionCommand(MObjectId.get().toHexString(), ids[i], i%2==0?110:240);
+				waitQ.offer(cmd);
 			}
 		}
-		cdl.await();
-		String msg = String.format("batch start at: %d, time use: %d ms", t.get(), System.currentTimeMillis() - t.get());
-		System.err.println(msg);
-		logger.error(msg);
 		
+		cdl.await();
+		exit.set(true);
+		logger.error("deposit's cmd send task all completed.");
+		logger.error("start at: {}, time use: {} ms", batchStartAt, System.currentTimeMillis() - batchStartAt);
+		
+		console.setStart();
 		
 //		TimeUnit.SECONDS.sleep(20l);
 //
@@ -174,8 +164,8 @@ public class TransferAppBatch {
 		String envKey2 = "ELoop";
 		if(isWindows) {
 			// All environment propertie's name will represent by upper case.
-			envKey1 = envKey1.toUpperCase();
-			envKey2 = envKey1.toUpperCase();
+//			envKey1 = envKey1.toUpperCase();
+//			envKey2 = envKey1.toUpperCase();
 		}
 		
 		Map<String, String> map = System.getenv();

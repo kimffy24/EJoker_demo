@@ -23,7 +23,7 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- 最快的json包 -->
+		<!-- 号称最快的json包 -->
 		<dependency>
 			<groupId>net.minidev</groupId>
 			<artifactId>json-smart</artifactId>
@@ -44,7 +44,6 @@
 			<groupId>org.apache.rocketmq</groupId>
 			<artifactId>rocketmq-client</artifactId>
 			<version>4.4.0</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.aliyun.openservices/ons-client -->
@@ -52,7 +51,6 @@
 			<groupId>com.aliyun.openservices</groupId>
 			<artifactId>ons-client</artifactId>
 			<version>1.7.9.Final</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/co.paralleluniverse/quasar-core -->
@@ -60,7 +58,6 @@
 			<groupId>co.paralleluniverse</groupId>
 			<artifactId>quasar-core</artifactId>
 			<version>0.7.10</version>
-			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

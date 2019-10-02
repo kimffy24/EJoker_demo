@@ -1,12 +1,11 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
 
+import static pro.jiefzz.ejoker.z.system.extension.LangUtil.await;
+
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import pro.jiefzz.ejoker.eventing.impl.InMemoryEventStore;
 import pro.jiefzz.ejoker.infrastructure.ITypeNameProvider;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.system.wrapper.SleepWrapper;
+import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker.z.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
@@ -58,14 +57,14 @@ public class TransferAppPerformanceTest {
         	final int j = i;
         	systemAsyncHelper.submit(() -> {
             	String accountId = ObjectId.get().toHexString();
-            	commandService.executeAsync(new CreateAccountCommand(accountId, "SampleAccount" + j), CommandReturnType.EventHandled).get();
+            	await(commandService.executeAsync(new CreateAccountCommand(accountId, "SampleAccount" + j), CommandReturnType.EventHandled));
             	accountList[j] = accountId;
         	});
         }
         for(int i=0; i<accountCount; i++) {
         	if(null == accountList[i]) {
         		i--;
-        		SleepWrapper.sleep(TimeUnit.MILLISECONDS, 0l);
+        		DiscardWrapper.sleep(TimeUnit.MILLISECONDS, 0l);
         	}
         }
         
@@ -75,7 +74,7 @@ public class TransferAppPerformanceTest {
         //每个账户都存入初始额度
         for(String accountId:accountList) {
         	StartDepositTransactionCommand cmd = new StartDepositTransactionCommand(ObjectId.get().toHexString(), accountId, depositAmount);
-        	systemAsyncHelper.submit(() -> commandService.sendAsync(cmd).get());
+        	systemAsyncHelper.submit(() -> await(commandService.sendAsync(cmd)));
         }
         countSyncHelper.waitOne();
 
@@ -136,7 +135,7 @@ public class TransferAppPerformanceTest {
 //        commandService.sendAsync(new StartTransferTransactionCommand(ObjectId.get().toHexString(), new TransferTransactionInfo(account2, account1, 500D))).get();
 //        syncHelper.waitOne();
 
-        SleepWrapper.sleep(TimeUnit.SECONDS, 1l);
+        DiscardWrapper.sleep(TimeUnit.SECONDS, 1l);
 
         logger.info("All OK.");
 

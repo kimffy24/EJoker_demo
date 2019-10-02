@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers;
 
-import pro.jiefzz.ejoker.infrastructure.varieties.applicationMessage.AbstractApplicationMessage;
+import pro.jiefzz.ejoker.infrastructure.messaging.varieties.applicationMessage.AbstractApplicationMessage;
 
 /**
  * 账户验证未通过
@@ -22,12 +22,6 @@ public class AccountValidateFailedMessage extends AbstractApplicationMessage {
         this.accountId = accountId;
         this.transactionId = transactionId;
         this.reason = reason;
-    }
-
-    @Override
-    public String getRoutingKey()
-    {
-        return accountId;
     }
 
 	public String getAccountId() {

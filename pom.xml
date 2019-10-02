@@ -185,6 +185,21 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+			<!-- 打个胖包，所以有依赖都打到一个包里 -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.TransferApp</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

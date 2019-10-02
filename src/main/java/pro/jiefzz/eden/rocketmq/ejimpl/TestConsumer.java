@@ -9,9 +9,9 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 
-import pro.jiefzz.ejoker.queue.aware.EJokerQueueMessage;
-import pro.jiefzz.ejoker.queue.aware.IEJokerQueueMessageContext;
-import pro.jiefzz.ejoker.z.system.wrapper.SleepWrapper;
+import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
+import pro.jiefzz.ejoker.queue.skeleton.aware.IEJokerQueueMessageContext;
+import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 
 public class TestConsumer {
@@ -41,8 +41,8 @@ public class TestConsumer {
 
 		new Thread(() -> {
 			while(true) {
-				SleepWrapper.sleep(TimeUnit.SECONDS, 2l);
-				defaultMQConsumer.syncOffsetToBroker();
+				DiscardWrapper.sleepInterruptable(TimeUnit.SECONDS, 2l);
+				defaultMQConsumer.loopInterval();
 				System.err.println(".");
 			}
 		}).start();
@@ -53,7 +53,7 @@ public class TestConsumer {
 		
 //		DefaultMQConsumer.EJokerQueueMessageContextImpl xcontext = (DefaultMQConsumer.EJokerQueueMessageContextImpl )context;
 //		System.err.println(queueMessage.toString() + ". body: " + new String(queueMessage.getBody()) + ", queueId: " + xcontext.mq.getQueueId());
-		context.onMessageHandled();
+		context.onMessageHandled(queueMessage);
 	}
 	
 }

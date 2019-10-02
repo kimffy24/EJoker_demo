@@ -2,6 +2,7 @@ package pro.jiefzz.ejoker_demo.transfer.processManagers;
 
 import static pro.jiefzz.ejoker.z.system.extension.LangUtil.await;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import co.paralleluniverse.fibers.Suspendable;
@@ -11,8 +12,6 @@ import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapperUtil;
 import pro.jiefzz.ejoker.z.system.helper.ForEachHelper;
 import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker.z.task.AsyncTaskStatus;
@@ -47,18 +46,18 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 	private ICommandService commandService;
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionStartedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransferTransactionStartedEvent evnt) {
 		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
 
 		ValidateAccountCommand validateSourceAccountCommand = new ValidateAccountCommand(
 				transactionInfo.getSourceAccountId(), evnt.getAggregateRootId());
 		validateSourceAccountCommand.setId(evnt.getId());
-		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync1 = commandService.sendAsync(validateSourceAccountCommand);
+		Future<AsyncTaskResult<Void>> sendAsync1 = commandService.sendAsync(validateSourceAccountCommand);
 
 		ValidateAccountCommand validateTargetAccountCommand = new ValidateAccountCommand(
 				transactionInfo.getTargetAccountId(), evnt.getAggregateRootId());
 		validateTargetAccountCommand.setId(evnt.getId());
-		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync2 = commandService.sendAsync(validateTargetAccountCommand);
+		Future<AsyncTaskResult<Void>> sendAsync2 = commandService.sendAsync(validateTargetAccountCommand);
 
 		// 没用CompletableFuture，所以没有相关的串联的状态判断和等待
 		AsyncTaskResult<Void> r1 = await(sendAsync1);
@@ -80,19 +79,17 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 			}
 		});
 		if (faild.get()) {
-			return new SystemFutureWrapper<>(
-					EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.Failed, eMessageSb.toString()));
+			return EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.Failed, eMessageSb.toString());
 		}
 		if (ioException.get()) {
-			return new SystemFutureWrapper<>(
-					EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.IOException, eMessageSb.toString()));
+			return EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.IOException, eMessageSb.toString());
 		}
 
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedMessage message) {
+	public Future<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedMessage message) {
 		ConfirmAccountValidatePassedCommand cmd = new ConfirmAccountValidatePassedCommand(message.getTransactionId(),
 				message.getAccountId());
 		cmd.setId(message.getId());
@@ -100,14 +97,14 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidateFailedMessage message) {
+	public Future<AsyncTaskResult<Void>> handleAsync(AccountValidateFailedMessage message) {
 		CancelTransferTransactionCommand cmd = new CancelTransferTransactionCommand(message.getTransactionId());
 		cmd.setId(message.getId());
 		return commandService.sendAsync(cmd);
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedConfirmCompletedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(AccountValidatePassedConfirmCompletedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(
 				evnt.getTransactionInfo().getSourceAccountId(), evnt.getAggregateRootId(),
 				TransactionType.TransferTransaction, PreparationType.DebitPreparation,
@@ -117,7 +114,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
 		TransactionPreparation transactionPreparation = evnt.getTransactionPreparation();
 		if (TransactionType.TransferTransaction.equals(transactionPreparation.getTransactionType())) {
 			if (PreparationType.DebitPreparation.equals(transactionPreparation.getPreparationType())) {
@@ -133,22 +130,22 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 			}
 		}
 
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
+	public Future<AsyncTaskResult<Void>> handleAsync(InsufficientBalanceException exception) {
 		if (TransactionType.TransferTransaction.equals(exception.getTransactionType())) {
 			CancelTransferTransactionCommand cmd = new CancelTransferTransactionCommand(exception.getTransactionId());
 			cmd.setId(exception.getId());
 			return commandService.sendAsync(cmd);
 		}
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferOutPreparationConfirmedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransferOutPreparationConfirmedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(
 				evnt.getTransactionInfo().getTargetAccountId(), evnt.getAggregateRootId(),
 				TransactionType.TransferTransaction, PreparationType.CreditPreparation,
@@ -158,19 +155,19 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferInPreparationConfirmedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransferInPreparationConfirmedEvent evnt) {
 
 		TransferTransactionInfo transactionInfo = evnt.getTransactionInfo();
 
 		CommitTransactionPreparationCommand cmd1 = new CommitTransactionPreparationCommand(
 				transactionInfo.getSourceAccountId(), evnt.getAggregateRootId());
 		cmd1.setId(evnt.getId());
-		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync1 = commandService.sendAsync(cmd1);
+		Future<AsyncTaskResult<Void>> sendAsync1 = commandService.sendAsync(cmd1);
 
 		CommitTransactionPreparationCommand cmd2 = new CommitTransactionPreparationCommand(
 				transactionInfo.getTargetAccountId(), evnt.getAggregateRootId());
 		cmd2.setId(evnt.getId());
-		SystemFutureWrapper<AsyncTaskResult<Void>> sendAsync2 = commandService.sendAsync(cmd2);
+		Future<AsyncTaskResult<Void>> sendAsync2 = commandService.sendAsync(cmd2);
 
 		// 没用CompletableFuture，所以没有相关的串联的状态判断和等待
 		AsyncTaskResult<Void> r1 = await(sendAsync1);
@@ -192,20 +189,18 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 			}
 		});
 		if (faild.get()) {
-			return new SystemFutureWrapper<>(
-					EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.Failed, eMessageSb.toString()));
+			return EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.Failed, eMessageSb.toString());
 		}
 		if (ioException.get()) {
-			return new SystemFutureWrapper<>(
-					EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.IOException, eMessageSb.toString()));
+			return EJokerFutureTaskUtil.newFutureTask(AsyncTaskStatus.IOException, eMessageSb.toString());
 		}
 
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
 		TransactionPreparation transactionPreparation = evnt.getTransactionPreparation();
 		if (TransactionType.TransferTransaction.equals(transactionPreparation.getTransactionType())) {
 			if (PreparationType.DebitPreparation.equals(transactionPreparation.getPreparationType())) {
@@ -219,6 +214,6 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 				return commandService.sendAsync(cmd);
 			}
 		}
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 }

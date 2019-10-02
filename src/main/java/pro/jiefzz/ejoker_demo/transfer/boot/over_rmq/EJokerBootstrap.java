@@ -1,8 +1,8 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
 
 import pro.jiefzz.ejoker.EJoker;
-import pro.jiefzz.ejoker.queue.aware.IConsumerWrokerAware;
-import pro.jiefzz.ejoker.queue.aware.IProducerWrokerAware;
+import pro.jiefzz.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
+import pro.jiefzz.ejoker.queue.skeleton.aware.IProducerWrokerAware;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker_support.rocketmq.MQInstanceHelper;
 

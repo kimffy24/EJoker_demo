@@ -12,7 +12,7 @@ import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.jiefzz.ejoker.queue.aware.EJokerQueueMessage;
+import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TopicReference;
 

@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers;
 
-import pro.jiefzz.ejoker.infrastructure.varieties.applicationMessage.AbstractApplicationMessage;
+import pro.jiefzz.ejoker.infrastructure.messaging.varieties.applicationMessage.AbstractApplicationMessage;
 
 /**
  * 账户验证已通过
@@ -19,12 +19,6 @@ public class AccountValidatePassedMessage extends AbstractApplicationMessage {
     public AccountValidatePassedMessage(String accountId, String transactionId) {
         this.accountId = accountId;
         this.transactionId = transactionId;
-    }
-
-    @Override
-    public String getRoutingKey()
-    {
-        return accountId;
     }
 
 	public String getAccountId() {

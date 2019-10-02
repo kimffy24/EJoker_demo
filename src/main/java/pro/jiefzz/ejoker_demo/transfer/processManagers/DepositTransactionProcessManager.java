@@ -1,13 +1,14 @@
 package pro.jiefzz.ejoker_demo.transfer.processManagers;
 
+import java.util.concurrent.Future;
+
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.commanding.ICommandService;
 import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.AddTransactionPreparationCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CommitTransactionPreparationCommand;
@@ -28,43 +29,47 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 	private ICommandService commandService;
 	
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionStartedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionStartedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(evnt.getAccountId(),
 				evnt.getAggregateRootId(), TransactionType.DepositTransaction, PreparationType.CreditPreparation,
 				evnt.getAmount());
 		cmd.setId(evnt.getId());
+		cmd.setItems(evnt.getItems());
 		return commandService.sendAsync(cmd);
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
 				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
-			ConfirmDepositPreparationCommand command = new ConfirmDepositPreparationCommand(
+			ConfirmDepositPreparationCommand cmd = new ConfirmDepositPreparationCommand(
 					evnt.getTransactionPreparation().getTransactionId());
-			command.setId(evnt.getId());
-			return commandService.sendAsync(command);
+			cmd.setId(evnt.getId());
+			cmd.setItems(evnt.getItems());
+			return commandService.sendAsync(cmd);
 		}
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionPreparationCompletedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionPreparationCompletedEvent evnt) {
 		CommitTransactionPreparationCommand cmd = new CommitTransactionPreparationCommand(evnt.getAccountId(),
 				evnt.getAggregateRootId());
 		cmd.setId(evnt.getId());
+		cmd.setItems(evnt.getItems());
 		return commandService.sendAsync(cmd);
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
 				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
-			ConfirmDepositCommand command = new ConfirmDepositCommand(
+			ConfirmDepositCommand cmd = new ConfirmDepositCommand(
 					evnt.getTransactionPreparation().getTransactionId());
-			command.setId(evnt.getId());
-			return commandService.sendAsync(command);
+			cmd.setId(evnt.getId());
+			cmd.setItems(evnt.getItems());
+			return commandService.sendAsync(cmd);
 		}
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 }

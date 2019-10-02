@@ -7,7 +7,7 @@ import pro.jiefzz.ejoker.commanding.AbstractCommand;
  * @author kimffy
  *
  */
-public class ConfirmAccountValidatePassedCommand extends AbstractCommand {
+public class ConfirmAccountValidatePassedCommand extends AbstractCommand<String> {
 
 	private String accountId;
 

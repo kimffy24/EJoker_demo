@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import pro.jiefzz.ejoker.EJoker;
 import pro.jiefzz.ejoker.queue.applicationMessage.ApplicationMessageConsumer;
 import pro.jiefzz.ejoker.queue.applicationMessage.ApplicationMessagePublisher;
-import pro.jiefzz.ejoker.queue.aware.IConsumerWrokerAware;
-import pro.jiefzz.ejoker.queue.aware.IProducerWrokerAware;
 import pro.jiefzz.ejoker.queue.command.CommandConsumer;
 import pro.jiefzz.ejoker.queue.command.CommandResultProcessor;
 import pro.jiefzz.ejoker.queue.command.CommandService;
@@ -19,6 +17,8 @@ import pro.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
 import pro.jiefzz.ejoker.queue.domainEvent.DomainEventPublisher;
 import pro.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionConsumer;
 import pro.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionPublisher;
+import pro.jiefzz.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
+import pro.jiefzz.ejoker.queue.skeleton.aware.IProducerWrokerAware;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
 import pro.jiefzz.ejoker.z.scavenger.Scavenger;
@@ -271,7 +271,7 @@ public abstract class AbstractEJokerBootstrap {
 		String envKey1 = "ES";
 		if(isWindows) {
 			// All environment propertie's name will represent by upper case.
-			envKey1 = envKey1.toUpperCase();
+//			envKey1 = envKey1.toUpperCase();
 		}
 		
 		Map<String, String> map = System.getenv();

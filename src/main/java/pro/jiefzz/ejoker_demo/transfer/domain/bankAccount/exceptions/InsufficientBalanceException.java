@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.exceptions;
 
-import pro.jiefzz.ejoker.infrastructure.varieties.publishableExceptionMessage.AbstractPublishableException;
+import pro.jiefzz.ejoker.infrastructure.messaging.varieties.publishableException.AbstractPublishableException;
 import pro.jiefzz.ejoker_demo.transfer.domain.TransactionType;
 
 public class InsufficientBalanceException extends AbstractPublishableException {

@@ -7,7 +7,7 @@ import pro.jiefzz.ejoker.commanding.AbstractCommand;
  * @author kimffy
  *
  */
-public class ConfirmTransferInCommand extends AbstractCommand {
+public class ConfirmTransferInCommand extends AbstractCommand<String> {
 	
 	public ConfirmTransferInCommand() {
 	}

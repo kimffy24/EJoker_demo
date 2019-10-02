@@ -10,14 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.ejoker.commanding.CommandReturnType;
 import pro.jiefzz.ejoker.commanding.ICommand;
-import pro.jiefzz.ejoker.commanding.ICommandRoutingKeyProvider;
 import pro.jiefzz.ejoker.queue.ITopicProvider;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.utils.MObjectId;
 import pro.jiefzz.ejoker.z.io.IOHelper;
-import pro.jiefzz.ejoker.z.schedule.IScheduleService;
 import pro.jiefzz.ejoker.z.service.IJSONConverter;
-import pro.jiefzz.ejoker.z.system.wrapper.SleepWrapper;
+import pro.jiefzz.ejoker.z.service.IScheduleService;
 import pro.jiefzz.ejoker.z.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
@@ -55,7 +53,6 @@ public class TransferFrontend {
 		
 		IJSONConverter jsonConverter = eJokerFrameworkInitializer.getEJokerContext().get(IJSONConverter.class);
 		ITopicProvider<ICommand> topicProvider = eJokerFrameworkInitializer.getEJokerContext().get(ITopicProvider.class, ICommand.class);
-		ICommandRoutingKeyProvider commandRoutingKeyProvider = eJokerFrameworkInitializer.getEJokerContext().get(ICommandRoutingKeyProvider.class);
 		SystemAsyncHelper systemAsyncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SystemAsyncHelper.class);
 		IScheduleService scheduleService = eJokerFrameworkInitializer.getEJokerContext().get(IScheduleService.class);
 		IOHelper ioHelper = eJokerFrameworkInitializer.getEJokerContext().get(IOHelper.class);

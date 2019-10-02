@@ -1,19 +1,72 @@
 package pro.jiefzz.ejoker_demo.transfer.debug;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker_demo.transfer.eventHandlers.ConsoleLogger;
-import pro.jiefzz.ejoker_demo.transfer.eventHandlers.SyncHelper;
+import pro.jiefzz.ejoker.z.system.helper.ForEachHelper;
 
 public final class DevUtils {
 	
+	private final static String[] probeTargets = new String[] {
+			
+			"pro.jiefzz.ejoker_demo.transfer.eventHandlers.ConsoleLogger",
+			
+	};
+	
 	public static long moniterQ(IEJokerSimpleContext eJokerContext) {
 
-		SyncHelper syncHelper = eJokerContext.get(SyncHelper.class);
-		ConsoleLogger testConsoleHelper = eJokerContext.get(ConsoleLogger.class);
-		
-		testConsoleHelper.show();
-		syncHelper.show();
+		ForEachHelper.processForEach(mStore, (c ,m) -> {
+			Object object = eJokerContext.get(c);
+			if(null == object)
+				return;
+			try {
+				m.invoke(c);
+			} catch (IllegalAccessException|IllegalArgumentException e) {
+				;
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		});
 		
 		return System.currentTimeMillis();
+	}
+
+	private final static String mName = "probe";
+	
+	private final static Map<Class<?>, Method> mStore = new HashMap<>();
+	
+	static {
+		
+		for(String t : probeTargets) {
+			Method m = null;
+			Class<?> cl = null;
+			try {
+				cl = Class.forName(t);
+			} catch (ClassNotFoundException e) {
+				continue;
+			}
+			try {
+				for(Class<?> c = cl;
+						!RuntimeException.class.equals(c)
+							&& !Exception.class.equals(c) 
+							&& !Object.class.equals(c) ;
+						c = c.getSuperclass())
+					try {
+						m = c.getDeclaredMethod(mName);
+					} catch (NoSuchMethodException e) {
+						continue;
+					}
+				if(null != m) {
+					m.setAccessible(true);
+					mStore.put(cl, m);
+				}
+			} catch (SecurityException e) {
+				;
+			}
+		}
+		
 	}
 }

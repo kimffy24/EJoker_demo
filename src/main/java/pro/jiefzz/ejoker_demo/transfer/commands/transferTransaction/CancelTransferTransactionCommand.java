@@ -7,7 +7,7 @@ import pro.jiefzz.ejoker.commanding.AbstractCommand;
  * @author kimffy
  *
  */
-public class CancelTransferTransactionCommand extends AbstractCommand {
+public class CancelTransferTransactionCommand extends AbstractCommand<String> {
 	
 	public CancelTransferTransactionCommand() {
 	}

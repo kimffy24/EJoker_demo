@@ -55,10 +55,10 @@ public class BankAccount extends AbstractAggregateRoot<String> {
     	double availableBalance = getAvailableBalance();
         if (PreparationType.DebitPreparation.equals(preparationType) && availableBalance < amount)
         {
-            throw new InsufficientBalanceException(id, transactionId, transactionType, amount, balance, availableBalance);
+            throw new InsufficientBalanceException(getId(), transactionId, transactionType, amount, balance, availableBalance);
         }
 
-        applyEvent(new TransactionPreparationAddedEvent(new TransactionPreparation(id, transactionId, transactionType, preparationType, amount)));
+        applyEvent(new TransactionPreparationAddedEvent(new TransactionPreparation(getId(), transactionId, transactionType, preparationType, amount)));
     }
     
     /**
@@ -99,12 +99,12 @@ public class BankAccount extends AbstractAggregateRoot<String> {
         				null == transactionPreparations?
         						"null == transactionPreparations":"0 == transactionPreparations.size()"
         	);
-            throw new TransactionPreparationNotExistException(id, transactionId);
+            throw new TransactionPreparationNotExistException(getId(), transactionId);
         }
         TransactionPreparation transactionPreparation;
         if (null == (transactionPreparation = transactionPreparations.get(transactionId)))
         {
-            throw new TransactionPreparationNotExistException(id, transactionId);
+            throw new TransactionPreparationNotExistException(getId(), transactionId);
         }
         return transactionPreparation;
     }
@@ -146,6 +146,7 @@ public class BankAccount extends AbstractAggregateRoot<String> {
     @SuppressWarnings("unused")
 	private void handle(AccountCreatedEvent evt) {
 		this.owner = evt.getOwner();
+		// 当snapshotES的时候 要注意 类型可能要丢哦~！
 		transactionPreparations = new ConcurrentHashMap<>();
 	}
 

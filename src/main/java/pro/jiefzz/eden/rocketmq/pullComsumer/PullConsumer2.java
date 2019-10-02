@@ -4,8 +4,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
-import pro.jiefzz.ejoker.queue.aware.EJokerQueueMessage;
-import pro.jiefzz.ejoker.queue.aware.IEJokerQueueMessageContext;
+import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
+import pro.jiefzz.ejoker.queue.skeleton.aware.IEJokerQueueMessageContext;
 import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 
 public class PullConsumer2 {
@@ -44,7 +44,7 @@ public class PullConsumer2 {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
 				}
-				consumer.syncOffsetToBroker();
+				consumer.loopInterval();
 			}
 		}).start();
 
@@ -61,7 +61,7 @@ public class PullConsumer2 {
 					if(System.currentTimeMillis()%5 == 0)
 						contextQueue.offer(currentTuple);
 					else
-						currentTuple.currentContext.onMessageHandled();
+						currentTuple.currentContext.onMessageHandled(null);
 				}
 			}
 		}).start();

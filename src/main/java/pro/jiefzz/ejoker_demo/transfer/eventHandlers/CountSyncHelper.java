@@ -2,15 +2,14 @@ package pro.jiefzz.ejoker_demo.transfer.eventHandlers;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
-import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.system.extension.AsyncWrapperException;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapper;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.SystemFutureWrapperUtil;
+import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
+import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureUtil;
 import pro.jiefzz.ejoker.z.system.wrapper.CountDownLatchWrapper;
 import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker_demo.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
@@ -39,16 +38,16 @@ public class CountSyncHelper extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent message) {
+	public Future<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent message) {
 		int currentCount = this.currentCount.incrementAndGet();
 		if (currentCount == expectedCount) {
 			CountDownLatchWrapper.countDown(waitHandle);
 		}
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 
 	@Suspendable
-	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
+	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
 		if(!markBefore.contains(message.getAggregateRootId())) {
 			markBefore.add(message.getAggregateRootId());
 			int currentCount = this.currentCount.incrementAndGet();
@@ -56,6 +55,6 @@ public class CountSyncHelper extends AbstractMessageHandler {
 				CountDownLatchWrapper.countDown(waitHandle);
 			}
 		}
-		return SystemFutureWrapperUtil.completeFutureTask();
+		return EJokerFutureTaskUtil.completeTask();
 	}
 }

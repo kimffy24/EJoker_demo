@@ -8,7 +8,7 @@ import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.TransferTransa
  * @author kimffy
  *
  */
-public class StartTransferTransactionCommand extends AbstractCommand {
+public class StartTransferTransactionCommand extends AbstractCommand<String> {
 
 	private TransferTransactionInfo transactionInfo;
 

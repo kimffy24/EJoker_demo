@@ -7,7 +7,7 @@ import pro.jiefzz.ejoker.commanding.AbstractCommand;
  * @author kimffy
  *
  */
-public class StartDepositTransactionCommand extends AbstractCommand {
+public class StartDepositTransactionCommand extends AbstractCommand<String> {
 
 	/**
 	 * 账户ID

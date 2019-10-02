@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import pro.jiefzz.ejoker.commanding.CommandReturnType;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.system.wrapper.SleepWrapper;
+import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
@@ -68,7 +68,7 @@ public class TransferApp {
         commandService.sendAsync(new StartTransferTransactionCommand(ObjectId.get().toHexString(), new TransferTransactionInfo(account2, account1, 500D))).get();
         syncHelper.waitOne();
 
-        SleepWrapper.sleep(TimeUnit.SECONDS, 1l);
+        DiscardWrapper.sleep(TimeUnit.SECONDS, 1l);
 
         logger.info("All OK.");
         TimeUnit.SECONDS.sleep(15l);

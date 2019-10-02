@@ -3,7 +3,7 @@ package pro.jiefzz.eden.quasar.countdownlatch;
 import java.util.concurrent.TimeUnit;
 
 import co.paralleluniverse.strands.concurrent.CountDownLatch;
-import pro.jiefzz.ejoker.z.system.wrapper.SleepWrapper;
+import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 
 public class Main {
 	
@@ -25,13 +25,13 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		SleepWrapper.sleep(TimeUnit.SECONDS, 5l);
+		DiscardWrapper.sleepInterruptable(TimeUnit.SECONDS, 5l);
 
 		System.err.println("try release cdl.");
 		cdl.countDown();
 		System.err.println("cdl released.");
 
-		SleepWrapper.sleep(TimeUnit.SECONDS, 1l);
+		DiscardWrapper.sleepInterruptable(TimeUnit.SECONDS, 1l);
 	}
 
 }
