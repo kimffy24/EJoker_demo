@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.ejoker.commanding.ICommandProcessor;
+import pro.jiefzz.ejoker.commanding.IProcessingCommandHandler;
 import pro.jiefzz.ejoker.commanding.ProcessingCommandMailbox;
 import pro.jiefzz.ejoker.eventing.EventCommittingContextMailBox;
 import pro.jiefzz.ejoker.eventing.IEventCommittingService;
@@ -26,26 +27,20 @@ import pro.jiefzz.ejoker.eventing.qeventing.IProcessingEventProcessor;
 import pro.jiefzz.ejoker.eventing.qeventing.IPublishedVersionStore;
 import pro.jiefzz.ejoker.eventing.qeventing.ProcessingEventMailBox;
 import pro.jiefzz.ejoker.eventing.qeventing.impl.InMemoryPublishedVersionStore;
-import pro.jiefzz.ejoker.infrastructure.messaging.IMessageDispatcher;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
+import pro.jiefzz.ejoker.messaging.IMessageDispatcher;
+import pro.jiefzz.ejoker.queue.SendQueueMessageService;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EInitialize;
+import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.z.system.helper.MapHelper;
-import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
+import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
 
-@MessageHandler
-@EService
+@EService(type = ESType.MESSAGE_HANDLER)
 public class DebugHelperEJoker extends DAssemblier {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DebugHelperEJoker.class);
-	
-//	@Dependence
-//	IOHelper ioHelper;
-//
-//	@Dependence
-//	IMessageDispatcher dispatcher;
 	
 	@Dependence
 	IPublishedVersionStore inMemoryPublishedVersionStore;
@@ -57,6 +52,9 @@ public class DebugHelperEJoker extends DAssemblier {
 	ICommandProcessor commandProcessor;
 
 	@Dependence
+	IProcessingCommandHandler processingCommandHandler;
+	
+	@Dependence
 	IEventCommittingService eventService;
 	
 	@Dependence
@@ -64,6 +62,9 @@ public class DebugHelperEJoker extends DAssemblier {
 	
 	@Dependence
 	IMessageDispatcher messageDispatcher;
+
+	@Dependence
+	SendQueueMessageService sendQueueMessageService;
 	
 	// ============ 
 	
@@ -332,11 +333,16 @@ public class DebugHelperEJoker extends DAssemblier {
 				AtomicBoolean onPause = fieldValue(dF_ProcessingCommandMailbox_onPaused, e.getValue(), AtomicBoolean.class);
 				if(onPause.get())
 					amountOfPause.incrementAndGet();
+				
 				return 0;
 			}).distinct().count(); // end stream
 			
 			logger.error("size of commandMailBoxDict: {}, which onRunning: {}, onProcessing: {}, onPause: {}",
-					commandMailboxDict.size(), amountOfRunning.get(), amountOfProcessing.get(), amountOfPause.get());
+					commandMailboxDict.size(),
+					amountOfRunning.get(),
+					amountOfProcessing.get(),
+					amountOfPause.get()
+					);
 		}
 		
 		// 探针 -> EventCommitting过程
@@ -372,11 +378,21 @@ public class DebugHelperEJoker extends DAssemblier {
 		{
 			Integer amountOfRunning = eventMailboxDict.entrySet().parallelStream().map(e -> e.getValue().isRunning()?1:0).reduce(0, (l, r) -> l + r);
 			Integer amountOfHasRemind = eventMailboxDict.entrySet().parallelStream().map(e -> e.getValue().hasRemindMessage()?1:0).reduce(0, (l, r) -> l + r);
-			logger.error("size of ProcessingEventMailBox: {} which onRunning: {}, amountOfHasRemind: {}", eventMailboxDict.size(), amountOfRunning, amountOfHasRemind);
+			Integer amountOfWaitting = eventMailboxDict.entrySet().parallelStream().map(e -> fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, e.getValue(), Map.class).size()).reduce(0, (l, r) -> l + r);
+			
+			logger.error("size of ProcessingEventMailBox: {} which onRunning: {}, amountOfHasRemind: {}, amountOfWaitting: {}",
+					eventMailboxDict.size(),
+					amountOfRunning,
+					amountOfHasRemind,
+					amountOfWaitting);
 			eventMailboxDict.entrySet().forEach(e -> {
 				ProcessingEventMailBox mailBox = e.getValue();
 				if(mailBox.isRunning() || mailBox.hasRemindMessage())
-					logger.error("\t\t mainBox[aggrId={}]  ->  totalUnHandledMessageCount: {}, latestHandledEventVersion: {}", e.getKey(), mailBox.getTotalUnHandledMessageCount(), mailBox.getLatestHandledEventVersion());
+					logger.error("\t\t mainBox[aggrId={}]  ->  latestHandledEventVersion: {}, totalUnHandledMessageCount: {}, totalWaittingSize: {}",
+							e.getKey(),
+							mailBox.getLatestHandledEventVersion(),
+							mailBox.getTotalUnHandledMessageCount(),
+							fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, mailBox, Map.class).size());
 			});
 		}
 
@@ -407,7 +423,12 @@ public class DebugHelperEJoker extends DAssemblier {
 		// 输出内存中记录量(如果使用内存版本库)
 		if(null != versionDict) {
 			logger.error("size of InMemoryPublishedVersionStore: {}", versionDict.size());
-			if(0 < versionDict.size()) {
+			if(!versionDict.isEmpty()) {
+				versionDict.entrySet().parallelStream().map(e -> {
+					
+					return 0;
+				});
+				
 				final Map<String, AtomicLong> dict = new ConcurrentHashMap<>();
 				versionDict.entrySet().parallelStream().map(e -> {
 					return e.getValue();
@@ -422,6 +443,7 @@ public class DebugHelperEJoker extends DAssemblier {
 
 	Field dF_ProcessingCommandMailbox_onProcessing = null;
 	Field dF_ProcessingCommandMailbox_onPaused = null;
+	Field dF_ProcessingCommandMailbox_messageDict = null;
 	
 //	Field dF_EventCommittingContextMailBox_onProcessing = null;
 	Field dF_EventCommittingContextMailBox_aggregateDictDict = null;
@@ -442,7 +464,6 @@ public class DebugHelperEJoker extends DAssemblier {
 		
 		if(inMemoryPublishedVersionStore instanceof InMemoryPublishedVersionStore)
 			connect(inMemoryPublishedVersionStore, "versionDict");
-		
 	}
 
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.2.0-snapshot
+VERSION=1.2.0-snapshot-3
 
 mvn deploy:deploy-file -Dfile=/server/data/ejoker/target/ejoker-${VERSION}.jar -Dpackaging=jar \
     -DgroupId=pro.jiefzz -DartifactId=ejoker -Dversion=${VERSION} -Durl=file:./minimal-maven-repository/ -DrepositoryId=minimal-maven-repository -DupdateReleaseInfo=true

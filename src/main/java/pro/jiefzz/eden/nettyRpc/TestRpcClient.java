@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
-import pro.jiefzz.ejoker.z.rpc.IRPCService;
+import pro.jiefzz.ejoker.z.service.rpc.IRPCService;
 import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;

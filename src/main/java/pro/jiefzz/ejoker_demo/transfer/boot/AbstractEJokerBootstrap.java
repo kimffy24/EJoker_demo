@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.ejoker.EJoker;
+import pro.jiefzz.ejoker.EJoker.EJokerSingletonFactory;
 import pro.jiefzz.ejoker.queue.applicationMessage.ApplicationMessageConsumer;
 import pro.jiefzz.ejoker.queue.applicationMessage.ApplicationMessagePublisher;
 import pro.jiefzz.ejoker.queue.command.CommandConsumer;
@@ -15,14 +16,14 @@ import pro.jiefzz.ejoker.queue.command.CommandResultProcessor;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
 import pro.jiefzz.ejoker.queue.domainEvent.DomainEventPublisher;
-import pro.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionConsumer;
-import pro.jiefzz.ejoker.queue.publishableExceptions.PublishableExceptionPublisher;
+import pro.jiefzz.ejoker.queue.domainException.DomainExceptionConsumer;
+import pro.jiefzz.ejoker.queue.domainException.DomainExceptionPublisher;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IProducerWrokerAware;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
-import pro.jiefzz.ejoker.z.scavenger.Scavenger;
-import pro.jiefzz.ejoker.z.task.context.SystemAsyncHelper;
+import pro.jiefzz.ejoker.z.service.Scavenger;
+import pro.jiefzz.ejoker.z.system.task.context.SystemAsyncHelper;
 
 public abstract class AbstractEJokerBootstrap {
 	
@@ -62,7 +63,7 @@ public abstract class AbstractEJokerBootstrap {
 	};
 
 	public AbstractEJokerBootstrap() {
-		this(EJoker.getInstance());
+		this(new EJokerSingletonFactory(EJoker.class).getInstance());
 	}
 	
 	protected AbstractEJokerBootstrap(EJoker eJokerInstance) {
@@ -227,10 +228,10 @@ public abstract class AbstractEJokerBootstrap {
 	
 	/* ========================= */
 
-	public PublishableExceptionConsumer initPublishableExceptionConsumer() throws Exception {
+	public DomainExceptionConsumer initPublishableExceptionConsumer() throws Exception {
 
 		// 启动可发布异常消费者
-		PublishableExceptionConsumer publishableExceptionConsumer = eJokerContext.get(PublishableExceptionConsumer.class);
+		DomainExceptionConsumer publishableExceptionConsumer = eJokerContext.get(DomainExceptionConsumer.class);
 		if(cTables[6].compareAndSet(false, true)) {
 			publishableExceptionConsumer
 				.useConsumer(createDefaultMQConsumer(EJokerPublishableExceptionGroup, eJokerContext))
@@ -245,9 +246,9 @@ public abstract class AbstractEJokerBootstrap {
 		
 	}
 	
-	public PublishableExceptionPublisher initPublishableExceptionProducer() {
+	public DomainExceptionPublisher initPublishableExceptionProducer() {
 		// 启动可发布异常生产者
-		PublishableExceptionPublisher publishableExceptionProducer = eJokerContext.get(PublishableExceptionPublisher.class);
+		DomainExceptionPublisher publishableExceptionProducer = eJokerContext.get(DomainExceptionPublisher.class);
 		if(cTables[7].compareAndSet(false, true)) {
 			publishableExceptionProducer
 				.useProducer(createDefaultMQProducer(EJokerPublishableExceptionGroup, eJokerContext))

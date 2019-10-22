@@ -8,13 +8,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.commanding.ICommandService;
 import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
+import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.z.system.helper.ForEachHelper;
-import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.z.task.AsyncTaskStatus;
+import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
+import pro.jiefzz.ejoker.z.system.task.AsyncTaskStatus;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.AddTransactionPreparationCommand;
@@ -38,8 +38,7 @@ import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.T
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.TransferOutPreparationConfirmedEvent;
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.TransferTransactionStartedEvent;
 
-@MessageHandler
-@EService
+@EService(type = ESType.MESSAGE_HANDLER)
 public class TransferTransactionProcessManager extends AbstractMessageHandler {
 
 	@Dependence

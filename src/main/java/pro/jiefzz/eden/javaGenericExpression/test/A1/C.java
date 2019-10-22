@@ -2,8 +2,6 @@ package pro.jiefzz.eden.javaGenericExpression.test.A1;
 
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import pro.jiefzz.eden.javaGenericExpression.test.A.IAAAA;
 import pro.jiefzz.eden.javaGenericExpression.test.A.IB;
 import pro.jiefzz.eden.javaGenericExpression.test.A.Y;

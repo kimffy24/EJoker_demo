@@ -1,6 +1,7 @@
 package pro.jiefzz.eden.nettyRpc;
 
 import pro.jiefzz.ejoker.EJoker;
+import pro.jiefzz.ejoker.EJoker.EJokerSingletonFactory;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IProducerWrokerAware;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
@@ -23,7 +24,7 @@ public class EJokerBootstrap extends AbstractEJokerBootstrap {
 		System.out.println("====================== EJokerFramework ======================");
 		System.out.println("");
 		
-		EJoker eJokerInstance = EJoker.getInstance();
+		EJoker eJokerInstance = new EJokerSingletonFactory(EJoker.class).getInstance();
 		eJokerContext = eJokerInstance.getEJokerContext();
 		
 		{

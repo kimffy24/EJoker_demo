@@ -10,14 +10,12 @@ import org.slf4j.LoggerFactory;
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.commanding.AbstractCommandHandler;
 import pro.jiefzz.ejoker.commanding.ICommandContext;
-import pro.jiefzz.ejoker.infrastructure.messaging.varieties.applicationMessage.AbstractApplicationMessage;
-import pro.jiefzz.ejoker.infrastructure.messaging.varieties.applicationMessage.IApplicationMessage;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.CommandHandler;
+import pro.jiefzz.ejoker.messaging.AbstractApplicationMessage;
+import pro.jiefzz.ejoker.messaging.IApplicationMessage;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
+import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.service.IJSONConverter;
-import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.AddTransactionPreparationCommand;
@@ -26,8 +24,7 @@ import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.ValidateAccountCommand;
 import pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.BankAccount;
 
-@EService
-@CommandHandler
+@EService(type = ESType.COMMAND_HANDLER)
 public class BankAccountCommandHandler extends AbstractCommandHandler {
 
 	private final static  Logger logger = LoggerFactory.getLogger(BankAccountCommandHandler.class);
@@ -36,12 +33,12 @@ public class BankAccountCommandHandler extends AbstractCommandHandler {
 	IJSONConverter jsonConverter;
 	
 	@Suspendable
-	public void handle(ICommandContext context, CreateAccountCommand command) {
-		context.add(new BankAccount(command.getAggregateRootId(), command.getOwner()));
+	public Future<Void> handleAsync(ICommandContext context, CreateAccountCommand command) {
+		return context.addAsync(new BankAccount(command.getAggregateRootId(), command.getOwner()));
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<IApplicationMessage>> handleAsync(ICommandContext context, ValidateAccountCommand command) {
+	public void handleAsync(ICommandContext context, ValidateAccountCommand command) {
 		IApplicationMessage applicationMessage = new AbstractApplicationMessage() {};
 		
 		//此处应该会调用外部接口验证账号是否合法，这里仅仅简单通过账号是否以INVALID字符串开头来判断是否合法；根据账号的合法性，返回不同的应用层消息
@@ -50,11 +47,11 @@ public class BankAccountCommandHandler extends AbstractCommandHandler {
         } else {
             applicationMessage = new AccountValidatePassedMessage(command.getAggregateRootId(), command.getTransactionId());
         }
-		return EJokerFutureTaskUtil.completeTask(applicationMessage);
+        context.setApplicationMessage(applicationMessage);
 	}
 
 	@Suspendable
-	public void handle(ICommandContext context, AddTransactionPreparationCommand command) {
+	public void handleAsync(ICommandContext context, AddTransactionPreparationCommand command) {
 		BankAccount account = await(context.getAsync(command.getAggregateRootId(), BankAccount.class));
 		if(null == account) {
 			logger.error("account == null, command: {}", jsonConverter.convert(command));
@@ -67,7 +64,7 @@ public class BankAccountCommandHandler extends AbstractCommandHandler {
 	}
 
 	@Suspendable
-	public void handle(ICommandContext context, CommitTransactionPreparationCommand command) {
+	public void handleAsync(ICommandContext context, CommitTransactionPreparationCommand command) {
 		BankAccount account = await(context.getAsync(command.getAggregateRootId(), BankAccount.class));
 		account.commitTransactionPreparation(command.getTransactionId());
 	}

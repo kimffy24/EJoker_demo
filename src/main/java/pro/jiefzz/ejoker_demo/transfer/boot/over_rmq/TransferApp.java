@@ -34,9 +34,9 @@ public class TransferApp {
 		CommandService commandService = eJokerContext.get(CommandService.class);
 		SyncHelper syncHelper = eJokerContext.get(SyncHelper.class);
 		
-		String account1 = ObjectId.get().toHexString();
-		String account2 = ObjectId.get().toHexString();
-		String account3 = "INVALID-" + ObjectId.get().toHexString();
+		var account1 = ObjectId.get().toHexString();
+		var account2 = ObjectId.get().toHexString();
+		var account3 = "INVALID-" + ObjectId.get().toHexString();
 		
 		//创建两个银行账户
         commandService.executeAsync(new CreateAccountCommand(account1, "雪华"), CommandReturnType.EventHandled).get();

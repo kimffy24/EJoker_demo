@@ -21,9 +21,9 @@ public class TransferPrepare {
 		aliasMap.put(BankAccount.class, "BankAccount");
 		aliasMap.put(DepositTransaction.class, "DepositTransaction");
 		aliasMap.put(TransferTransaction.class, "TransferTransaction");
-		typeNameProvider.applyDictionary(aliasMap);
+		typeNameProvider.applyAlias(aliasMap);
 		
-		typeNameProvider.applyDecorator(new IDecorator() {
+		typeNameProvider.useDecorator(new IDecorator() {
 			
 			@Override
 			public String preGetType(String typeName) {

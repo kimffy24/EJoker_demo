@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.utils.MObjectId;
-import pro.jiefzz.ejoker.z.io.IOHelper;
+import pro.jiefzz.ejoker.z.system.task.context.SystemAsyncHelper;
+import pro.jiefzz.ejoker.z.system.task.io.IOHelper;
 import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
-import pro.jiefzz.ejoker.z.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
 import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
@@ -105,7 +105,10 @@ public class TransferAppBatch {
 			DiscardWrapper.sleepInterruptable(100l);
 		System.err.println("all account ok. ");
 		
+		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
+		
 		console.sepOnce();
+		
 		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
 		
 		int amount = transferLoop*ids.length;
@@ -132,6 +135,8 @@ public class TransferAppBatch {
 				}
 			}).start();
 
+		console.setStart();
+		
 		long batchStartAt = System.currentTimeMillis();
 		logger.error("deposit's cmd send task started.");
 		for(int j=0; j<transferLoop; j++) {
@@ -146,7 +151,6 @@ public class TransferAppBatch {
 		logger.error("deposit's cmd send task all completed.");
 		logger.error("start at: {}, time use: {} ms", batchStartAt, System.currentTimeMillis() - batchStartAt);
 		
-		console.setStart();
 		
 //		TimeUnit.SECONDS.sleep(20l);
 //

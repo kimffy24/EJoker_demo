@@ -4,7 +4,7 @@ import java.util.concurrent.locks.LockSupport;
 
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
-import pro.jiefzz.ejoker.z.rpc.IRPCService;
+import pro.jiefzz.ejoker.z.service.rpc.IRPCService;
 
 public class MainRpcService {
 

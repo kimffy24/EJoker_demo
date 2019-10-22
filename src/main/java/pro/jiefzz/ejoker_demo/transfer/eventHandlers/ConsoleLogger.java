@@ -2,19 +2,18 @@ package pro.jiefzz.ejoker_demo.transfer.eventHandlers;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
+import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.service.IJSONConverter;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
+import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker_demo.transfer.domain.TransactionType;
@@ -31,8 +30,7 @@ import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.T
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.TransferTransactionStartedEvent;
 
-@MessageHandler
-@EService
+@EService(type = ESType.MESSAGE_HANDLER)
 public class ConsoleLogger extends AbstractMessageHandler {
 
 	private final static Logger logger = LoggerFactory.getLogger(ConsoleLogger.class);
@@ -40,7 +38,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 	@Dependence
 	IJSONConverter jsonConverter;
 
-	//// for debug
+	/// for debug
 
 	private AtomicInteger accountCreatedEventHit = new AtomicInteger(0);
 	private AtomicInteger depositTransactionCompletedEventHit = new AtomicInteger(0);
@@ -55,7 +53,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 		logger.error("收到的存款完成事件事件的总数: {}", depositTransactionCompletedEventHit.get());
 		logger.error("收到的转账完成事件事件的总数: {}", transferTransactionCompletedEventHit.get());
 	}
-	//// for debug
+	/// for debug end
 
 	@Suspendable
 	public Future<AsyncTaskResult<Void>> handleAsync(AccountCreatedEvent message) {

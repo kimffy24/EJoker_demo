@@ -18,6 +18,7 @@ import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.system.functional.IFunction;
 import pro.jiefzz.ejoker.z.system.functional.IVoidFunction1;
+import pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.mqmock.ICQProvider;
 import pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.mqmock.MQConsumerMemoryAdapter;
 
 @EService
@@ -30,6 +31,9 @@ public class DebugHelperJavaQueue extends DAssemblier {
 	
 	@Dependence
 	DomainEventConsumer eventConsumer;
+	
+	@Dependence
+	DebugHelperEJoker debugHelperEJoker;
 	
 	Queue<EJokerQueueMessage> commandQueue = null;
 	AtomicBoolean commandHandledStatictics = null;
@@ -119,6 +123,9 @@ public class DebugHelperJavaQueue extends DAssemblier {
 			commandHandledLatestAll.clear();
 		}
 		
+
+		ICQProvider.mockMsgQueues.forEach((t, dsh) -> dsh.ai.set(0));
+		
 		blocker.countDown();
 	}
 	
@@ -148,6 +155,10 @@ public class DebugHelperJavaQueue extends DAssemblier {
 		
 		logger.error("CommandQueue delay: {}", commandQueue.size());
 		logger.error("EventQueue delay: {}", eventQueue.size());
+		
+		ICQProvider.mockMsgQueues.forEach((t, dsh) -> {
+			logger.error("queue of topic: {}, total send: {}", t, dsh.ai.get());
+		});
 		
 	}
 	

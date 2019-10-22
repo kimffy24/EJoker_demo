@@ -1,9 +1,9 @@
 package pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.exceptions;
 
-import pro.jiefzz.ejoker.infrastructure.messaging.varieties.publishableException.AbstractPublishableException;
+import pro.jiefzz.ejoker.domain.domainException.AbstractDomainException;
 import pro.jiefzz.ejoker_demo.transfer.domain.TransactionType;
 
-public class InsufficientBalanceException extends AbstractPublishableException {
+public class InsufficientBalanceException extends AbstractDomainException {
 
 	private static final long serialVersionUID = 2101829149997987092L;
 

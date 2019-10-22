@@ -10,8 +10,8 @@ import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import pro.jiefzz.ejoker.z.system.extension.AsyncWrapperException;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
 import pro.jiefzz.ejoker.z.system.wrapper.CountDownLatchWrapper;
-import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
 import pro.jiefzz.ejoker_demo.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
 
@@ -32,7 +32,7 @@ public class CountSyncHelper extends AbstractMessageHandler {
 	public void waitOne() {
 		try {
 			CountDownLatchWrapper.await(waitHandle);
-		} catch (AsyncWrapperException e) {
+		} catch (AsyncWrapperException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

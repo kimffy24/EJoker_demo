@@ -1,7 +1,7 @@
 package pro.jiefzz.eden.nettyRpc;
 
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
-import pro.jiefzz.ejoker.z.rpc.IClientNodeIPAddressProvider;
+import pro.jiefzz.ejoker.z.service.rpc.IClientNodeIPAddressProvider;
 
 @EService
 public class ClientNodeIPAddressProvider implements IClientNodeIPAddressProvider {

@@ -22,7 +22,7 @@ public class MQConsumerMemoryAdapter implements ICQProvider, IConsumerWrokerAwar
 	
 	private AtomicBoolean shutdownFlag = new AtomicBoolean(false);
 	
-	/// for DEBUG!!! 
+	/// for debug
 	private AtomicBoolean dispatchStatictics = new AtomicBoolean(false);
 	private AtomicLong dispatchAmount = new AtomicLong(0l);
 	private AtomicLong dispatchStartAt = new AtomicLong(-1l);
@@ -31,7 +31,7 @@ public class MQConsumerMemoryAdapter implements ICQProvider, IConsumerWrokerAwar
 
 	private AtomicBoolean sepOnce = new AtomicBoolean(false);
 	private CountDownLatch blocker = new CountDownLatch(1);
-	/// for DEBUG!!! end
+	/// for debug end
 	
 	@Override
 	public void start() throws Exception {
@@ -45,20 +45,20 @@ public class MQConsumerMemoryAdapter implements ICQProvider, IConsumerWrokerAwar
 					
 					i = 0;
 					
-					/// for DEBUG!!!
+					/// for debug
 					if(dispatchStartAt.compareAndSet(0l, 1l)) {
 						dispatchStartAt.set(System.currentTimeMillis());
 					};
-					/// for DEBUG!!! end
+					/// for debug end
 					
 					vfHandler.trigger(msg, m -> {
 						
-						/// for DEBUG!!!
+						/// for debug
 						if(dispatchStatictics.get()) {
 							dispatchAmount.incrementAndGet();
 							dispatchLatestAll.offer(System.currentTimeMillis());
 						}
-						/// for DEBUG!!! end
+						/// for debug end
 						
 					});
 				} else {
@@ -66,7 +66,7 @@ public class MQConsumerMemoryAdapter implements ICQProvider, IConsumerWrokerAwar
 						return;
 					if(32 < ++ i ) {
 						DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 1l);
-						/// for DEBUG!!!
+						/// for debug
 						if(sepOnce.get()) {
 							try {
 								blocker.await();
@@ -74,7 +74,8 @@ public class MQConsumerMemoryAdapter implements ICQProvider, IConsumerWrokerAwar
 								e.printStackTrace();
 							}
 						}
-						/// for DEBUG!!! end
+						/// for debug end
+						i = 0;
 					}
 				}
 			}
@@ -88,7 +89,7 @@ public class MQConsumerMemoryAdapter implements ICQProvider, IConsumerWrokerAwar
 
 	@Override
 	public void subscribe(String topic, String filter) {
-		queue = MapHelper.getOrAddConcurrent(mockMsgQueues, topic, () -> new ConcurrentLinkedQueue<>());
+		queue = MapHelper.getOrAddConcurrent(mockMsgQueues, topic, () -> new DSH()).queue;
 	}
 
 	@Override

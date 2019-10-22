@@ -5,11 +5,11 @@ import java.util.concurrent.Future;
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.commanding.ICommandService;
 import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.MessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
+import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.z.task.AsyncTaskResult;
+import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.AddTransactionPreparationCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CommitTransactionPreparationCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.ConfirmDepositCommand;
@@ -21,8 +21,7 @@ import pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.domainEvents.Transacti
 import pro.jiefzz.ejoker_demo.transfer.domain.depositTransaction.domainEvents.DepositTransactionPreparationCompletedEvent;
 import pro.jiefzz.ejoker_demo.transfer.domain.depositTransaction.domainEvents.DepositTransactionStartedEvent;
 
-@MessageHandler
-@EService
+@EService(type = ESType.MESSAGE_HANDLER)
 public class DepositTransactionProcessManager extends AbstractMessageHandler {
 
 	@Dependence

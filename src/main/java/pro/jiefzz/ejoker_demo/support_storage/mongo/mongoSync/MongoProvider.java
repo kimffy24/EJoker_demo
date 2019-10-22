@@ -23,7 +23,7 @@ import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EInitialize;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
-import pro.jiefzz.ejoker.z.scavenger.Scavenger;
+import pro.jiefzz.ejoker.z.service.Scavenger;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.RipenFuture;
 import pro.jiefzz.ejoker.z.system.functional.IFunction;
 import pro.jiefzz.ejoker.z.system.functional.IVoidFunction;
