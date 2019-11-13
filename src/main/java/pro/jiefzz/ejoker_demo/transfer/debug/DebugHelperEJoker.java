@@ -33,8 +33,8 @@ import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EInitialize;
 import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
+import pro.jiefzz.ejoker.z.system.enhance.MapUtil;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.z.system.helper.MapHelper;
 import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
 
 @EService(type = ESType.MESSAGE_HANDLER)
@@ -414,7 +414,7 @@ public class DebugHelperEJoker extends DAssemblier {
 					.parallelStream()
 					.filter(e -> tName.equals(e.getValue().eventDict.get(e.getValue().currentVersion).getAggregateRootTypeName()))
 					.map(e -> e.getValue().currentVersion)
-					.mapToLong(l -> MapHelper.getOrAddConcurrent(dict, "" + l, () -> new AtomicLong()).incrementAndGet())
+					.mapToLong(l -> MapUtil.getOrAdd(dict, "" + l, () -> new AtomicLong()).incrementAndGet())
 					.sum();
 				logger.error("\t\t domain[type={}] version statistics: {}", tName, dict.toString());
 			}
@@ -432,7 +432,7 @@ public class DebugHelperEJoker extends DAssemblier {
 				final Map<String, AtomicLong> dict = new ConcurrentHashMap<>();
 				versionDict.entrySet().parallelStream().map(e -> {
 					return e.getValue();
-				}).mapToLong(l -> MapHelper.getOrAddConcurrent(dict, "" + l, () -> new AtomicLong()).incrementAndGet()).sum();
+				}).mapToLong(l -> MapUtil.getOrAdd(dict, "" + l, () -> new AtomicLong()).incrementAndGet()).sum();
 				logger.error("\t\t version statistics: {}", dict.toString());
 			}
 		}

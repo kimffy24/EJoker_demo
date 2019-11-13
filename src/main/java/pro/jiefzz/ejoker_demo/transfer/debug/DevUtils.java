@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.system.helper.ForEachHelper;
+import pro.jiefzz.ejoker.z.system.enhance.ForEachUtil;
 
 public final class DevUtils {
 	
@@ -18,7 +18,7 @@ public final class DevUtils {
 	
 	public static long moniterQ(IEJokerSimpleContext eJokerContext) {
 
-		ForEachHelper.processForEach(mStore, (c ,m) -> {
+		ForEachUtil.processForEach(mStore, (c ,m) -> {
 			Object object = eJokerContext.get(c);
 			if(null == object)
 				return;

@@ -11,8 +11,8 @@ import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
 import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.z.context.annotation.context.EService;
+import pro.jiefzz.ejoker.z.system.enhance.ForEachUtil;
 import pro.jiefzz.ejoker.z.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.z.system.helper.ForEachHelper;
 import pro.jiefzz.ejoker.z.system.task.AsyncTaskResult;
 import pro.jiefzz.ejoker.z.system.task.AsyncTaskStatus;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
@@ -65,7 +65,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		AtomicBoolean faild = new AtomicBoolean(false);
 		AtomicBoolean ioException = new AtomicBoolean(false);
 		StringBuffer eMessageSb = new StringBuffer();
-		ForEachHelper.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
+		ForEachUtil.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
 			if (AsyncTaskStatus.Failed.equals(r.getStatus())) {
 				faild.set(true);
 				eMessageSb.append(r.getErrorMessage());
@@ -175,7 +175,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		AtomicBoolean faild = new AtomicBoolean(false);
 		AtomicBoolean ioException = new AtomicBoolean(false);
 		StringBuffer eMessageSb = new StringBuffer();
-		ForEachHelper.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
+		ForEachUtil.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
 			if (AsyncTaskStatus.Failed.equals(r.getStatus())) {
 				faild.set(true);
 				eMessageSb.append(r.getErrorMessage());

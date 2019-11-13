@@ -10,7 +10,7 @@ import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.z.context.annotation.context.EInitialize;
 import pro.jiefzz.ejoker.z.context.dev2.EjokerRootDefinationStore;
 import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.system.helper.ForEachHelper;
+import pro.jiefzz.ejoker.z.system.enhance.ForEachUtil;
 
 public abstract class DAssemblier extends AbstractMessageHandler {
 
@@ -151,7 +151,7 @@ public abstract class DAssemblier extends AbstractMessageHandler {
 	protected void connectField() {
 		for(Class<?> clazz = this.getClass(); !clazz.equals(AbstractMessageHandler.class); clazz = clazz.getSuperclass()) {
 			Field[] declaredFields = clazz.getDeclaredFields();
-			ForEachHelper.processForEach(declaredFields, f -> {
+			ForEachUtil.processForEach(declaredFields, f -> {
 				if(!f.getName().startsWith("dF_"))
 					return;
 				String[] sg = f.getName().split("_");
