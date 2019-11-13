@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>pro.jiefzz</groupId>
-  <artifactId>ejoker</artifactId>
+  <artifactId>ejoker-mq-rocketmq</artifactId>
   <versioning>
     <release>2.0.0-snapshot-2</release>
     <versions>
       <version>2.0.0-snapshot-2</version>
     </versions>
-    <lastUpdated>20191113172652</lastUpdated>
+    <lastUpdated>20191113172721</lastUpdated>
   </versioning>
 </metadata>
