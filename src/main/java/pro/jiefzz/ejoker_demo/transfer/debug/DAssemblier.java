@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
+import pro.jiefzz.ejoker.common.context.annotation.context.EInitialize;
+import pro.jiefzz.ejoker.common.context.dev2.EjokerRootDefinationStore;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jiefzz.ejoker.common.system.enhance.ForEachUtil;
 import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
-import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.z.context.annotation.context.EInitialize;
-import pro.jiefzz.ejoker.z.context.dev2.EjokerRootDefinationStore;
-import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.system.enhance.ForEachUtil;
 
 public abstract class DAssemblier extends AbstractMessageHandler {
 

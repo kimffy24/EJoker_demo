@@ -6,8 +6,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.jiefzz.ejoker.z.context.annotation.context.EService;
-import pro.jiefzz.ejoker.z.service.rpc.IClientNodeIPAddressProvider;
+import pro.jiefzz.ejoker.common.context.annotation.context.EService;
+import pro.jiefzz.ejoker.common.service.rpc.IClientNodeIPAddressProvider;
 
 @EService
 public class ClientNodeIPAddressProviderImpl implements IClientNodeIPAddressProvider {

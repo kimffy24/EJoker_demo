@@ -2,9 +2,9 @@ package pro.jiefzz.eden.functional;
 
 import pro.jiefzz.ejoker.EJoker;
 import pro.jiefzz.ejoker.EJoker.EJokerSingletonFactory;
-import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
-import pro.jiefzz.ejoker.z.service.IScheduleService;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jiefzz.ejoker.common.context.dev2.IEjokerContextDev2;
+import pro.jiefzz.ejoker.common.service.IScheduleService;
 
 public class TestScheduler {
 

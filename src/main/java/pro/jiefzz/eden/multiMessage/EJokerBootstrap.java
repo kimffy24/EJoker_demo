@@ -2,8 +2,8 @@ package pro.jiefzz.eden.multiMessage;
 
 import pro.jiefzz.ejoker.EJoker;
 import pro.jiefzz.ejoker.EJoker.EJokerSingletonFactory;
-import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jiefzz.ejoker.common.context.dev2.IEjokerContextDev2;
 
 public class EJokerBootstrap {
 

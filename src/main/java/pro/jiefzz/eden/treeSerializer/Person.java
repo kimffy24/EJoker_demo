@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import pro.jiefzz.ejoker.z.context.annotation.persistent.PersistentIgnore;
+import pro.jiefzz.ejoker.common.context.annotation.persistent.PersistentIgnore;
 
 public class Person {
 

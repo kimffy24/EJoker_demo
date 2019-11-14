@@ -3,8 +3,8 @@ package pro.jiefzz.eden.aa;
 import java.util.Set;
 
 import pro.jiefzz.ejoker.commanding.ICommand;
+import pro.jiefzz.ejoker.common.context.annotation.context.EService;
 import pro.jiefzz.ejoker.queue.ITopicProvider;
-import pro.jiefzz.ejoker.z.context.annotation.context.EService;
 
 @EService
 public class CommandTopicProvider implements ITopicProvider<ICommand> {

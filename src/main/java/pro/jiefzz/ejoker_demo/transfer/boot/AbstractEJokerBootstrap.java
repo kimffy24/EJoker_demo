@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.ejoker.EJoker;
 import pro.jiefzz.ejoker.EJoker.EJokerSingletonFactory;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jiefzz.ejoker.common.context.dev2.IEjokerContextDev2;
+import pro.jiefzz.ejoker.common.service.Scavenger;
+import pro.jiefzz.ejoker.common.system.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker.queue.applicationMessage.ApplicationMessageConsumer;
 import pro.jiefzz.ejoker.queue.applicationMessage.ApplicationMessagePublisher;
 import pro.jiefzz.ejoker.queue.command.CommandConsumer;
@@ -20,10 +24,6 @@ import pro.jiefzz.ejoker.queue.domainException.DomainExceptionConsumer;
 import pro.jiefzz.ejoker.queue.domainException.DomainExceptionPublisher;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IProducerWrokerAware;
-import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.z.context.dev2.IEjokerContextDev2;
-import pro.jiefzz.ejoker.z.service.Scavenger;
-import pro.jiefzz.ejoker.z.system.task.context.SystemAsyncHelper;
 
 public abstract class AbstractEJokerBootstrap {
 	

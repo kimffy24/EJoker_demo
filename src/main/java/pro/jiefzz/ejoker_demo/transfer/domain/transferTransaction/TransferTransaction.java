@@ -1,7 +1,7 @@
 package pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction;
 
+import pro.jiefzz.ejoker.common.context.annotation.assemblies.AggregateRoot;
 import pro.jiefzz.ejoker.domain.AbstractAggregateRoot;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.AggregateRoot;
 import pro.jiefzz.ejoker_demo.transfer.domain.TransactionStatus;
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.AccountValidatePassedConfirmCompletedEvent;
 import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.domainEvents.SourceAccountValidatePassedConfirmedEvent;

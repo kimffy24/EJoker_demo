@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pro.jiefzz.ejoker.common.context.annotation.assemblies.AggregateRoot;
 import pro.jiefzz.ejoker.domain.AbstractAggregateRoot;
-import pro.jiefzz.ejoker.z.context.annotation.assemblies.AggregateRoot;
 import pro.jiefzz.ejoker_demo.transfer.domain.TransactionType;
 import pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.domainEvents.AccountCreatedEvent;
 import pro.jiefzz.ejoker_demo.transfer.domain.bankAccount.domainEvents.TransactionPreparationAddedEvent;

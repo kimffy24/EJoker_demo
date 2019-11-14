@@ -3,7 +3,7 @@ package pro.jiefzz.eden.quasar.countdownlatch;
 import java.util.concurrent.TimeUnit;
 
 import co.paralleluniverse.strands.concurrent.CountDownLatch;
-import pro.jiefzz.ejoker.z.system.wrapper.DiscardWrapper;
+import pro.jiefzz.ejoker.common.system.wrapper.DiscardWrapper;
 
 public class Main {
 	

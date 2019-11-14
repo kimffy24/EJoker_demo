@@ -1,7 +1,7 @@
 package pro.jiefzz.eden.javaGenericExpression.test.A1;
 
-import pro.jiefzz.ejoker.z.utils.genericity.GenericExpression;
-import pro.jiefzz.ejoker.z.utils.genericity.GenericExpressionFactory;
+import pro.jiefzz.ejoker.common.utils.genericity.GenericExpression;
+import pro.jiefzz.ejoker.common.utils.genericity.GenericExpressionFactory;
 
 public class FuckA1 {
 

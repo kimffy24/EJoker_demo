@@ -1,10 +1,10 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.mqmock;
 
+import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
+import pro.jiefzz.ejoker.common.system.functional.IVoidFunction;
+import pro.jiefzz.ejoker.common.system.functional.IVoidFunction1;
 import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IProducerWrokerAware;
-import pro.jiefzz.ejoker.z.system.enhance.MapUtil;
-import pro.jiefzz.ejoker.z.system.functional.IVoidFunction;
-import pro.jiefzz.ejoker.z.system.functional.IVoidFunction1;
 
 public class MQProducerMomoryAdapter implements ICQProvider, IProducerWrokerAware {
 

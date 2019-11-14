@@ -3,12 +3,12 @@ package pro.jiefzz.eden.scan;
 import java.util.Set;
 import java.util.TreeSet;
 
-import pro.jiefzz.ejoker.z.context.dev2.impl.EjokerContextDev2Impl;
-import pro.jiefzz.ejoker.z.system.enhance.ForEachUtil;
-import pro.jiefzz.ejoker.z.system.functional.IVoidFunction2;
-import pro.jiefzz.ejoker.z.utils.genericity.GenericDefination;
-import pro.jiefzz.ejoker.z.utils.genericity.GenericExpression;
-import pro.jiefzz.ejoker.z.utils.genericity.GenericExpressionFactory;
+import pro.jiefzz.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
+import pro.jiefzz.ejoker.common.system.enhance.ForEachUtil;
+import pro.jiefzz.ejoker.common.system.functional.IVoidFunction2;
+import pro.jiefzz.ejoker.common.utils.genericity.GenericDefination;
+import pro.jiefzz.ejoker.common.utils.genericity.GenericExpression;
+import pro.jiefzz.ejoker.common.utils.genericity.GenericExpressionFactory;
 
 public class ScanAsync {
 

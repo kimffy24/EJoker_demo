@@ -2,12 +2,9 @@ package pro.jiefzz.eden.context;
 
 import pro.jiefzz.eden.context.completion.CommandTopicProviders;
 import pro.jiefzz.ejoker.commanding.ICommand;
+import pro.jiefzz.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
 import pro.jiefzz.ejoker.queue.AbstractTopicProvider;
 import pro.jiefzz.ejoker.queue.ITopicProvider;
-import pro.jiefzz.ejoker.utils.handlerProviderHelper.RegistCommandHandlerHelper;
-import pro.jiefzz.ejoker.utils.handlerProviderHelper.RegistDomainEventHandlerHelper;
-import pro.jiefzz.ejoker.utils.handlerProviderHelper.RegistMessageHandlerHelper;
-import pro.jiefzz.ejoker.z.context.dev2.impl.EjokerContextDev2Impl;
 
 public class TestEjokerContext {
 

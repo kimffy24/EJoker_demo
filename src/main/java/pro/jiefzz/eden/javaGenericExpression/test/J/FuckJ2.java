@@ -7,10 +7,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import pro.jiefzz.eden.javaGenericExpression.test.A.Y;
-import pro.jiefzz.ejoker.z.utils.relationship.IRelationshipTreeAssemblers;
-import pro.jiefzz.ejoker.z.utils.relationship.RelationshipTreeUtil;
-import pro.jiefzz.ejoker.z.utils.relationship.SpecialTypeCodec;
-import pro.jiefzz.ejoker.z.utils.relationship.SpecialTypeCodecStore;
+import pro.jiefzz.ejoker.common.utils.relationship.IRelationshipTreeAssemblers;
+import pro.jiefzz.ejoker.common.utils.relationship.RelationshipTreeUtil;
+import pro.jiefzz.ejoker.common.utils.relationship.SpecialTypeCodec;
+import pro.jiefzz.ejoker.common.utils.relationship.SpecialTypeCodecStore;
 
 public class FuckJ2 {
 

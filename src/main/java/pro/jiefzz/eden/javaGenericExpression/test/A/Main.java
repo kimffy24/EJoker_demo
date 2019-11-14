@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import pro.jiefzz.ejoker.z.utils.GenericTypeUtil;
+import pro.jiefzz.ejoker.common.utils.GenericTypeUtil;
 
 public class Main {
 

@@ -6,8 +6,8 @@ import pro.jiefzz.eden.javaGenericExpression.test.A.IAAAA;
 import pro.jiefzz.eden.javaGenericExpression.test.A.IB;
 import pro.jiefzz.eden.javaGenericExpression.test.A.Y;
 import pro.jiefzz.eden.javaGenericExpression.test.A.Z;
+import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.domain.IAggregateRoot;
-import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
 
 public class C<TPc1> extends B<TPc1> {
 

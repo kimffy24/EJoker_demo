@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker_demo.transfer.commandHandlers;
 
-import static pro.jiefzz.ejoker.z.system.extension.LangUtil.await;
+import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
 
 import java.util.concurrent.Future;
 
@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.ejoker.commanding.AbstractCommandHandler;
 import pro.jiefzz.ejoker.commanding.ICommandContext;
+import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
+import pro.jiefzz.ejoker.common.context.annotation.context.ESType;
+import pro.jiefzz.ejoker.common.context.annotation.context.EService;
+import pro.jiefzz.ejoker.common.service.IJSONConverter;
 import pro.jiefzz.ejoker.messaging.AbstractApplicationMessage;
 import pro.jiefzz.ejoker.messaging.IApplicationMessage;
-import pro.jiefzz.ejoker.z.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.z.context.annotation.context.ESType;
-import pro.jiefzz.ejoker.z.context.annotation.context.EService;
-import pro.jiefzz.ejoker.z.service.IJSONConverter;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidateFailedMessage;
 import pro.jiefzz.ejoker_demo.transfer.applicationMessageHandlers.AccountValidatePassedMessage;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.AddTransactionPreparationCommand;

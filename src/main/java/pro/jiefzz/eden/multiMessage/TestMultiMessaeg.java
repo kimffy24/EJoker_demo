@@ -6,8 +6,8 @@ import pro.jiefzz.eden.multiMessage.bus.DE2;
 import pro.jiefzz.eden.multiMessage.bus.DE4;
 import pro.jiefzz.eden.multiMessage.bus.DE6;
 import pro.jiefzz.eden.multiMessage.bus.DE8;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.messaging.IMessageDispatcher;
-import pro.jiefzz.ejoker.z.context.dev2.IEJokerSimpleContext;
 
 public class TestMultiMessaeg {
 
