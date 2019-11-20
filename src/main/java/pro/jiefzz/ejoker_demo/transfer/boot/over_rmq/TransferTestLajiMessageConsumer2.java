@@ -13,8 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
-import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
-import pro.jiefzz.ejoker_demo.transfer.boot.TopicReference;
+import pro.jiefzz.ejoker_demo.transfer.topicProviders.TopicReference;
 
 /**
  * 清理掉测试时遗留在队列中的信息
@@ -26,12 +25,12 @@ public class TransferTestLajiMessageConsumer2 {
 	private final static Logger logger = LoggerFactory.getLogger(TransferTestLajiMessageConsumer2.class);
 	
 	public static void main(String[] args) throws Exception {
-		
+
 		String[][] tuples = new String [][] {
-			new String[] {AbstractEJokerBootstrap.EJokerDomainEventGroup, TopicReference.DomainEventTopic},
-//			new String[] {EJokerBootstrap.EJokerCommandGroup, TopicReference.CommandTopic},
-//			new String[] {EJokerBootstrap.EJokerApplicationMessageGroup, TopicReference.ApplicationMessageTopic},
-//			new String[] {EJokerBootstrap.EJokerPublishableExceptionGroup, TopicReference.ExceptionTopic},
+			new String[] {"EjokerDomainEventGroup", TopicReference.DomainEventTopic},
+//			new String[] {"EjokerCommandGroup", TopicReference.CommandTopic},
+//			new String[] {"EjokerApplicationMessageGroup", TopicReference.ApplicationMessageTopic},
+//			new String[] {"EjokerDomainExceptionGroup", TopicReference.ExceptionTopic},
 		};
 		
 		for(String[] tuple : tuples) {
@@ -51,7 +50,7 @@ public class TransferTestLajiMessageConsumer2 {
 	public static void xx(String group, String topic) throws Exception {
 		AtomicLong yy = new AtomicLong(0);
 		DefaultMQPullConsumer c = new DefaultMQPullConsumer(group);
-        c.setNamesrvAddr(EJokerBootstrap.NameServAddr);
+        c.setNamesrvAddr(Prepare.NameServAddr);
         c.start();
 		Set<MessageQueue> fetchSubscribeMessageQueues = c.fetchSubscribeMessageQueues(topic);
 		

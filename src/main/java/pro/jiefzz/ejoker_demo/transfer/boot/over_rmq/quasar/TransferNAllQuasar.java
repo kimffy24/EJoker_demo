@@ -1,6 +1,5 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.quasar;
 
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.TransferNAll;
 
 /**
@@ -13,7 +12,7 @@ public class TransferNAllQuasar {
 
 	public static void main(String[] args) throws Exception {
 		
-		TransferNAll.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
+		TransferNAll.start(new PrepareQuasar().getEb());
 		
 	}
 }

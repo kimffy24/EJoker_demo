@@ -1,6 +1,5 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.quasar;
 
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.TransferAppPerformanceTest;
 
 /**
@@ -12,8 +11,6 @@ import pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.TransferAppPerformanceTest;
 public class TransferAppPerformanceTestQuasar {
 
 	public static void main(String[] args) throws Exception {
-		
-		TransferAppPerformanceTest.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
-		
+		TransferAppPerformanceTest.start(new PrepareQuasar().getEb());
 	}
 }

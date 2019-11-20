@@ -12,9 +12,7 @@ import pro.jiefzz.ejoker_demo.transfer.domain.transferTransaction.TransferTransa
 
 public class TransferPrepare {
 
-	public static AbstractEJokerBootstrap prepare(AbstractEJokerBootstrap eJokerBootstrap) {
-
-		IEJokerSimpleContext eJokerContext = eJokerBootstrap.getEJokerContext();
+	public static void prepare(IEJokerSimpleContext eJokerContext) {
 		ITypeNameProvider typeNameProvider = eJokerContext.get(ITypeNameProvider.class);
 		
 		Map<Class<?>, String> aliasMap = new HashMap<>();
@@ -36,8 +34,6 @@ public class TransferPrepare {
 			}
 			
 		});
-		
-		return eJokerBootstrap;
 	}
 	
 }

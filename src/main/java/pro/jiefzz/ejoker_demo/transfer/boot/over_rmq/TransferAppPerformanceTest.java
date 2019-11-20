@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
 import pro.jiefzz.ejoker.commanding.CommandReturnType;
 import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.common.system.task.context.SystemAsyncHelper;
@@ -20,8 +21,6 @@ import pro.jiefzz.ejoker.eventing.IEventStore;
 import pro.jiefzz.ejoker.eventing.impl.InMemoryEventStore;
 import pro.jiefzz.ejoker.infrastructure.ITypeNameProvider;
 import pro.jiefzz.ejoker.queue.command.CommandService;
-import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 import pro.jiefzz.ejoker_demo.transfer.domain.depositTransaction.DepositTransaction;
@@ -31,13 +30,12 @@ import pro.jiefzz.ejoker_demo.transfer.eventHandlers.SyncHelper;
 public class TransferAppPerformanceTest {
 	
 	private final static Logger logger = LoggerFactory.getLogger(TransferAppPerformanceTest.class);
-	
+
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()));
+		start(new Prepare().getEb());
 	}
 
-	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
-		eJokerFrameworkInitializer.initAll();
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
 		

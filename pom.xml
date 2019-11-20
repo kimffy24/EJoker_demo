@@ -17,6 +17,7 @@
 		<version.spring>4.3.9.RELEASE</version.spring>
 		<version.jetty>9.4.3.v20170317</version.jetty>
 		<version.jackson>2.7.5</version.jackson>
+		<version.ejoker>2.0.0-snapshot-4</version.ejoker>
 	</properties>
 
 	<repositories>
@@ -72,8 +73,13 @@
 
 		<dependency>
 			<groupId>pro.jiefzz</groupId>
+			<artifactId>ejoker-bootstrap</artifactId>
+			<version>${version.ejoker}</version>
+		</dependency>
+		<dependency>
+			<groupId>pro.jiefzz</groupId>
 			<artifactId>ejoker-mq-rocketmq</artifactId>
-			<version>2.0.0-snapshot-3</version>
+			<version>${version.ejoker}</version>
 		</dependency>
 
 
@@ -137,8 +143,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>11</source>
-					<target>11</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 

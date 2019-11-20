@@ -7,12 +7,12 @@ import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
 import pro.jiefzz.ejoker.commanding.ICommand;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.common.system.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker.common.system.task.io.IOHelper;
 import pro.jiefzz.ejoker.queue.command.CommandService;
-import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.ConfirmDepositPreparationCommand;
 
 /**
@@ -31,12 +31,14 @@ public class TransferFrontendCompensation {
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontendCompensation.class);
 
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()));
+		start(new Prepare().getEb());
 	}
 
-	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
-
-		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+		
+		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
+		
+		CommandService commandService = eJokerContext.get(CommandService.class);
 		SystemAsyncHelper systemAsyncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SystemAsyncHelper.class);
 		IOHelper ioHelper = eJokerFrameworkInitializer.getEJokerContext().get(IOHelper.class);
 		

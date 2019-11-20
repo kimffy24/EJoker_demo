@@ -6,12 +6,11 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
 import pro.jiefzz.ejoker.commanding.CommandReturnType;
 import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.common.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker.queue.command.CommandService;
-import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.transferTransaction.StartTransferTransactionCommand;
@@ -23,20 +22,19 @@ public class TransferApp {
 	private final static Logger logger = LoggerFactory.getLogger(TransferApp.class);
 	
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()));
+		start(new Prepare().getEb());
 	}
 
-	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
-		eJokerFrameworkInitializer.initAll();
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
 		
 		CommandService commandService = eJokerContext.get(CommandService.class);
 		SyncHelper syncHelper = eJokerContext.get(SyncHelper.class);
 		
-		var account1 = ObjectId.get().toHexString();
-		var account2 = ObjectId.get().toHexString();
-		var account3 = "INVALID-" + ObjectId.get().toHexString();
+		String account1 = ObjectId.get().toHexString();
+		String account2 = ObjectId.get().toHexString();
+		String account3 = "INVALID-" + ObjectId.get().toHexString();
 		
 		//创建两个银行账户
         commandService.executeAsync(new CreateAccountCommand(account1, "雪华"), CommandReturnType.EventHandled).get();

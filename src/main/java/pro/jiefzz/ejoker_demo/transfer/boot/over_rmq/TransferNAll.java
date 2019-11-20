@@ -3,10 +3,9 @@ package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
 import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.common.service.IScheduleService;
-import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 
 /**
  * 这是一个C端和Q端一起的demo<br />
@@ -18,14 +17,12 @@ import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 public class TransferNAll {
 
 	private final static Logger logger = LoggerFactory.getLogger(TransferNAll.class);
-	
-	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()));
-	}
-	
-	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 
-		eJokerFrameworkInitializer.initAll();
+	public static void main(String[] args) throws Exception {
+		start(new Prepare().getEb());
+	}
+
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
 		IScheduleService scheduleService = eJokerContext.get(IScheduleService.class);

@@ -8,17 +8,13 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
 import pro.jiefzz.ejoker.commanding.CommandReturnType;
-import pro.jiefzz.ejoker.commanding.ICommand;
-import pro.jiefzz.ejoker.common.service.IJSONConverter;
-import pro.jiefzz.ejoker.common.service.IScheduleService;
+import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jiefzz.ejoker.common.system.task.context.SystemAsyncHelper;
 import pro.jiefzz.ejoker.common.system.task.io.IOHelper;
-import pro.jiefzz.ejoker.queue.ITopicProvider;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.utils.MObjectId;
-import pro.jiefzz.ejoker_demo.transfer.boot.AbstractEJokerBootstrap;
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 
@@ -42,19 +38,16 @@ public class TransferFrontend {
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontend.class);
 
 	public static void main(String[] args) throws Exception {
-		start(TransferPrepare.prepare(new EJokerBootstrap()));
+		start(new Prepare().getEb());
 	}
 
-	public static void start(AbstractEJokerBootstrap eJokerFrameworkInitializer) throws Exception {
-
-		eJokerFrameworkInitializer.initAll();
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		
-		CommandService commandService = eJokerFrameworkInitializer.initCommandService();
+		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
 		
-		IJSONConverter jsonConverter = eJokerFrameworkInitializer.getEJokerContext().get(IJSONConverter.class);
-		ITopicProvider<ICommand> topicProvider = eJokerFrameworkInitializer.getEJokerContext().get(ITopicProvider.class, ICommand.class);
+		CommandService commandService = eJokerContext.get(CommandService.class);
+		
 		SystemAsyncHelper systemAsyncHelper = eJokerFrameworkInitializer.getEJokerContext().get(SystemAsyncHelper.class);
-		IScheduleService scheduleService = eJokerFrameworkInitializer.getEJokerContext().get(IScheduleService.class);
 		IOHelper ioHelper = eJokerFrameworkInitializer.getEJokerContext().get(IOHelper.class);
 		
 		TimeUnit.SECONDS.sleep(1l);
@@ -89,7 +82,7 @@ public class TransferFrontend {
 		cdlx.await();
 		System.err.println("all account ok.");
 //		System.exit(0);
-		TimeUnit.MILLISECONDS.sleep(AbstractEJokerBootstrap.BatchDelay);
+		TimeUnit.MILLISECONDS.sleep(Prepare.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
 		int amount = transferLoop*ids.length;

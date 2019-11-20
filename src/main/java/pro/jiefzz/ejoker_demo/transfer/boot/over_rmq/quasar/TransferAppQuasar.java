@@ -1,6 +1,5 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.quasar;
 
-import pro.jiefzz.ejoker_demo.transfer.boot.TransferPrepare;
 import pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.TransferApp;
 
 /**
@@ -13,7 +12,7 @@ public class TransferAppQuasar {
 
 	public static void main(String[] args) throws Exception {
 		
-		TransferApp.start(TransferPrepare.prepare(new EJokerQuasarBootstrap()));
+		TransferApp.start(new PrepareQuasar().getEb());
 		
 	}
 }
