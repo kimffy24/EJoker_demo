@@ -38,7 +38,7 @@ public class ClientNodeIPAddressProviderImpl implements IClientNodeIPAddressProv
         }
         
         if(null == eJokerNodeAddrTmp || "".equals(eJokerNodeAddrTmp)) {
-        	eJokerNodeAddrTmp = "127.0.0.1";
+        	eJokerNodeAddrTmp = "172.16.0.2";
         }
         logger.info("Detect node address: {}.", eJokerNodeAddrTmp);
         EJokerNodeAddr = eJokerNodeAddrTmp;
