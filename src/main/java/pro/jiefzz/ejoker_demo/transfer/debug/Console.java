@@ -82,8 +82,8 @@ public class Console {
 		if(!debugHelperEJoker.isActive() && !debugHelperJavaQueue.isActive()) {
 
 			debugHelperEJoker.probe();
-			debugHelperJavaQueue.probe();
-			debugHelperMQ.probe();
+//			debugHelperJavaQueue.probe();
+//			debugHelperMQ.probe();
 			
 			// 输出transfer的设置的统计数据
 			DevUtils.moniterQ(eJokerContext);

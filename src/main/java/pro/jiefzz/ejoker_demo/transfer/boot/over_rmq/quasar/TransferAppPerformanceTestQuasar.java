@@ -1,6 +1,6 @@
 package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.quasar;
 
-import pro.jiefzz.ejoker_demo.transfer.boot.over_rmq.TransferAppPerformanceTest;
+import pro.jiefzz.ejoker_demo.transfer.boot.TransferAppPerformanceTest;
 
 /**
  * 

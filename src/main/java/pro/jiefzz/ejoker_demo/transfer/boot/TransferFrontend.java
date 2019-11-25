@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
+package pro.jiefzz.ejoker_demo.transfer.boot;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +36,6 @@ public class TransferFrontend {
 	public final static int transferLoop = 5;
 	
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontend.class);
-
-	public static void main(String[] args) throws Exception {
-		start(new Prepare().getEb());
-	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		
@@ -82,7 +78,7 @@ public class TransferFrontend {
 		cdlx.await();
 		System.err.println("all account ok.");
 //		System.exit(0);
-		TimeUnit.MILLISECONDS.sleep(Prepare.BatchDelay);
+		TimeUnit.MILLISECONDS.sleep(TransferConst.BatchDelay);
 		System.out.println("Start batch deposit... ");
 		
 		int amount = transferLoop*ids.length;

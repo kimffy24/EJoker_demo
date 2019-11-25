@@ -18,8 +18,8 @@ import pro.jiefzz.ejoker.queue.command.CommandConsumer;
 import pro.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
 import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
 import pro.jiefzz.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
-import pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.mqmock.ICQProvider;
-import pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.mqmock.MQConsumerMemoryAdapter;
+import pro.jiefzz.ejoker_support.javaqueue.ICQProvider;
+import pro.jiefzz.ejoker_support.javaqueue.MQConsumerMemoryAdapter;
 
 @EService
 public class DebugHelperJavaQueue extends DAssemblier {

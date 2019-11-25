@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
+package pro.jiefzz.ejoker_demo.transfer.boot;
 
 import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
 
@@ -30,10 +30,6 @@ import pro.jiefzz.ejoker_demo.transfer.eventHandlers.SyncHelper;
 public class TransferAppPerformanceTest {
 	
 	private final static Logger logger = LoggerFactory.getLogger(TransferAppPerformanceTest.class);
-
-	public static void main(String[] args) throws Exception {
-		start(new Prepare().getEb());
-	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		

@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
+package pro.jiefzz.ejoker_demo.transfer.boot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +29,6 @@ import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.ConfirmDeposi
 public class TransferFrontendCompensation {
 	
 	private final static  Logger logger = LoggerFactory.getLogger(TransferFrontendCompensation.class);
-
-	public static void main(String[] args) throws Exception {
-		start(new Prepare().getEb());
-	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		

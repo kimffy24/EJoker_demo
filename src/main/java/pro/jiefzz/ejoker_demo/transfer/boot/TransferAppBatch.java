@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
+package pro.jiefzz.ejoker_demo.transfer.boot;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -34,16 +34,16 @@ public class TransferAppBatch {
 
 	public final static int depositLoop;
 	
-	public static void main(String[] args) throws Exception {
-		start(new Prepare().getEb(), getAccountAmount(), getDepositLoop());
-	}
-	
 	public final static int getAccountAmount() {
 		return accountAmount;
 	}
 	
 	public final static int getDepositLoop() {
 		return depositLoop;
+	}
+	
+	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
+		start(eJokerFrameworkInitializer, getAccountAmount(), getDepositLoop());
 	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer, int accountAmount, int transferLoop) throws Exception {

@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
+package pro.jiefzz.ejoker_demo.transfer.boot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,6 @@ import pro.jiefzz.ejoker.common.service.IScheduleService;
 public class TransferNAll {
 
 	private final static Logger logger = LoggerFactory.getLogger(TransferNAll.class);
-
-	public static void main(String[] args) throws Exception {
-		start(new Prepare().getEb());
-	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		

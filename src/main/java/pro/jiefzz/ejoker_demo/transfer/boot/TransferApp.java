@@ -1,4 +1,4 @@
-package pro.jiefzz.ejoker_demo.transfer.boot.over_rmq;
+package pro.jiefzz.ejoker_demo.transfer.boot;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,10 +20,6 @@ import pro.jiefzz.ejoker_demo.transfer.eventHandlers.SyncHelper;
 public class TransferApp {
 	
 	private final static Logger logger = LoggerFactory.getLogger(TransferApp.class);
-	
-	public static void main(String[] args) throws Exception {
-		start(new Prepare().getEb());
-	}
 
 	public static void start(EJokerBootstrap eJokerFrameworkInitializer) throws Exception {
 		
