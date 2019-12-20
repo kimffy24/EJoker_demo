@@ -23,10 +23,6 @@ public class Prepare {
 			.initAll();
 	}
 
-//	public final IEJokerSimpleContext getEJokerContext() {
-//		return eb.getEJokerContext();
-//	}
-
 	public EJokerBootstrap getEb() {
 		return eb;
 	}
