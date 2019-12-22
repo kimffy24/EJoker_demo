@@ -23,7 +23,6 @@ import pro.jiefzz.ejoker.queue.command.CommandService;
 import pro.jiefzz.ejoker.utils.MObjectId;
 import pro.jiefzz.ejoker_demo.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.ejoker_demo.transfer.commands.depositTransaction.StartDepositTransactionCommand;
-import pro.jiefzz.ejoker_demo.transfer.debug.Console;
 import pro.jiefzz.ejoker_demo.transfer.eventHandlers.ConsoleLogger;
 
 public class TransferAppBatch {
@@ -53,8 +52,6 @@ public class TransferAppBatch {
 		IOHelper ioHelper = eJokerFrameworkInitializer.getEJokerContext().get(IOHelper.class);
 		ConsoleLogger consoleLogger = eJokerFrameworkInitializer.getEJokerContext().get(ConsoleLogger.class);
 		
-		Console console = eJokerFrameworkInitializer.getEJokerContext().get(Console.class);
-
 		TimeUnit.SECONDS.sleep(1l);
 		System.out.println("");
 		System.out.println("====================== TransferAPP ======================");
@@ -106,8 +103,6 @@ public class TransferAppBatch {
 		
 		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
 		
-		console.sepOnce();
-		
 		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
 		
 		int amount = transferLoop*ids.length;
@@ -133,8 +128,6 @@ public class TransferAppBatch {
 							true);
 				}
 			}).start();
-
-		console.setStart();
 		
 		long batchStartAt = System.currentTimeMillis();
 		logger.error("deposit's cmd send task started.");

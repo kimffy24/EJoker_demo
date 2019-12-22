@@ -4,23 +4,91 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.common.system.enhance.ForEachUtil;
+import pro.jiefzz.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
+import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
 
 public final class DevUtils {
 	
-	private final static String[] probeTargets = new String[] {
-			
-			"pro.jiefzz.ejoker_demo.transfer.eventHandlers.ConsoleLogger",
-			
-	};
+	private final static String mName = "probe";
 	
-	public static long moniterQ(IEJokerSimpleContext eJokerContext) {
+	private final static Map<Object, DevUtils> devUtilsStore = new ConcurrentHashMap<>();
+	
+	private final static DevUtils getCurrentDevUtils(Object eJokerContext) {
+		return MapUtil.getOrAdd(devUtilsStore, eJokerContext, () -> new DevUtils(eJokerContext));
+	}
 
-		ForEachUtil.processForEach(mStore, (c ,m) -> {
-			Object object = eJokerContext.get(c);
-			if(null == object)
+	private final Map<String, Object> instanceMap = null;
+
+	private final Map<String, Object> instanceGenericTypeMap = null;
+
+	private final Map<Object, Method> mStore = new HashMap<>();
+	
+	private DevUtils(Object eJokerContext) {
+		if(!(eJokerContext instanceof EjokerContextDev2Impl)) {
+			throw new RuntimeException("parameter #1 is not a ejoker context");
+		}
+		DevHelper devHelper = DevHelper.of(eJokerContext);
+		devHelper.connect(eJokerContext, "instanceMap", this);
+		devHelper.connect(eJokerContext, "instanceGenericTypeMap", this);
+		
+		instanceMap.forEach((k, v) -> {
+			Method m = null;
+			try {
+				for(Class<?> c = v.getClass();
+					!RuntimeException.class.equals(c)
+						&& !Exception.class.equals(c) 
+						&& !Object.class.equals(c) ;
+					c = c.getSuperclass())
+				try {
+					m = c.getDeclaredMethod(mName);
+				} catch (NoSuchMethodException e) {
+					continue;
+				}
+				if(null != m) {
+					m.setAccessible(true);
+					mStore.put(v, m);
+				}
+			} catch (SecurityException e) {
+				;
+			}
+		});
+
+		instanceGenericTypeMap.forEach((k, v) -> {
+			Method m = null;
+			try {
+				for(Class<?> c = v.getClass();
+					!RuntimeException.class.equals(c)
+						&& !Exception.class.equals(c) 
+						&& !Object.class.equals(c) ;
+					c = c.getSuperclass())
+				try {
+					m = c.getDeclaredMethod(mName);
+				} catch (NoSuchMethodException e) {
+					continue;
+				}
+				if(null != m) {
+					m.setAccessible(true);
+					mStore.put(v, m);
+				}
+			} catch (SecurityException e) {
+				;
+			}
+		});
+	}
+	
+	/**
+	 * 从eJokerContext中找出probeTargets中定义的实例，并为他们执行名为probe方法
+	 * @param eJokerContext
+	 * @return
+	 */
+	public static long moniterQ(IEJokerSimpleContext eJokerContext) {
+		long execTMillis = System.currentTimeMillis();
+		DevUtils currentDevUtils = getCurrentDevUtils(eJokerContext);
+		currentDevUtils.mStore.forEach((c ,m) -> {
+			if(null == c)
 				return;
 			try {
 				m.invoke(c);
@@ -31,42 +99,7 @@ public final class DevUtils {
 			}
 		});
 		
-		return System.currentTimeMillis();
+		return execTMillis;
 	}
 
-	private final static String mName = "probe";
-	
-	private final static Map<Class<?>, Method> mStore = new HashMap<>();
-	
-	static {
-		
-		for(String t : probeTargets) {
-			Method m = null;
-			Class<?> cl = null;
-			try {
-				cl = Class.forName(t);
-			} catch (ClassNotFoundException e) {
-				continue;
-			}
-			try {
-				for(Class<?> c = cl;
-						!RuntimeException.class.equals(c)
-							&& !Exception.class.equals(c) 
-							&& !Object.class.equals(c) ;
-						c = c.getSuperclass())
-					try {
-						m = c.getDeclaredMethod(mName);
-					} catch (NoSuchMethodException e) {
-						continue;
-					}
-				if(null != m) {
-					m.setAccessible(true);
-					mStore.put(cl, m);
-				}
-			} catch (SecurityException e) {
-				;
-			}
-		}
-		
-	}
 }

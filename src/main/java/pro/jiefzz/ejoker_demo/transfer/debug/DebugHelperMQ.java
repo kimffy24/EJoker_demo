@@ -15,25 +15,25 @@ import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
 import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer.ControlStruct;
 
 @EService
-public class DebugHelperMQ {
+public class DebugHelperMQ extends DAssemblier {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DebugHelperMQ.class);
-
-	@Dependence
-	CommandConsumer commandConsumer;
 	
 	@Dependence
-	DomainEventConsumer eventConsumer;
+	private CommandConsumer commandConsumer;
+	
+	@Dependence
+	private DomainEventConsumer eventConsumer;
 
-	static final Field dF_DefaultMQConsumer_dashboards;
+	static final Field DefaultMQConsumer_dashboards_field;
 
 	static {
 		try {
-			dF_DefaultMQConsumer_dashboards = DefaultMQConsumer.class.getDeclaredField("dashboards");
+			DefaultMQConsumer_dashboards_field = DefaultMQConsumer.class.getDeclaredField("dashboards");
 		} catch (NoSuchFieldException|SecurityException e) {
 			throw new RuntimeException(e);
 		}
-		dF_DefaultMQConsumer_dashboards.setAccessible(true);
+		DefaultMQConsumer_dashboards_field.setAccessible(true);
 	}
 
 	private DefaultMQConsumer getEvtConsumer() {
@@ -58,7 +58,7 @@ public class DebugHelperMQ {
 			Object object;
 			{
 				try {
-					object = dF_DefaultMQConsumer_dashboards.get(eventConsumer.getDeeplyConsumer());
+					object = DefaultMQConsumer_dashboards_field.get(eventConsumer.getDeeplyConsumer());
 				} catch (IllegalArgumentException|IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
@@ -70,7 +70,7 @@ public class DebugHelperMQ {
 			Object object;
 			{
 				try {
-					object = dF_DefaultMQConsumer_dashboards.get(commandConsumer.getDeeplyConsumer());
+					object = DefaultMQConsumer_dashboards_field.get(commandConsumer.getDeeplyConsumer());
 				} catch (IllegalArgumentException|IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
@@ -121,5 +121,9 @@ public class DebugHelperMQ {
 			e.printStackTrace();
 		}
 		
+	}
+
+	@Override
+	protected void initChild(DevHelper devHelper) {
 	}
 }

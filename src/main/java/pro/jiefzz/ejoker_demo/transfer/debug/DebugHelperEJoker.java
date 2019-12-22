@@ -19,7 +19,6 @@ import pro.jiefzz.ejoker.commanding.ICommandProcessor;
 import pro.jiefzz.ejoker.commanding.IProcessingCommandHandler;
 import pro.jiefzz.ejoker.commanding.ProcessingCommandMailbox;
 import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EInitialize;
 import pro.jiefzz.ejoker.common.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.common.context.annotation.context.EService;
 import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
@@ -43,42 +42,30 @@ public class DebugHelperEJoker extends DAssemblier {
 	private final static Logger logger = LoggerFactory.getLogger(DebugHelperEJoker.class);
 	
 	@Dependence
-	IPublishedVersionStore inMemoryPublishedVersionStore;
+	private IPublishedVersionStore inMemoryPublishedVersionStore;
 	
 	@Dependence
-	IEventStore eventStore;
+	private IEventStore eventStore;
 	
 	@Dependence
-	ICommandProcessor commandProcessor;
+	private ICommandProcessor commandProcessor;
 
 	@Dependence
-	IProcessingCommandHandler processingCommandHandler;
+	private IProcessingCommandHandler processingCommandHandler;
 	
 	@Dependence
-	IEventCommittingService eventService;
+	private IEventCommittingService eventService;
 	
 	@Dependence
-	IProcessingEventProcessor processingEventProcessor;
+	private IProcessingEventProcessor processingEventProcessor;
 	
 	@Dependence
-	IMessageDispatcher messageDispatcher;
+	private IMessageDispatcher messageDispatcher;
 
 	@Dependence
-	SendQueueMessageService sendQueueMessageService;
+	private SendQueueMessageService sendQueueMessageService;
 	
-	// ============ 
 	
-	Map<String, ProcessingCommandMailbox> commandMailboxDict = null;
-	
-	List<EventCommittingContextMailBox> eventCommittingContextMailBoxList = null;
-	
-	Map<String, ProcessingEventMailBox> eventMailboxDict = null;
-	
-	Map<String, AggregateInfo> mStorage = null;
-	
-	Map<String, Long> versionDict = null;
-	
-//	
 //	/**
 //	 * 列出某个聚合的领域基础设施中的所有状态和属性
 //	 * @param aggregateRootId 目标的聚合根ID
@@ -134,54 +121,54 @@ public class DebugHelperEJoker extends DAssemblier {
 //					consumedSequence, box.isRunning(), onPaused.get(), onProcessing.get(), lastActiveTime);
 //		}
 //		
-////		// 提取并输出EventMailbox的状态和属性
-////		Optional<Entry<String, EventMailBox>> findEventMailBox = getEventMailBoxDict().entrySet()
-////				.parallelStream().filter(e -> aggregateRootId.equals(e.getKey())).findFirst();
-////		if (findEventMailBox.isPresent()) {
-////			Entry<String, EventMailBox> EventMailBoxEntry = findEventMailBox.get();
-////			EventMailBox box = EventMailBoxEntry.getValue();
-////			long consumingSequence;
-////			long consumedSequence;
-////			Map<Long, EventCommittingContext> messageDict;
-////			Map<Long, Void> requestToCompleteCommandDict;
-////			Object enqueueLock;
-////			Object asyncLock;
-////			long nextSequence;
-////			long lastActiveTime;
-////			AtomicBoolean onRunning;
-////			AtomicBoolean onPaused;
-////			AtomicBoolean onProcessing;
-////			try {
-////				messageDict = (Map<Long, EventCommittingContext>) dF_AbstractAggregateMessageMailBox_messageDict.get(box);
-////				requestToCompleteCommandDict = (Map<Long, Void>) dF_AbstractAggregateMessageMailBox_requestToCompleteMessageDict.get(box);
-////				enqueueLock = dF_AbstractAggregateMessageMailBox_enqueueLock.get(box);
-////				asyncLock = dF_AbstractAggregateMessageMailBox_asyncLock.get(box);
-////				nextSequence = (long) dF_AbstractAggregateMessageMailBox_nextSequence.get(box);
-////				consumingSequence = (long) dF_AbstractAggregateMessageMailBox_consumingSequence.get(box);
-////				consumedSequence = (long) dF_AbstractAggregateMessageMailBox_consumedSequence.get(box);
-////
-////				onRunning = (AtomicBoolean) dF_AbstractAggregateMessageMailBox_onRunning.get(box);
-////				onPaused = (AtomicBoolean) dF_AbstractAggregateMessageMailBox_onPaused.get(box);
-////				onProcessing = (AtomicBoolean) dF_AbstractAggregateMessageMailBox_onProcessing.get(box);
-////
-////				lastActiveTime = (long) dF_AbstractAggregateMessageMailBox_lastActiveTime.get(box);
-////			} catch (IllegalArgumentException | IllegalAccessException e1) {
-////				logger.error("EventMailBox[aggregateRootId={}] cannot be profile!!!", aggregateRootId);
-////				logger.error("", e1);
-////				throw new RuntimeException(e1);
-////			}
-////
-////			Set<Long> keySet = messageDict.keySet();
-////			Set<Long> keySet2 = requestToCompleteCommandDict.keySet();
-////			logger.error(
-////					"eventMailbox: \n\tenqueueLock: {}, " + "\n\tasyncLock: {},"
-////							+ "\n\tmessageDict.keys: {}," + "\n\trequestToCompleteCommandDict.keys: {},"
-////							+ "\n\tnextSequence: {}," + "\n\tconsumingSequence: {}," + "\n\tconsumedSequence: {},"
-////							+ "\n\tonRunning.get(): {}," + "\n\tonPaused.get(): {}," + "\n\tonProcessing.get(): {},"
-////							+ "\n\tlastActiveTime: {}",
-////					enqueueLock, asyncLock, keySet.toString(), keySet2.toString(), nextSequence, consumingSequence,
-////					consumedSequence, box.isRunning(), onPaused.get(), onProcessing.get(), lastActiveTime);
-////		}
+//		// 提取并输出EventMailbox的状态和属性
+//		Optional<Entry<String, EventMailBox>> findEventMailBox = getEventMailBoxDict().entrySet()
+//				.parallelStream().filter(e -> aggregateRootId.equals(e.getKey())).findFirst();
+//		if (findEventMailBox.isPresent()) {
+//			Entry<String, EventMailBox> EventMailBoxEntry = findEventMailBox.get();
+//			EventMailBox box = EventMailBoxEntry.getValue();
+//			long consumingSequence;
+//			long consumedSequence;
+//			Map<Long, EventCommittingContext> messageDict;
+//			Map<Long, Void> requestToCompleteCommandDict;
+//			Object enqueueLock;
+//			Object asyncLock;
+//			long nextSequence;
+//			long lastActiveTime;
+//			AtomicBoolean onRunning;
+//			AtomicBoolean onPaused;
+//			AtomicBoolean onProcessing;
+//			try {
+//				messageDict = (Map<Long, EventCommittingContext>) dF_AbstractAggregateMessageMailBox_messageDict.get(box);
+//				requestToCompleteCommandDict = (Map<Long, Void>) dF_AbstractAggregateMessageMailBox_requestToCompleteMessageDict.get(box);
+//				enqueueLock = dF_AbstractAggregateMessageMailBox_enqueueLock.get(box);
+//				asyncLock = dF_AbstractAggregateMessageMailBox_asyncLock.get(box);
+//				nextSequence = (long) dF_AbstractAggregateMessageMailBox_nextSequence.get(box);
+//				consumingSequence = (long) dF_AbstractAggregateMessageMailBox_consumingSequence.get(box);
+//				consumedSequence = (long) dF_AbstractAggregateMessageMailBox_consumedSequence.get(box);
+//
+//				onRunning = (AtomicBoolean) dF_AbstractAggregateMessageMailBox_onRunning.get(box);
+//				onPaused = (AtomicBoolean) dF_AbstractAggregateMessageMailBox_onPaused.get(box);
+//				onProcessing = (AtomicBoolean) dF_AbstractAggregateMessageMailBox_onProcessing.get(box);
+//
+//				lastActiveTime = (long) dF_AbstractAggregateMessageMailBox_lastActiveTime.get(box);
+//			} catch (IllegalArgumentException | IllegalAccessException e1) {
+//				logger.error("EventMailBox[aggregateRootId={}] cannot be profile!!!", aggregateRootId);
+//				logger.error("", e1);
+//				throw new RuntimeException(e1);
+//			}
+//
+//			Set<Long> keySet = messageDict.keySet();
+//			Set<Long> keySet2 = requestToCompleteCommandDict.keySet();
+//			logger.error(
+//					"eventMailbox: \n\tenqueueLock: {}, " + "\n\tasyncLock: {},"
+//							+ "\n\tmessageDict.keys: {}," + "\n\trequestToCompleteCommandDict.keys: {},"
+//							+ "\n\tnextSequence: {}," + "\n\tconsumingSequence: {}," + "\n\tconsumedSequence: {},"
+//							+ "\n\tonRunning.get(): {}," + "\n\tonPaused.get(): {}," + "\n\tonProcessing.get(): {},"
+//							+ "\n\tlastActiveTime: {}",
+//					enqueueLock, asyncLock, keySet.toString(), keySet2.toString(), nextSequence, consumingSequence,
+//					consumedSequence, box.isRunning(), onPaused.get(), onProcessing.get(), lastActiveTime);
+//		}
 //
 //		// 提取并输出Q端MessageMailbox的状态和属性
 //		Optional<Entry<String, ProcessingMessageMailbox<ProcessingDomainEventStreamMessage, DomainEventStreamMessage>>> findProcessingMessageMailbox = getProcessingMessageMailBoxDict()
@@ -282,11 +269,11 @@ public class DebugHelperEJoker extends DAssemblier {
 //	 * @param dm
 //	 * @return
 //	 */
-//	public SystemFutureWrapper<AsyncTaskResult<Void>> handleAsync(DebugMessage2 dm) {
+//	public Future<AsyncTaskResult<Void>> handleAsync(DebugMessage2 dm) {
 //
 //		profileAggregateProperties(dm.aId);
-//		
-//		return SystemFutureWrapperUtil.completeFutureTask();
+//
+//		return EJokerFutureTaskUtil.completeTask();
 //	}
 //
 //	/**
@@ -327,10 +314,10 @@ public class DebugHelperEJoker extends DAssemblier {
 			commandMailboxDict.entrySet().parallelStream().map(e -> {
 				if(e.getValue().isRunning())
 					amountOfRunning.incrementAndGet();
-				AtomicBoolean onProcessing = fieldValue(dF_ProcessingCommandMailbox_onProcessing, e.getValue(), AtomicBoolean.class);
+				AtomicBoolean onProcessing = DevHelper.fieldValue(dF_ProcessingCommandMailbox_onProcessing, e.getValue(), AtomicBoolean.class);
 				if(onProcessing.get())
 					amountOfProcessing.incrementAndGet();
-				AtomicBoolean onPause = fieldValue(dF_ProcessingCommandMailbox_onPaused, e.getValue(), AtomicBoolean.class);
+				AtomicBoolean onPause = DevHelper.fieldValue(dF_ProcessingCommandMailbox_onPaused, e.getValue(), AtomicBoolean.class);
 				if(onPause.get())
 					amountOfPause.incrementAndGet();
 				
@@ -360,7 +347,7 @@ public class DebugHelperEJoker extends DAssemblier {
 //				if(onProcessing.get())
 //					amountOfProcessing.incrementAndGet();
 				
-				Map<String, Map<String, Byte>> aggregateDictDict = (Map<String, Map<String, Byte>> )fieldValue(dF_EventCommittingContextMailBox_aggregateDictDict, ecc, Map.class);
+				Map<String, Map<String, Byte>> aggregateDictDict = (Map<String, Map<String, Byte>> )DevHelper.fieldValue(dF_EventCommittingContextMailBox_aggregateDictDict, ecc, Map.class);
 				Set<String> aggrIds = aggregateDictDict.entrySet().parallelStream().map(Entry::getKey).distinct().collect(Collectors.toSet());
 				amountOfAggr.getAndAdd(aggrIds.size());
 				
@@ -378,7 +365,7 @@ public class DebugHelperEJoker extends DAssemblier {
 		{
 			Integer amountOfRunning = eventMailboxDict.entrySet().parallelStream().map(e -> e.getValue().isRunning()?1:0).reduce(0, (l, r) -> l + r);
 			Integer amountOfHasRemind = eventMailboxDict.entrySet().parallelStream().map(e -> e.getValue().hasRemindMessage()?1:0).reduce(0, (l, r) -> l + r);
-			Integer amountOfWaitting = eventMailboxDict.entrySet().parallelStream().map(e -> fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, e.getValue(), Map.class).size()).reduce(0, (l, r) -> l + r);
+			Integer amountOfWaitting = eventMailboxDict.entrySet().parallelStream().map(e -> DevHelper.fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, e.getValue(), Map.class).size()).reduce(0, (l, r) -> l + r);
 			
 			logger.error("size of ProcessingEventMailBox: {} which onRunning: {}, amountOfHasRemind: {}, amountOfWaitting: {}",
 					eventMailboxDict.size(),
@@ -392,7 +379,7 @@ public class DebugHelperEJoker extends DAssemblier {
 							e.getKey(),
 							mailBox.getLatestHandledEventVersion(),
 							mailBox.getTotalUnHandledMessageCount(),
-							fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, mailBox, Map.class).size());
+							DevHelper.fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, mailBox, Map.class).size());
 			});
 		}
 
@@ -425,7 +412,6 @@ public class DebugHelperEJoker extends DAssemblier {
 			logger.error("size of InMemoryPublishedVersionStore: {}", versionDict.size());
 			if(!versionDict.isEmpty()) {
 				versionDict.entrySet().parallelStream().map(e -> {
-					
 					return 0;
 				});
 				
@@ -439,31 +425,43 @@ public class DebugHelperEJoker extends DAssemblier {
 		
 	}
 	
+	// ============ 
+	
+	Map<String, ProcessingCommandMailbox> commandMailboxDict = null;
+	
+	List<EventCommittingContextMailBox> eventCommittingContextMailBoxList = null;
+	
+	Map<String, ProcessingEventMailBox> eventMailboxDict = null;
+	
+	Map<String, AggregateInfo> mStorage = null;
+	
+	Map<String, Long> versionDict = null;
+	
 	// ======================  
 
 	Field dF_ProcessingCommandMailbox_onProcessing = null;
 	Field dF_ProcessingCommandMailbox_onPaused = null;
 	Field dF_ProcessingCommandMailbox_messageDict = null;
 	
-//	Field dF_EventCommittingContextMailBox_onProcessing = null;
 	Field dF_EventCommittingContextMailBox_aggregateDictDict = null;
 	
 	Field dF_ProcessingEventMailBox_waitingMessageDict = null;
 
-	@EInitialize
-	private void init() {
+	@Override
+	protected void initChild(DevHelper devHelper) {
 		
-		connect(commandProcessor, "mailboxDict", "commandMailboxDict");
+		devHelper.connect(commandProcessor, "mailboxDict", this, "commandMailboxDict");
 		
-		connect(eventService, "eventCommittingContextMailBoxList");
+		devHelper.connect(eventService, "eventCommittingContextMailBoxList", this);
 		
-		connect(processingEventProcessor, "mailboxDict", "eventMailboxDict");
+		devHelper.connect(processingEventProcessor, "mailboxDict", this, "eventMailboxDict");
 		
 		if(eventStore instanceof InMemoryEventStore)
-			connect(eventStore, "mStorage");
+			devHelper.connect(eventStore, "mStorage", this);
 		
 		if(inMemoryPublishedVersionStore instanceof InMemoryPublishedVersionStore)
-			connect(inMemoryPublishedVersionStore, "versionDict");
+			devHelper.connect(inMemoryPublishedVersionStore, "versionDict", this);
+		
 	}
 
 }
