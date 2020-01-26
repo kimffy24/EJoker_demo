@@ -12,7 +12,7 @@ public final class TransferConst {
 	
 	public final static long BatchDelay = 5000l;
 
-	public final static String EBusinessPackage = "pro.jiefzz.ejoker_demo.transfer";
+	public final static String EBusinessPackage = "pro.jiefzz.demo.ejoker.transfer";
 
 	public final static String EJokerDefaultImplPackage;
 	
@@ -36,9 +36,10 @@ public final class TransferConst {
         if(null == ES)
         	ES="";
         switch(ES) {
+        case "mongo":
         case "mongosync":
         case "mongo_sync":
-        	ES = "pro.jiefzz.ejoker_demo.support_storage.mongo.mongoSync";
+        	ES = "pro.jiefzz.demo.ejoker.storage.mongo";
         	break;
         case "":
         default :

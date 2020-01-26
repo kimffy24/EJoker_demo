@@ -25,12 +25,12 @@ public class TransferPrepare {
 			
 			@Override
 			public String preGetType(String typeName) {
-				return "pro.jiefzz.ejoker_demo.transfer." + typeName;
+				return "pro.jiefzz.demo.ejoker.transfer." + typeName;
 			}
 			
 			@Override
 			public String postGetTypeName(String typeName) {
-				return typeName.substring("pro.jiefzz.ejoker_demo.transfer.".length());
+				return typeName.substring("pro.jiefzz.demo.ejoker.transfer.".length());
 			}
 			
 		});

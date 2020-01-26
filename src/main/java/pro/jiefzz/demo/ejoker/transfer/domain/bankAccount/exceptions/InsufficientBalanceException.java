@@ -24,7 +24,7 @@ public class InsufficientBalanceException extends AbstractDomainException {
 	
 	public InsufficientBalanceException(String accountId, String transactionId, TransactionType transactionType,
 			double amount, double currentBalance, double currentAvailableBalance) {
-		super();
+		super("Insufficient Balance");
 		this.accountId = accountId;
 		this.transactionId = transactionId;
 		this.transactionType = transactionType;

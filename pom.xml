@@ -46,15 +46,21 @@
 		</dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.8.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.16</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.8.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.8.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>co.paralleluniverse</groupId>
 			<artifactId>quasar-core</artifactId>
@@ -75,10 +81,6 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>3.8.1</version>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-async -->
-		<!-- <dependency> <groupId>org.mongodb</groupId> <artifactId>mongodb-driver-async</artifactId> 
-			<version>3.8.2</version> </dependency> -->
 
 		<dependency>
 			<groupId>pro.jiefzz</groupId>
@@ -170,14 +172,18 @@
 							<tasks>
 								<property name="ant_classpath"
 									refid="maven.dependency.classpath" />
-								
+
 								<!-- 解压ejoker相关包到指定目录，并在扫描时带上 -->
 								<mkdir dir="${project.build.directory}/elibx" />
-								<unzip src="${maven.dependency.pro.jiefzz.ejoker-common.jar.path}" dest="${project.build.directory}/elibx" />
-								<unzip src="${maven.dependency.pro.jiefzz.ejoker-core.jar.path}" dest="${project.build.directory}/elibx" />
-								<delete file="${project.build.directory}/elibx/co"/>
+								<unzip
+									src="${maven.dependency.pro.jiefzz.ejoker-common.jar.path}"
+									dest="${project.build.directory}/elibx" />
+								<unzip
+									src="${maven.dependency.pro.jiefzz.ejoker-core.jar.path}"
+									dest="${project.build.directory}/elibx" />
+								<delete file="${project.build.directory}/elibx/co" />
 								<delete file="${project.build.directory}/elibx/META-INF" />
-								
+
 								<taskdef name="scanSuspendables"
 									classname="co.paralleluniverse.fibers.instrument.SuspendablesScanner"
 									classpath="${ant_classpath}" />
@@ -190,14 +196,14 @@
 										includes="**/*.class" />
 								</scanSuspendables>
 
-								<taskdef name="instrumentationTask"
+								<!-- <taskdef name="instrumentationTask"
 									classname="co.paralleluniverse.fibers.instrument.InstrumentationTask"
 									classpath="${ant_classpath}" />
 								<instrumentationTask verbose="true"
 									check="true" debug="true">
 									<fileset dir="${project.build.directory}/classes/"
 										includes="**/*.class" />
-								</instrumentationTask>
+								</instrumentationTask> -->
 							</tasks>
 						</configuration>
 						<goals>
@@ -211,14 +217,15 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.6.0</version>
-				<!-- Run with "mvn compile maven-dependency-plugin:properties exec:exec" -->
+				<!-- Run with "mvn -Dmaven.test.skip=true clean compile exec:exec" -->
 				<configuration>
 					<mainClass>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.quasar.TransferAppQuasar</mainClass>
 					<workingDirectory>target/classes</workingDirectory>
 					<executable>java</executable>
 					<arguments>
-						<argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
-						<argument>-javaagent:${co.paralleluniverse:quasar-core:jar}</argument>
+						<argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=false</argument>
+						<argument>-Dco.paralleluniverse.fibers.detectRunawayFibers=false</argument>
+						<argument>-javaagent:${co.paralleluniverse:quasar-core:jar:jdk8}</argument>
 						<argument>-classpath</argument>
 						<classpath />
 						<argument>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.quasar.TransferAppQuasar</argument>
@@ -227,12 +234,12 @@
 			</plugin>
 
 			<plugin>
-				<!-- 打个胖包，所以有依赖都打到一个包里 -->
+				<!-- package a fat jar -->
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.TransferApp</mainClass>
+							<mainClass>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.TransferAppMain</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
