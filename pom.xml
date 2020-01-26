@@ -13,6 +13,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
 		<!-- spring版本号 -->
 		<version.spring>4.3.9.RELEASE</version.spring>
 		<version.jetty>9.4.3.v20170317</version.jetty>
@@ -52,6 +55,12 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.16</version>
 		</dependency>
+		<dependency>
+			<groupId>co.paralleluniverse</groupId>
+			<artifactId>quasar-core</artifactId>
+			<version>0.7.10</version>
+			<classifier>jdk8</classifier>
+		</dependency>
 
 		<!-- 用于SpringMVC返回json格式的response -->
 		<!-- <dependency> <groupId>com.fasterxml.jackson.core</groupId> <artifactId>jackson-core</artifactId> 
@@ -81,6 +90,11 @@
 			<artifactId>ejoker-mq-rocketmq</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
+		<dependency>
+			<groupId>pro.jiefzz</groupId>
+			<artifactId>ejoker-mq-javaqueue</artifactId>
+			<version>${version.ejoker}</version>
+		</dependency>
 
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
@@ -93,51 +107,48 @@
 
 
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugin</groupId>
-										<artifactId>maven-dependency-plugin</artifactId>
-										<versionRange>[3.0,)</versionRange>
-										<goals>
-											<goal>properties</goal>
-											<goal>resource</goal>
-											<goal>testResource</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-				
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>getClasspathFilenames</id>
-							<goals>
-								<goal>properties</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				
-			</plugins>
-		</pluginManagement>
+
 		<plugins>
+
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-dependency-plugin</artifactId>
+									<versionRange>[2.8,)</versionRange>
+									<goals>
+										<goal>properties</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore />
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>getClasspathFilenames</id>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -149,12 +160,79 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>instrument-classes</id>
+						<phase>compile</phase>
+						<configuration>
+							<tasks>
+								<property name="ant_classpath"
+									refid="maven.dependency.classpath" />
+								
+								<!-- 解压ejoker相关包到指定目录，并在扫描时带上 -->
+								<mkdir dir="${project.build.directory}/elibx" />
+								<unzip src="${maven.dependency.pro.jiefzz.ejoker-common.jar.path}" dest="${project.build.directory}/elibx" />
+								<unzip src="${maven.dependency.pro.jiefzz.ejoker-core.jar.path}" dest="${project.build.directory}/elibx" />
+								<delete file="${project.build.directory}/elibx/co"/>
+								<delete file="${project.build.directory}/elibx/META-INF" />
+								
+								<taskdef name="scanSuspendables"
+									classname="co.paralleluniverse.fibers.instrument.SuspendablesScanner"
+									classpath="${ant_classpath}" />
+								<scanSuspendables auto="true" append="true"
+									supersFile="${project.build.directory}/classes/META-INF/suspendable-supers"
+									suspendablesFile="${project.build.directory}/classes/META-INF/suspendables">
+									<fileset dir="${project.build.directory}/classes/"
+										includes="**/*.class" />
+									<fileset dir="${project.build.directory}/elibx"
+										includes="**/*.class" />
+								</scanSuspendables>
+
+								<taskdef name="instrumentationTask"
+									classname="co.paralleluniverse.fibers.instrument.InstrumentationTask"
+									classpath="${ant_classpath}" />
+								<instrumentationTask verbose="true"
+									check="true" debug="true">
+									<fileset dir="${project.build.directory}/classes/"
+										includes="**/*.class" />
+								</instrumentationTask>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<!-- Run with "mvn compile maven-dependency-plugin:properties exec:exec" -->
+				<configuration>
+					<mainClass>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.quasar.TransferAppQuasar</mainClass>
+					<workingDirectory>target/classes</workingDirectory>
+					<executable>java</executable>
+					<arguments>
+						<argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
+						<argument>-javaagent:${co.paralleluniverse:quasar-core:jar}</argument>
+						<argument>-classpath</argument>
+						<classpath />
+						<argument>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.quasar.TransferAppQuasar</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<!-- 打个胖包，所以有依赖都打到一个包里 -->
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>pro.jiefzz.ejoker_demo.transfer.boot.over_javaqueue.TransferApp</mainClass>
+							<mainClass>pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue.TransferApp</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
