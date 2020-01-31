@@ -1,5 +1,7 @@
 package pro.jiefzz.demo.ejoker.transfer.processManagers;
 
+import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
+
 import java.util.concurrent.Future;
 
 import co.paralleluniverse.fibers.Suspendable;
@@ -34,6 +36,10 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 				evnt.getAmount());
 		cmd.setId(evnt.getId());
 		cmd.setItems(evnt.getItems());
+		// 连发3 测试重复命令的情况
+		await(commandService.sendAsync(cmd));
+		await(commandService.sendAsync(cmd));
+		await(commandService.sendAsync(cmd));
 		return commandService.sendAsync(cmd);
 	}
 

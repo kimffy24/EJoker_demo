@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import pro.jiefzz.ejoker.common.context.dev2.EjokerRootDefinationStore;
 import pro.jiefzz.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
-import pro.jiefzz.ejoker.common.system.enhance.ForEachUtil;
+import pro.jiefzz.ejoker.common.system.enhance.EachUtil;
 import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
 
 public final class DevHelper {
@@ -83,7 +83,7 @@ public final class DevHelper {
 		Set<String> fieldsBefore = new HashSet<>();
 		for(Class<?> clazz = target.getClass(); !clazz.equals(Object.class); clazz = clazz.getSuperclass()) {
 			Field[] declaredFields = clazz.getDeclaredFields();
-			ForEachUtil.processForEach(declaredFields, f -> {
+			EachUtil.forEach(declaredFields, f -> {
 				if(!f.getName().startsWith("dF_"))
 					return;
 				if(fieldsBefore.contains(f.getName()))

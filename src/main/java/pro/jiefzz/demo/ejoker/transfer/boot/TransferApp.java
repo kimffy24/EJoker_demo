@@ -1,5 +1,7 @@
 package pro.jiefzz.demo.ejoker.transfer.boot;
 
+import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
+
 import java.util.concurrent.TimeUnit;
 
 import org.bson.types.ObjectId;
@@ -9,11 +11,13 @@ import org.slf4j.LoggerFactory;
 import pro.jiefzz.demo.ejoker.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.demo.ejoker.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 import pro.jiefzz.demo.ejoker.transfer.commands.transferTransaction.StartTransferTransactionCommand;
+import pro.jiefzz.demo.ejoker.transfer.debug.DevUtils;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.TransferTransactionInfo;
 import pro.jiefzz.demo.ejoker.transfer.eventHandlers.SyncHelper;
 import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
 import pro.jiefzz.ejoker.commanding.CommandReturnType;
 import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jiefzz.ejoker.common.service.IScheduleService;
 import pro.jiefzz.ejoker.common.system.wrapper.DiscardWrapper;
 import pro.jiefzz.ejoker.queue.command.CommandService;
 
@@ -25,6 +29,9 @@ public class TransferApp {
 		
 		IEJokerSimpleContext eJokerContext = eJokerFrameworkInitializer.getEJokerContext();
 		
+		IScheduleService scheduleService = eJokerContext.get(IScheduleService.class);
+		scheduleService.startTask("doProbe", () -> DevUtils.moniterQ(eJokerContext), 5000, 5000);
+		
 		CommandService commandService = eJokerContext.get(CommandService.class);
 		SyncHelper syncHelper = eJokerContext.get(SyncHelper.class);
 		
@@ -33,15 +40,17 @@ public class TransferApp {
 		String account3 = "INVALID-" + ObjectId.get().toHexString();
 		
 		//创建两个银行账户
+		
         commandService.executeAsync(new CreateAccountCommand(account1, "雪华"), CommandReturnType.EventHandled).get();
         commandService.executeAsync(new CreateAccountCommand(account2, "凯锋"), CommandReturnType.EventHandled).get();
-        
         System.out.println();
         
+        String depositId1 = ObjectId.get().toHexString();
+		String depositId2 = ObjectId.get().toHexString();
         //每个账户都存入1000元
-        commandService.sendAsync(new StartDepositTransactionCommand(ObjectId.get().toHexString(), account1, 1000)).get();
+        await(commandService.sendAsync(new StartDepositTransactionCommand(depositId1, account1, 1000)));
         syncHelper.waitOne();
-        commandService.sendAsync(new StartDepositTransactionCommand(ObjectId.get().toHexString(), account2, 1000)).get();
+        await(commandService.sendAsync(new StartDepositTransactionCommand(depositId2, account2, 1000)));
         syncHelper.waitOne();
         
         System.out.println();

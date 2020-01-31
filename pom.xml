@@ -223,8 +223,8 @@
 					<workingDirectory>target/classes</workingDirectory>
 					<executable>java</executable>
 					<arguments>
-						<argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=false</argument>
-						<argument>-Dco.paralleluniverse.fibers.detectRunawayFibers=false</argument>
+						<argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
+						<argument>-Dco.paralleluniverse.fibers.detectRunawayFibers=true</argument>
 						<argument>-javaagent:${co.paralleluniverse:quasar-core:jar:jdk8}</argument>
 						<argument>-classpath</argument>
 						<classpath />

@@ -4,7 +4,6 @@
 	<Properties>
 		<Property name="filepath">/tmp/log4j2</Property>
 	</Properties>
-	info
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout>

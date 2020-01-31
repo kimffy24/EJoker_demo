@@ -32,7 +32,7 @@ import pro.jiefzz.ejoker.commanding.ICommandService;
 import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
 import pro.jiefzz.ejoker.common.context.annotation.context.ESType;
 import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.system.enhance.ForEachUtil;
+import pro.jiefzz.ejoker.common.system.enhance.EachUtil;
 import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
 import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
 import pro.jiefzz.ejoker.common.system.task.AsyncTaskStatus;
@@ -65,7 +65,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		AtomicBoolean faild = new AtomicBoolean(false);
 		AtomicBoolean ioException = new AtomicBoolean(false);
 		StringBuffer eMessageSb = new StringBuffer();
-		ForEachUtil.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
+		EachUtil.forEach(new AsyncTaskResult[] { r1, r2 }, r -> {
 			if (AsyncTaskStatus.Failed.equals(r.getStatus())) {
 				faild.set(true);
 				eMessageSb.append(r.getErrorMessage());
@@ -175,7 +175,7 @@ public class TransferTransactionProcessManager extends AbstractMessageHandler {
 		AtomicBoolean faild = new AtomicBoolean(false);
 		AtomicBoolean ioException = new AtomicBoolean(false);
 		StringBuffer eMessageSb = new StringBuffer();
-		ForEachUtil.processForEach(new AsyncTaskResult[] { r1, r2 }, r -> {
+		EachUtil.forEach(new AsyncTaskResult[] { r1, r2 }, r -> {
 			if (AsyncTaskStatus.Failed.equals(r.getStatus())) {
 				faild.set(true);
 				eMessageSb.append(r.getErrorMessage());

@@ -314,8 +314,8 @@ public class DebugHelperEJoker extends DAssemblier {
 			commandMailboxDict.entrySet().parallelStream().map(e -> {
 				if(e.getValue().isRunning())
 					amountOfRunning.incrementAndGet();
-				AtomicBoolean onProcessing = DevHelper.fieldValue(dF_ProcessingCommandMailbox_onProcessing, e.getValue(), AtomicBoolean.class);
-				if(onProcessing.get())
+				AtomicBoolean onRunning = DevHelper.fieldValue(dF_ProcessingCommandMailbox_onRunning, e.getValue(), AtomicBoolean.class);
+				if(onRunning.get())
 					amountOfProcessing.incrementAndGet();
 				AtomicBoolean onPause = DevHelper.fieldValue(dF_ProcessingCommandMailbox_onPaused, e.getValue(), AtomicBoolean.class);
 				if(onPause.get())
@@ -365,21 +365,23 @@ public class DebugHelperEJoker extends DAssemblier {
 		{
 			Integer amountOfRunning = eventMailboxDict.entrySet().parallelStream().map(e -> e.getValue().isRunning()?1:0).reduce(0, (l, r) -> l + r);
 			Integer amountOfHasRemind = eventMailboxDict.entrySet().parallelStream().map(e -> e.getValue().hasRemindMessage()?1:0).reduce(0, (l, r) -> l + r);
-			Integer amountOfWaitting = eventMailboxDict.entrySet().parallelStream().map(e -> DevHelper.fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, e.getValue(), Map.class).size()).reduce(0, (l, r) -> l + r);
+			Integer amountOfArrived = eventMailboxDict.entrySet().parallelStream().map(e -> DevHelper.fieldValue(dF_ProcessingEventMailBox_arrivedMessageDict, e.getValue(), Map.class).size()).reduce(0, (l, r) -> l + r);
 			
 			logger.error("size of ProcessingEventMailBox: {} which onRunning: {}, amountOfHasRemind: {}, amountOfWaitting: {}",
 					eventMailboxDict.size(),
 					amountOfRunning,
 					amountOfHasRemind,
-					amountOfWaitting);
+					amountOfArrived);
 			eventMailboxDict.entrySet().forEach(e -> {
 				ProcessingEventMailBox mailBox = e.getValue();
 				if(mailBox.isRunning() || mailBox.hasRemindMessage())
-					logger.error("\t\t mainBox[aggrId={}]  ->  latestHandledEventVersion: {}, totalUnHandledMessageCount: {}, totalWaittingSize: {}",
+					logger.error("\t\t mainBox[aggrId={}]  ->  latestHandledEventVersion: {}, totalUnHandledMessageCount: {}, totalArrivedSize: {}, nextExpectingEventVersion: {}",
 							e.getKey(),
 							mailBox.getLatestHandledEventVersion(),
 							mailBox.getTotalUnHandledMessageCount(),
-							DevHelper.fieldValue(dF_ProcessingEventMailBox_waitingMessageDict, mailBox, Map.class).size());
+							DevHelper.fieldValue(dF_ProcessingEventMailBox_arrivedMessageDict, mailBox, Map.class).size(),
+							DevHelper.fieldValue(dF_ProcessingEventMailBox_nextExpectingEventVersion, mailBox, long.class)
+					);
 			});
 		}
 
@@ -439,13 +441,14 @@ public class DebugHelperEJoker extends DAssemblier {
 	
 	// ======================  
 
-	Field dF_ProcessingCommandMailbox_onProcessing = null;
+	Field dF_ProcessingCommandMailbox_onRunning = null;
 	Field dF_ProcessingCommandMailbox_onPaused = null;
 	Field dF_ProcessingCommandMailbox_messageDict = null;
 	
 	Field dF_EventCommittingContextMailBox_aggregateDictDict = null;
 	
-	Field dF_ProcessingEventMailBox_waitingMessageDict = null;
+	Field dF_ProcessingEventMailBox_arrivedMessageDict = null;
+	Field dF_ProcessingEventMailBox_nextExpectingEventVersion = null;
 
 	@Override
 	protected void initChild(DevHelper devHelper) {
