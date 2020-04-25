@@ -7,12 +7,12 @@ import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.queue.command.CommandConsumer;
-import pro.jiefzz.ejoker.queue.domainEvent.DomainEventConsumer;
-import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer;
-import pro.jiefzz.ejoker_support.rocketmq.DefaultMQConsumer.ControlStruct;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.queue.command.CommandConsumer;
+import pro.jk.ejoker.queue.domainEvent.DomainEventConsumer;
+import pro.jk.ejoker_support.rocketmq.DefaultMQConsumer;
+import pro.jk.ejoker_support.rocketmq.DefaultMQConsumer.ControlStruct;
 
 @EService
 public class DebugHelperMQ extends DAssemblier {

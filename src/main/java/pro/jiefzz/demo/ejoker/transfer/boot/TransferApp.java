@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.boot;
 
-import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
+import static pro.jk.ejoker.common.system.extension.LangUtil.await;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,12 +14,12 @@ import pro.jiefzz.demo.ejoker.transfer.commands.transferTransaction.StartTransfe
 import pro.jiefzz.demo.ejoker.transfer.debug.DevUtils;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.TransferTransactionInfo;
 import pro.jiefzz.demo.ejoker.transfer.eventHandlers.SyncHelper;
-import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
-import pro.jiefzz.ejoker.commanding.CommandReturnType;
-import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.common.service.IScheduleService;
-import pro.jiefzz.ejoker.common.system.wrapper.DiscardWrapper;
-import pro.jiefzz.ejoker.queue.command.CommandService;
+import pro.jk.ejoker.bootstrap.EJokerBootstrap;
+import pro.jk.ejoker.commanding.CommandReturnType;
+import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jk.ejoker.common.service.IScheduleService;
+import pro.jk.ejoker.common.system.wrapper.DiscardWrapper;
+import pro.jk.ejoker.queue.command.CommandService;
 
 public class TransferApp {
 	

@@ -4,7 +4,7 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
-import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
+import static pro.jk.ejoker.common.system.extension.LangUtil.await;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +21,15 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.BulkWriteOptions;
 
 import co.paralleluniverse.fibers.Suspendable;
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.common.system.task.io.IOHelper;
-import pro.jiefzz.ejoker.eventing.DomainEventStream;
-import pro.jiefzz.ejoker.eventing.EventAppendResult;
-import pro.jiefzz.ejoker.eventing.IDomainEvent;
-import pro.jiefzz.ejoker.eventing.IEventSerializer;
-import pro.jiefzz.ejoker.eventing.IEventStore;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jk.ejoker.common.system.task.io.IOHelper;
+import pro.jk.ejoker.eventing.DomainEventStream;
+import pro.jk.ejoker.eventing.EventAppendResult;
+import pro.jk.ejoker.eventing.IDomainEvent;
+import pro.jk.ejoker.eventing.IEventSerializer;
+import pro.jk.ejoker.eventing.IEventStore;
 
 @EService
 public class MongoEventStore implements IEventStore {
@@ -62,9 +61,9 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public Future<AsyncTaskResult<EventAppendResult>> batchAppendAsync(
+	public Future<EventAppendResult> batchAppendAsync(
 			List<DomainEventStream> eventStreams) {
-		return EJokerFutureTaskUtil.completeTask(
+			return EJokerFutureUtil.completeFuture(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> batchAppend(eventStreams)
@@ -75,8 +74,8 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public Future<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, long version) {
-		return EJokerFutureTaskUtil.completeTask(
+	public Future<DomainEventStream> findAsync(String aggregateRootId, long version) {
+		return EJokerFutureUtil.completeFuture(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> find(aggregateRootId, version)
@@ -87,8 +86,8 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public Future<AsyncTaskResult<DomainEventStream>> findAsync(String aggregateRootId, String commandId) {
-		return EJokerFutureTaskUtil.completeTask(
+	public Future<DomainEventStream> findAsync(String aggregateRootId, String commandId) {
+		return EJokerFutureUtil.completeFuture(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> find(aggregateRootId, commandId)
@@ -99,9 +98,9 @@ public class MongoEventStore implements IEventStore {
 
 	@Suspendable
 	@Override
-	public Future<AsyncTaskResult<List<DomainEventStream>>> queryAggregateEventsAsync(
+	public Future<List<DomainEventStream>> queryAggregateEventsAsync(
 			String aggregateRootId, String aggregateRootTypeName, long minVersion, long maxVersion) {
-		return EJokerFutureTaskUtil.completeTask(
+		return EJokerFutureUtil.completeFuture(
 				await(
 						mongoProvider.submitWithInnerExector(
 								() -> queryAggregateEvents(aggregateRootId, aggregateRootTypeName, minVersion, maxVersion)

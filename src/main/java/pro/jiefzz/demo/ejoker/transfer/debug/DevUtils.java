@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
-import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
+import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jk.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
+import pro.jk.ejoker.common.system.enhance.MapUtilx;
 
 public final class DevUtils {
 	
@@ -17,7 +17,7 @@ public final class DevUtils {
 	private final static Map<Object, DevUtils> devUtilsStore = new ConcurrentHashMap<>();
 	
 	private final static DevUtils getCurrentDevUtils(Object eJokerContext) {
-		return MapUtil.getOrAdd(devUtilsStore, eJokerContext, () -> new DevUtils(eJokerContext));
+		return MapUtilx.getOrAdd(devUtilsStore, eJokerContext, () -> new DevUtils(eJokerContext));
 	}
 
 	private final Map<String, Object> instanceMap = null;

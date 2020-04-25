@@ -2,7 +2,7 @@ package pro.jiefzz.demo.ejoker.transfer.commands.bankAccount;
 
 import pro.jiefzz.demo.ejoker.transfer.domain.TransactionType;
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.PreparationType;
-import pro.jiefzz.ejoker.commanding.AbstractCommand;
+import pro.jk.ejoker.commanding.AbstractCommand;
 
 public class AddTransactionPreparationCommand extends AbstractCommand<String> {
 

@@ -1,7 +1,7 @@
 package pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.exceptions;
 
 import pro.jiefzz.demo.ejoker.transfer.domain.TransactionType;
-import pro.jiefzz.ejoker.domain.domainException.AbstractDomainException;
+import pro.jk.ejoker.domain.domainException.AbstractDomainException;
 
 public class InsufficientBalanceException extends AbstractDomainException {
 

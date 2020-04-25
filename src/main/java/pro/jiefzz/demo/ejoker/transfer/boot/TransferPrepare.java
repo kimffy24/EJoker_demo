@@ -6,9 +6,9 @@ import java.util.Map;
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.BankAccount;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.DepositTransaction;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.TransferTransaction;
-import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.infrastructure.ITypeNameProvider;
-import pro.jiefzz.ejoker.infrastructure.ITypeNameProvider.IDecorator;
+import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jk.ejoker.infrastructure.ITypeNameProvider;
+import pro.jk.ejoker.infrastructure.ITypeNameProvider.IDecorator;
 
 public class TransferPrepare {
 

@@ -1,7 +1,5 @@
 package pro.jiefzz.demo.ejoker.transfer.processManagers;
 
-import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
-
 import java.util.concurrent.Future;
 
 import co.paralleluniverse.fibers.Suspendable;
@@ -15,13 +13,12 @@ import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents.Transacti
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents.TransactionPreparationCommittedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionPreparationCompletedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionStartedEvent;
-import pro.jiefzz.ejoker.commanding.ICommandService;
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.ESType;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
+import pro.jk.ejoker.commanding.ICommandService;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.ESType;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jk.ejoker.infrastructure.impl.AbstractMessageHandler;
 
 @EService(type = ESType.MESSAGE_HANDLER)
 public class DepositTransactionProcessManager extends AbstractMessageHandler {
@@ -30,7 +27,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 	private ICommandService commandService;
 	
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionStartedEvent evnt) {
+	public Future<Void> handleAsync(DepositTransactionStartedEvent evnt) {
 		AddTransactionPreparationCommand cmd = new AddTransactionPreparationCommand(evnt.getAccountId(),
 				evnt.getAggregateRootId(), TransactionType.DepositTransaction, PreparationType.CreditPreparation,
 				evnt.getAmount());
@@ -40,7 +37,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(TransactionPreparationAddedEvent evnt) {
+	public Future<Void> handleAsync(TransactionPreparationAddedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
 				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
 			ConfirmDepositPreparationCommand cmd = new ConfirmDepositPreparationCommand(
@@ -49,11 +46,11 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 			cmd.setItems(evnt.getItems());
 			return commandService.sendAsync(cmd);
 		}
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionPreparationCompletedEvent evnt) {
+	public Future<Void> handleAsync(DepositTransactionPreparationCompletedEvent evnt) {
 		CommitTransactionPreparationCommand cmd = new CommitTransactionPreparationCommand(evnt.getAccountId(),
 				evnt.getAggregateRootId());
 		cmd.setId(evnt.getId());
@@ -62,7 +59,7 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(TransactionPreparationCommittedEvent evnt) {
+	public Future<Void> handleAsync(TransactionPreparationCommittedEvent evnt) {
 		if (TransactionType.DepositTransaction.equals(evnt.getTransactionPreparation().getTransactionType())
 				&& PreparationType.CreditPreparation.equals(evnt.getTransactionPreparation().getPreparationType())) {
 			ConfirmDepositCommand cmd = new ConfirmDepositCommand(
@@ -71,6 +68,6 @@ public class DepositTransactionProcessManager extends AbstractMessageHandler {
 			cmd.setItems(evnt.getItems());
 			return commandService.sendAsync(cmd);
 		}
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 }

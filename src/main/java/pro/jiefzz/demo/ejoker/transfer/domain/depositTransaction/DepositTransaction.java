@@ -4,8 +4,8 @@ import pro.jiefzz.demo.ejoker.transfer.domain.TransactionStatus;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionPreparationCompletedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionStartedEvent;
-import pro.jiefzz.ejoker.common.context.annotation.assemblies.AggregateRoot;
-import pro.jiefzz.ejoker.domain.AbstractAggregateRoot;
+import pro.jk.ejoker.common.context.annotation.assemblies.AggregateRoot;
+import pro.jk.ejoker.domain.AbstractAggregateRoot;
 
 /**
  * 聚合根，表示一笔银行存款交易
@@ -27,7 +27,9 @@ public class DepositTransaction extends AbstractAggregateRoot<String> {
 	
 	public DepositTransaction(String transactionId, String accountId, double amount)  {
 		super(transactionId);
-		applyEvent(new DepositTransactionStartedEvent(accountId, amount));
+		applyEvent(
+				new DepositTransactionStartedEvent(accountId, amount)
+		);
 	}
 	
 	/**
@@ -61,7 +63,7 @@ public class DepositTransaction extends AbstractAggregateRoot<String> {
     private void handle(DepositTransactionPreparationCompletedEvent evnt) {
         status = TransactionStatus.PreparationCompleted;
     }
-    
+
     @SuppressWarnings("unused")
 	private void handle(DepositTransactionCompletedEvent evnt) {
         status = TransactionStatus.Completed;

@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents;
 
-import pro.jiefzz.ejoker.eventing.AbstractDomainEvent;
+import pro.jk.ejoker.eventing.AbstractDomainEvent;
 
 /**
  * 转账交易已取消（结束），交易已失败

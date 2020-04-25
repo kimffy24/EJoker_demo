@@ -8,11 +8,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
-import pro.jiefzz.ejoker.common.system.extension.AsyncWrapperException;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.common.system.wrapper.CountDownLatchWrapper;
-import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
+import pro.jk.ejoker.common.system.extension.AsyncWrapperException;
+import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jk.ejoker.common.system.wrapper.CountDownLatchWrapper;
+import pro.jk.ejoker.infrastructure.impl.AbstractMessageHandler;
 
 // @MessageHandler
 // @EService
@@ -37,16 +36,16 @@ public class CountSyncHelper extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent message) {
+	public Future<Void> handleAsync(TransferTransactionCompletedEvent message) {
 		int currentCount = this.currentCount.incrementAndGet();
 		if (currentCount == expectedCount) {
 			CountDownLatchWrapper.countDown(waitHandle);
 		}
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
+	public Future<Void> handleAsync(DepositTransactionCompletedEvent message) {
 		if(!markBefore.contains(message.getAggregateRootId())) {
 			markBefore.add(message.getAggregateRootId());
 			int currentCount = this.currentCount.incrementAndGet();
@@ -54,6 +53,6 @@ public class CountSyncHelper extends AbstractMessageHandler {
 				CountDownLatchWrapper.countDown(waitHandle);
 			}
 		}
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 }

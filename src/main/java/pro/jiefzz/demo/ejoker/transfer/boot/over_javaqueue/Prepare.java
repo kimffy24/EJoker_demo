@@ -2,9 +2,9 @@ package pro.jiefzz.demo.ejoker.transfer.boot.over_javaqueue;
 
 import pro.jiefzz.demo.ejoker.transfer.boot.TransferConst;
 import pro.jiefzz.demo.ejoker.transfer.boot.TransferPrepare;
-import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
-import pro.jiefzz.ejoker_support.javaqueue.MQConsumerMemoryAdapter;
-import pro.jiefzz.ejoker_support.javaqueue.MQProducerMomoryAdapter;
+import pro.jk.ejoker.bootstrap.EJokerBootstrap;
+import pro.jk.ejoker_support.javaqueue.MQConsumerMemoryAdapter;
+import pro.jk.ejoker_support.javaqueue.MQProducerMomoryAdapter;
 
 public class Prepare {
 	

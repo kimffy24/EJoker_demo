@@ -43,7 +43,7 @@ public final class TransferConst {
         	break;
         case "":
         default :
-        	ES =  "pro.jiefzz.ejoker_support.defaultMemoryImpl";
+        	ES =  "pro.jk.ejoker_support.defaultMemoryImpl";
             break;
         }
         logger.info("Detect ES: {} .", ES);

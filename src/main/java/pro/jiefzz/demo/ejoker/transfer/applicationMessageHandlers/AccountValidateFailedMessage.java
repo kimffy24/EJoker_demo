@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.applicationMessageHandlers;
 
-import pro.jiefzz.ejoker.messaging.AbstractApplicationMessage;
+import pro.jk.ejoker.messaging.AbstractApplicationMessage;
 
 /**
  * 账户验证未通过

@@ -8,17 +8,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import pro.jiefzz.ejoker.common.context.dev2.EjokerRootDefinationStore;
-import pro.jiefzz.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
-import pro.jiefzz.ejoker.common.system.enhance.EachUtil;
-import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
+import pro.jk.ejoker.common.context.dev2.EjokerRootDefinationStore;
+import pro.jk.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
+import pro.jk.ejoker.common.system.enhance.EachUtilx;
+import pro.jk.ejoker.common.system.enhance.MapUtilx;
 
 public final class DevHelper {
 	
 	private final static Map<Object, DevHelper> HelperInstanceStore = new ConcurrentHashMap<>();
 	
 	public final static DevHelper of(Object context) {
-		return MapUtil.getOrAdd(HelperInstanceStore, context, () -> new DevHelper(context));
+		return MapUtilx.getOrAdd(HelperInstanceStore, context, () -> new DevHelper(context));
 	}
 	
 	protected EjokerRootDefinationStore defaultRootDefinationStore = null;
@@ -83,7 +83,7 @@ public final class DevHelper {
 		Set<String> fieldsBefore = new HashSet<>();
 		for(Class<?> clazz = target.getClass(); !clazz.equals(Object.class); clazz = clazz.getSuperclass()) {
 			Field[] declaredFields = clazz.getDeclaredFields();
-			EachUtil.forEach(declaredFields, f -> {
+			EachUtilx.forEach(declaredFields, f -> {
 				if(!f.getName().startsWith("dF_"))
 					return;
 				if(fieldsBefore.contains(f.getName()))

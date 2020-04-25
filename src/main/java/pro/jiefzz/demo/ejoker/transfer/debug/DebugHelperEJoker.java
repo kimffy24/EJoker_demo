@@ -15,26 +15,25 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.jiefzz.ejoker.commanding.ICommandProcessor;
-import pro.jiefzz.ejoker.commanding.IProcessingCommandHandler;
-import pro.jiefzz.ejoker.commanding.ProcessingCommandMailbox;
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.ESType;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.system.enhance.MapUtil;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.eventing.EventCommittingContextMailBox;
-import pro.jiefzz.ejoker.eventing.IEventCommittingService;
-import pro.jiefzz.ejoker.eventing.IEventStore;
-import pro.jiefzz.ejoker.eventing.impl.InMemoryEventStore;
-import pro.jiefzz.ejoker.eventing.impl.InMemoryEventStore.AggregateInfo;
-import pro.jiefzz.ejoker.eventing.qeventing.IProcessingEventProcessor;
-import pro.jiefzz.ejoker.eventing.qeventing.IPublishedVersionStore;
-import pro.jiefzz.ejoker.eventing.qeventing.ProcessingEventMailBox;
-import pro.jiefzz.ejoker.eventing.qeventing.impl.InMemoryPublishedVersionStore;
-import pro.jiefzz.ejoker.messaging.IMessageDispatcher;
-import pro.jiefzz.ejoker.queue.SendQueueMessageService;
+import pro.jk.ejoker.commanding.ICommandProcessor;
+import pro.jk.ejoker.commanding.IProcessingCommandHandler;
+import pro.jk.ejoker.commanding.ProcessingCommandMailbox;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.ESType;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.system.enhance.MapUtilx;
+import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jk.ejoker.eventing.EventCommittingContextMailBox;
+import pro.jk.ejoker.eventing.IEventCommittingService;
+import pro.jk.ejoker.eventing.IEventStore;
+import pro.jk.ejoker.eventing.impl.InMemoryEventStore;
+import pro.jk.ejoker.eventing.impl.InMemoryEventStore.AggregateInfo;
+import pro.jk.ejoker.eventing.qeventing.IProcessingEventProcessor;
+import pro.jk.ejoker.eventing.qeventing.IPublishedVersionStore;
+import pro.jk.ejoker.eventing.qeventing.ProcessingEventMailBox;
+import pro.jk.ejoker.eventing.qeventing.impl.InMemoryPublishedVersionStore;
+import pro.jk.ejoker.messaging.IMessageDispatcher;
+import pro.jk.ejoker.queue.SendQueueMessageService;
 
 @EService(type = ESType.MESSAGE_HANDLER)
 public class DebugHelperEJoker extends DAssemblier {
@@ -259,9 +258,9 @@ public class DebugHelperEJoker extends DAssemblier {
 	 * @param dm
 	 * @return
 	 */
-	public Future<AsyncTaskResult<Void>> handleAsync(DebugMessage dm) {
+	public Future<Void> handleAsync(DebugMessage dm) {
 		logger.debug("Receive a message: {}", dm.getClass().getSimpleName());
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 
 //	/**
@@ -403,7 +402,7 @@ public class DebugHelperEJoker extends DAssemblier {
 					.parallelStream()
 					.filter(e -> tName.equals(e.getValue().eventDict.get(e.getValue().currentVersion).getAggregateRootTypeName()))
 					.map(e -> e.getValue().currentVersion)
-					.mapToLong(l -> MapUtil.getOrAdd(dict, "" + l, () -> new AtomicLong()).incrementAndGet())
+					.mapToLong(l -> MapUtilx.getOrAdd(dict, "" + l, () -> new AtomicLong()).incrementAndGet())
 					.sum();
 				logger.error("\t\t domain[type={}] version statistics: {}", tName, dict.toString());
 			}
@@ -420,7 +419,7 @@ public class DebugHelperEJoker extends DAssemblier {
 				final Map<String, AtomicLong> dict = new ConcurrentHashMap<>();
 				versionDict.entrySet().parallelStream().map(e -> {
 					return e.getValue();
-				}).mapToLong(l -> MapUtil.getOrAdd(dict, "" + l, () -> new AtomicLong()).incrementAndGet()).sum();
+				}).mapToLong(l -> MapUtilx.getOrAdd(dict, "" + l, () -> new AtomicLong()).incrementAndGet()).sum();
 				logger.error("\t\t version statistics: {}", dict.toString());
 			}
 		}

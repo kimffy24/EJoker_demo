@@ -1,7 +1,7 @@
 package pro.jiefzz.demo.ejoker.transfer.commands.transferTransaction;
 
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.TransferTransactionInfo;
-import pro.jiefzz.ejoker.commanding.AbstractCommand;
+import pro.jk.ejoker.commanding.AbstractCommand;
 
 /**
  * 发起一笔转账交易

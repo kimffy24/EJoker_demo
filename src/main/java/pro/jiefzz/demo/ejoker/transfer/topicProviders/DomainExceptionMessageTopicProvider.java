@@ -3,9 +3,9 @@ package pro.jiefzz.demo.ejoker.transfer.topicProviders;
 import java.util.HashSet;
 import java.util.Set;
 
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.domain.domainException.IDomainException;
-import pro.jiefzz.ejoker.queue.ITopicProvider;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.domain.domainException.IDomainException;
+import pro.jk.ejoker.queue.ITopicProvider;
 
 @EService
 public class DomainExceptionMessageTopicProvider implements ITopicProvider<IDomainException> {

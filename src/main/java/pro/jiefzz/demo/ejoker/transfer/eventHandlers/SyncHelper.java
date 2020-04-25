@@ -6,12 +6,11 @@ import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents.DepositTransactionCompletedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.TransferTransactionCanceledEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
-import pro.jiefzz.ejoker.common.context.annotation.context.ESType;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.common.system.wrapper.CountDownLatchWrapper;
-import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
+import pro.jk.ejoker.common.context.annotation.context.ESType;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jk.ejoker.common.system.wrapper.CountDownLatchWrapper;
+import pro.jk.ejoker.infrastructure.impl.AbstractMessageHandler;
 
 @EService(type = ESType.MESSAGE_HANDLER)
 public class SyncHelper extends AbstractMessageHandler {
@@ -28,23 +27,23 @@ public class SyncHelper extends AbstractMessageHandler {
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(DepositTransactionCompletedEvent message) {
+	public Future<Void> handleAsync(DepositTransactionCompletedEvent message) {
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(TransferTransactionCompletedEvent message) {
+	public Future<Void> handleAsync(TransferTransactionCompletedEvent message) {
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 
 	@Suspendable
-	public Future<AsyncTaskResult<Void>> handleAsync(TransferTransactionCanceledEvent message) {
+	public Future<Void> handleAsync(TransferTransactionCanceledEvent message) {
 		CountDownLatchWrapper.countDown(waitHandle);
 		waitHandle = CountDownLatchWrapper.newCountDownLatch();
-		return EJokerFutureTaskUtil.completeTask();
+		return EJokerFutureUtil.completeFuture();
 	}
 }

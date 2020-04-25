@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import co.paralleluniverse.fibers.Suspendable;
 import pro.jiefzz.demo.ejoker.transfer.domain.TransactionType;
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents.AccountCreatedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents.TransactionPreparationAddedEvent;
@@ -15,8 +16,9 @@ import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents.Transacti
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents.TransactionPreparationCommittedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.exceptions.InsufficientBalanceException;
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.exceptions.TransactionPreparationNotExistException;
-import pro.jiefzz.ejoker.common.context.annotation.assemblies.AggregateRoot;
-import pro.jiefzz.ejoker.domain.AbstractAggregateRoot;
+import pro.jk.ejoker.common.context.annotation.assemblies.AggregateRoot;
+import pro.jk.ejoker.common.system.wrapper.DiscardWrapper;
+import pro.jk.ejoker.domain.AbstractAggregateRoot;
 
 /**
  * 银行账户聚合根，封装银行账户余额变动的数据一致性
@@ -58,7 +60,11 @@ public class BankAccount extends AbstractAggregateRoot<String> {
             throw new InsufficientBalanceException(getId(), transactionId, transactionType, amount, balance, availableBalance);
         }
 
-        applyEvent(new TransactionPreparationAddedEvent(new TransactionPreparation(getId(), transactionId, transactionType, preparationType, amount)));
+        applyEvent(
+        		new TransactionPreparationAddedEvent(
+        				new TransactionPreparation(getId(), transactionId, transactionType, preparationType, amount)
+        		)
+        );
     }
     
     /**
@@ -150,8 +156,10 @@ public class BankAccount extends AbstractAggregateRoot<String> {
 		transactionPreparations = new ConcurrentHashMap<>();
 	}
 
+    @Suspendable
     @SuppressWarnings("unused")
     private void handle(TransactionPreparationAddedEvent evnt) {
+    	DiscardWrapper.sleepInterruptable(500);
         transactionPreparations.put(evnt.getTransactionPreparation().getTransactionId(), evnt.getTransactionPreparation());
     }
 

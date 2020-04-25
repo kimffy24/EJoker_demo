@@ -1,9 +1,9 @@
 package pro.jiefzz.demo.ejoker.transfer.debug;
 
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EInitialize;
-import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.infrastructure.impl.AbstractMessageHandler;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.EInitialize;
+import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jk.ejoker.infrastructure.impl.AbstractMessageHandler;
 
 public abstract class DAssemblier extends AbstractMessageHandler {
 

@@ -16,11 +16,9 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<!-- spring版本号 -->
-		<version.spring>4.3.9.RELEASE</version.spring>
-		<version.jetty>9.4.3.v20170317</version.jetty>
-		<version.jackson>2.7.5</version.jackson>
 		<version.ejoker>2.0.0-snapshot-4</version.ejoker>
+		
+		<useQuasar>0</useQuasar> <!-- 此处定义变量，可让命令传入 -DuseQuasar=? -->
 	</properties>
 
 	<repositories>
@@ -83,28 +81,21 @@
 		</dependency>
 
 		<dependency>
-			<groupId>pro.jiefzz</groupId>
+			<groupId>pro.jk</groupId>
 			<artifactId>ejoker-bootstrap</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
 		<dependency>
-			<groupId>pro.jiefzz</groupId>
+			<groupId>pro.jk</groupId>
 			<artifactId>ejoker-mq-rocketmq</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
 		<dependency>
-			<groupId>pro.jiefzz</groupId>
+			<groupId>pro.jk</groupId>
 			<artifactId>ejoker-mq-javaqueue</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
 
-
-		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.8</version>
-		</dependency>
 	</dependencies>
 
 
@@ -164,51 +155,76 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version><!--$NO-MVN-MAN-VER$-->
+				<dependencies>
+					<dependency>
+						<groupId>ant-contrib</groupId>
+						<artifactId>ant-contrib</artifactId>
+						<version>1.0b3</version>
+						<exclusions>
+							<exclusion>
+								<groupId>ant</groupId>
+								<artifactId>ant</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-nodeps</artifactId>
+						<version>1.8.1</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<id>instrument-classes</id>
 						<phase>compile</phase>
-						<configuration>
-							<tasks>
-								<property name="ant_classpath"
-									refid="maven.dependency.classpath" />
-
-								<!-- 解压ejoker相关包到指定目录，并在扫描时带上 -->
-								<mkdir dir="${project.build.directory}/elibx" />
-								<unzip
-									src="${maven.dependency.pro.jiefzz.ejoker-common.jar.path}"
-									dest="${project.build.directory}/elibx" />
-								<unzip
-									src="${maven.dependency.pro.jiefzz.ejoker-core.jar.path}"
-									dest="${project.build.directory}/elibx" />
-								<delete file="${project.build.directory}/elibx/co" />
-								<delete file="${project.build.directory}/elibx/META-INF" />
-
-								<taskdef name="scanSuspendables"
-									classname="co.paralleluniverse.fibers.instrument.SuspendablesScanner"
-									classpath="${ant_classpath}" />
-								<scanSuspendables auto="true" append="true"
-									supersFile="${project.build.directory}/classes/META-INF/suspendable-supers"
-									suspendablesFile="${project.build.directory}/classes/META-INF/suspendables">
-									<fileset dir="${project.build.directory}/classes/"
-										includes="**/*.class" />
-									<fileset dir="${project.build.directory}/elibx"
-										includes="**/*.class" />
-								</scanSuspendables>
-
-								<!-- <taskdef name="instrumentationTask"
-									classname="co.paralleluniverse.fibers.instrument.InstrumentationTask"
-									classpath="${ant_classpath}" />
-								<instrumentationTask verbose="true"
-									check="true" debug="true">
-									<fileset dir="${project.build.directory}/classes/"
-										includes="**/*.class" />
-								</instrumentationTask> -->
-							</tasks>
-						</configuration>
 						<goals>
 							<goal>run</goal>
 						</goals>
+						<configuration>
+							<target>
+								<echo message="useQuasar = ${useQuasar}" />
+								<property name="ant_classpath"
+									refid="maven.dependency.classpath" />
+									
+								<!--这句很重要，ant会加载antcontrib.properties中定义的标签-->
+								<taskdef resource="net/sf/antcontrib/antcontrib.properties"
+									classpathref="maven.runtime.classpath" />
+								
+								<if>
+									<!--  取maven参数 -DuseQuasar -->
+									<equals arg1="${useQuasar}" arg2="1" />
+									<then>
+										<echo message="Doing instrument... " />
+										
+										<!-- 解压ejoker相关包到指定目录，并在扫描时带上 -->
+										<mkdir dir="${project.build.directory}/elibx" />
+										<unzip
+											src="${maven.dependency.pro.jk.ejoker-common.jar.path}"
+											dest="${project.build.directory}/elibx" />
+										<unzip
+											src="${maven.dependency.pro.jk.ejoker-core.jar.path}"
+											dest="${project.build.directory}/elibx" />
+										<delete file="${project.build.directory}/elibx/co" />
+										<delete file="${project.build.directory}/elibx/META-INF" />
+								
+										<taskdef name="scanSuspendables"
+											classname="co.paralleluniverse.fibers.instrument.SuspendablesScanner"
+											classpath="${ant_classpath}" />
+										<scanSuspendables auto="true" append="true"
+											supersFile="${project.build.directory}/classes/META-INF/suspendable-supers"
+											suspendablesFile="${project.build.directory}/classes/META-INF/suspendables">
+											<fileset dir="${project.build.directory}/classes/"
+												includes="**/*.class" />
+											<fileset dir="${project.build.directory}/elibx"
+												includes="**/*.class" />
+										</scanSuspendables>
+										
+									</then>
+									<else />
+								</if>
+							</target>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -11,8 +11,8 @@ import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.T
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.TransferTransactionCanceledEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.TransferTransactionCompletedEvent;
 import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.TransferTransactionStartedEvent;
-import pro.jiefzz.ejoker.common.context.annotation.assemblies.AggregateRoot;
-import pro.jiefzz.ejoker.domain.AbstractAggregateRoot;
+import pro.jk.ejoker.common.context.annotation.assemblies.AggregateRoot;
+import pro.jk.ejoker.domain.AbstractAggregateRoot;
 
 /**
  * 聚合根，表示一笔银行内账户之间的转账交易

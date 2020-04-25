@@ -9,12 +9,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import co.paralleluniverse.fibers.Suspendable;
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.service.IJSONConverter;
-import pro.jiefzz.ejoker.eventing.IDomainEvent;
-import pro.jiefzz.ejoker.eventing.IEventSerializer;
-import pro.jiefzz.ejoker.infrastructure.ITypeNameProvider;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.service.IJSONConverter;
+import pro.jk.ejoker.eventing.IDomainEvent;
+import pro.jk.ejoker.eventing.IEventSerializer;
+import pro.jk.ejoker.infrastructure.ITypeNameProvider;
 
 @EService
 public class EventStreamMongoSerializer implements IEventSerializer {

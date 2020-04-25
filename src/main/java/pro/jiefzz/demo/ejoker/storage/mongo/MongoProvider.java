@@ -20,13 +20,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import co.paralleluniverse.fibers.Suspendable;
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EInitialize;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.service.Scavenger;
-import pro.jiefzz.ejoker.common.system.functional.IFunction;
-import pro.jiefzz.ejoker.common.system.functional.IVoidFunction;
-import pro.jiefzz.ejoker.common.system.wrapper.MixedThreadPoolExecutor;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.EInitialize;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.service.Scavenger;
+import pro.jk.ejoker.common.system.functional.IFunction;
+import pro.jk.ejoker.common.system.functional.IVoidFunction;
+import pro.jk.ejoker.common.system.wrapper.MixedThreadPoolExecutor;
 
 @EService
 public class MongoProvider {

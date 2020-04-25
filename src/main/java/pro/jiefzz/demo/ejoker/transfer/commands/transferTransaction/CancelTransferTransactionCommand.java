@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.commands.transferTransaction;
 
-import pro.jiefzz.ejoker.commanding.AbstractCommand;
+import pro.jk.ejoker.commanding.AbstractCommand;
 
 /**
  * 取消转账交易

@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.commands.transferTransaction;
 
-import pro.jiefzz.ejoker.commanding.AbstractCommand;
+import pro.jk.ejoker.commanding.AbstractCommand;
 
 /**
  * 确认转入

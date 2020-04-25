@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.demo.ejoker.transfer.topicProviders.TopicReference;
-import pro.jiefzz.ejoker.queue.skeleton.aware.EJokerQueueMessage;
+import pro.jk.ejoker.queue.skeleton.aware.EJokerQueueMessage;
 
 /**
  * 清理掉测试时遗留在队列中的信息

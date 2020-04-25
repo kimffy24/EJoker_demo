@@ -1,7 +1,7 @@
 package pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.domainEvents;
 
 import pro.jiefzz.demo.ejoker.transfer.domain.bankAccount.TransactionPreparation;
-import pro.jiefzz.ejoker.eventing.AbstractDomainEvent;
+import pro.jk.ejoker.eventing.AbstractDomainEvent;
 
 public class TransactionPreparationCanceledEvent extends AbstractDomainEvent<String> {
 

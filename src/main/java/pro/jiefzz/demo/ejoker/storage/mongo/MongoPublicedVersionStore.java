@@ -4,7 +4,7 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
-import static pro.jiefzz.ejoker.common.system.extension.LangUtil.await;
+import static pro.jk.ejoker.common.system.extension.LangUtil.await;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -19,14 +19,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 
 import co.paralleluniverse.fibers.Suspendable;
-import pro.jiefzz.ejoker.common.context.annotation.context.Dependence;
-import pro.jiefzz.ejoker.common.context.annotation.context.EService;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.EJokerFutureTaskUtil;
-import pro.jiefzz.ejoker.common.system.extension.acrossSupport.RipenFuture;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskResult;
-import pro.jiefzz.ejoker.common.system.task.AsyncTaskStatus;
-import pro.jiefzz.ejoker.common.system.task.io.IOExceptionOnRuntime;
-import pro.jiefzz.ejoker.eventing.qeventing.IPublishedVersionStore;
+import pro.jk.ejoker.common.context.annotation.context.Dependence;
+import pro.jk.ejoker.common.context.annotation.context.EService;
+import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
+import pro.jk.ejoker.common.system.task.io.IOExceptionOnRuntime;
+import pro.jk.ejoker.eventing.qeventing.IPublishedVersionStore;
 
 @EService
 public class MongoPublicedVersionStore implements IPublishedVersionStore {
@@ -46,30 +43,18 @@ public class MongoPublicedVersionStore implements IPublishedVersionStore {
 
 	@Suspendable
 	@Override
-	public Future<AsyncTaskResult<Void>> updatePublishedVersionAsync(String processorName,
+	public Future<Void> updatePublishedVersionAsync(String processorName,
 			String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {
-		try {
-			await(mongoProvider.submitWithInnerExector(() -> updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion)));
-			return EJokerFutureTaskUtil.completeTask();
-		} catch (Exception e) {
-			RipenFuture<AsyncTaskResult<Void>> ripenFuture = new RipenFuture<>();
-			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));
-			return ripenFuture;
-		}
+		await(mongoProvider.submitWithInnerExector(() -> updatePublishedVersion(processorName, aggregateRootTypeName, aggregateRootId, publishedVersion)));
+		return EJokerFutureUtil.completeFuture();
 	}
 	
 	@Suspendable
 	@Override
-	public Future<AsyncTaskResult<Long>> getPublishedVersionAsync(String processorName,
+	public Future<Long> getPublishedVersionAsync(String processorName,
 			String aggregateRootTypeName, String aggregateRootId) {
-		try {
-			long r = await(mongoProvider.submitWithInnerExector(() -> getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId)));
-			return EJokerFutureTaskUtil.completeTask(r);
-		} catch (Exception e) {
-			RipenFuture<AsyncTaskResult<Long>> ripenFuture = new RipenFuture<>();
-			ripenFuture.trySetResult(new AsyncTaskResult<>(AsyncTaskStatus.Failed, e.getMessage(), null));
-			return ripenFuture;
-		}
+		long r = await(mongoProvider.submitWithInnerExector(() -> getPublishedVersion(processorName, aggregateRootTypeName, aggregateRootId)));
+		return EJokerFutureUtil.completeFuture(r);
 	}
 	
 	private void updatePublishedVersion(String processorName, String aggregateRootTypeName, String aggregateRootId, long publishedVersion) {

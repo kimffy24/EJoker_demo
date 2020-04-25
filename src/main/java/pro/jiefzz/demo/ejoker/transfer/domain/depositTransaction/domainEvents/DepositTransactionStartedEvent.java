@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.domainEvents;
 
-import pro.jiefzz.ejoker.eventing.AbstractDomainEvent;
+import pro.jk.ejoker.eventing.AbstractDomainEvent;
 
 public class DepositTransactionStartedEvent extends AbstractDomainEvent<String> {
 

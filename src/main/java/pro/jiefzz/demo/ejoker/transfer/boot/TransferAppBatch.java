@@ -10,20 +10,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.jiefzz.demo.ejoker.transfer.commands.bankAccount.CreateAccountCommand;
 import pro.jiefzz.demo.ejoker.transfer.commands.depositTransaction.StartDepositTransactionCommand;
 import pro.jiefzz.demo.ejoker.transfer.eventHandlers.ConsoleLogger;
-import pro.jiefzz.ejoker.bootstrap.EJokerBootstrap;
-import pro.jiefzz.ejoker.common.context.dev2.IEJokerSimpleContext;
-import pro.jiefzz.ejoker.common.system.task.context.SystemAsyncHelper;
-import pro.jiefzz.ejoker.common.system.task.io.IOHelper;
-import pro.jiefzz.ejoker.common.system.wrapper.DiscardWrapper;
-import pro.jiefzz.ejoker.queue.command.CommandService;
-import pro.jiefzz.ejoker.utils.MObjectId;
+import pro.jk.ejoker.bootstrap.EJokerBootstrap;
+import pro.jk.ejoker.commanding.CommandReturnType;
+import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
+import pro.jk.ejoker.common.system.extension.LangUtil;
+import pro.jk.ejoker.common.system.task.context.SystemAsyncHelper;
+import pro.jk.ejoker.common.system.task.io.IOHelper;
+import pro.jk.ejoker.common.system.wrapper.DiscardWrapper;
+import pro.jk.ejoker.queue.command.CommandService;
+import pro.jk.ejoker.utils.MObjectId;
 
 public class TransferAppBatch {
 	
@@ -62,19 +63,22 @@ public class TransferAppBatch {
 		String[] ids = new String[accountAmount];
 
 		for(int i=0; i<ids.length; i++) {
-			ids[i] = ObjectId.get().toHexString();
+			ids[i] = MObjectId.get().toHexString();
 		}
 		
 		final AtomicInteger cursor = new AtomicInteger(0);
 
+		if(System.currentTimeMillis() < 0 ) {
+		
 		// ++++++++++++++ switch 1 : 通过 commandService.executeAsync
 		
-//		for(int i=0; i<ids.length; i++) {
-//			int index = cursor.getAndIncrement();
-//			LangUtil.await(commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled));
-//		}
-//		System.err.println("send ok.");
+		for(int i=0; i<ids.length; i++) {
+			int index = cursor.getAndIncrement();
+			LangUtil.await(commandService.executeAsync(new CreateAccountCommand(ids[index], "owner_" + index), CommandReturnType.EventHandled));
+		}
+		logger.error("send ok.");
 
+		} else {
 		// ++++++++++++++ switch 2 : 通过 commandService.sendAsync
 		
 		final CountDownLatch cdlx = new CountDownLatch(accountAmount);
@@ -87,21 +91,26 @@ public class TransferAppBatch {
 						() -> commandService.sendAsync(new CreateAccountCommand(ids[index], "owner_" + index)),
 						r -> cdlx.countDown(),
 						() -> "",
-						e -> e.printStackTrace(),
+						e -> logger.error("send faild 1!!!", e),
 						true);
 			});
-			System.err.println("send No." + i);
+			logger.error("send No." + i);
 		}
-		System.err.println("send ok.");
+		logger.error("send ok.");
 		cdlx.await();
 		
 		// ++++++++++++++
+		}
 		
 		while(consoleLogger.getAccountHit() < accountAmount)
 			DiscardWrapper.sleepInterruptable(100l);
-		System.err.println("all account ok. ");
+		logger.error("all account ok. ");
 		
 		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
+		
+		String latestAccountId = MObjectId.get().toHexString();
+		consoleLogger.setLatestTransferId(latestAccountId);
+		LangUtil.await(commandService.executeAsync(new CreateAccountCommand(latestAccountId, "owner_" + latestAccountId), CommandReturnType.EventHandled));
 		
 		DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
 		
@@ -114,7 +123,7 @@ public class TransferAppBatch {
 				while(true) {
 					StartDepositTransactionCommand cmdx = waitQ.poll();
 					if(null == cmdx) {
-						DiscardWrapper.sleepInterruptable(1l);
+						DiscardWrapper.sleepInterruptable(3l);
 						if(exit.get())
 							break;
 						continue;
@@ -124,7 +133,7 @@ public class TransferAppBatch {
 							() -> commandService.sendAsync(cmdx),
 							r -> cdl.countDown(),
 							() -> "",
-							e -> e.printStackTrace(),
+							e -> logger.error("send faild 2!!!", e),
 							true);
 				}
 			}).start();
@@ -139,10 +148,18 @@ public class TransferAppBatch {
 		}
 		
 		cdl.await();
+		
+
+		// DiscardWrapper.sleepInterruptable(TimeUnit.MILLISECONDS, 2000l);
+		StartDepositTransactionCommand cmd = new StartDepositTransactionCommand(MObjectId.get().toHexString(), latestAccountId, 567);
+		waitQ.offer(cmd);
+		consoleLogger.awaitEnd();
+		
 		exit.set(true);
 		logger.error("deposit's cmd send task all completed.");
 		logger.error("start at: {}, time use: {} ms", batchStartAt, System.currentTimeMillis() - batchStartAt);
-		
+        logger.error("Detect EAmount: {} .", accountAmount + 1);
+        logger.error("Detect ELoop: {} .", depositLoop);
 		
 //		TimeUnit.SECONDS.sleep(20l);
 //

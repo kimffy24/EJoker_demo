@@ -1,6 +1,6 @@
 package pro.jiefzz.demo.ejoker.transfer.commands.bankAccount;
 
-import pro.jiefzz.ejoker.commanding.AbstractCommand;
+import pro.jk.ejoker.commanding.AbstractCommand;
 
 public class CreateAccountCommand extends AbstractCommand<String> {
 
