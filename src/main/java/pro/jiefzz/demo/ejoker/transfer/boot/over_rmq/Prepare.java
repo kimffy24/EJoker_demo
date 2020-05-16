@@ -7,7 +7,7 @@ import pro.jk.ejoker_support.rocketmq.MQInstanceHelper;
 
 public class Prepare {
 	
-	public final static String NameServAddr = "172.16.0.1:9876";
+	public final static String NameServAddr = "172.16.1.11:9876";
 	
 	protected final EJokerBootstrap eb;
 	

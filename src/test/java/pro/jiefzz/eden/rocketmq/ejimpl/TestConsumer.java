@@ -11,8 +11,10 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
 
 import pro.jk.ejoker.common.system.wrapper.DiscardWrapper;
 import pro.jk.ejoker.queue.skeleton.aware.EJokerQueueMessage;
+import pro.jk.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
 import pro.jk.ejoker.queue.skeleton.aware.IEJokerQueueMessageContext;
-import pro.jk.ejoker_support.rocketmq.DefaultMQConsumer;
+import pro.jk.ejoker_support.rocketmq.DefaultMQConsumerEJokerBindder;
+import pro.jk.ejoker_support.rocketmq.consumer.pull.DefaultMQConsumer;
 
 public class TestConsumer {
 
@@ -22,7 +24,8 @@ public class TestConsumer {
 		defaultMQConsumer.setNamesrvAddr("test_rocketmq_2:9876;test_sit_1:9876");
 		defaultMQConsumer.subscribe("ZTestTopic", null);
 
-		defaultMQConsumer.registerEJokerCallback(TestConsumer::handle);
+		IConsumerWrokerAware eJokerBundlePullConsumerDirectly = DefaultMQConsumerEJokerBindder.getEJokerBundlePullConsumerDirectly(defaultMQConsumer);
+		eJokerBundlePullConsumerDirectly.registerEJokerCallback(TestConsumer::handle);
 		
 		defaultMQConsumer.registerMessageQueueListener("ZTestTopic", new MessageQueueListener() {
 

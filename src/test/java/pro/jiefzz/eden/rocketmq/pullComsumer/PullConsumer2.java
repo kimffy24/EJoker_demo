@@ -6,8 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 import co.paralleluniverse.common.util.Tuple;
 import pro.jk.ejoker.queue.skeleton.aware.EJokerQueueMessage;
+import pro.jk.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
 import pro.jk.ejoker.queue.skeleton.aware.IEJokerQueueMessageContext;
-import pro.jk.ejoker_support.rocketmq.DefaultMQConsumer;
+import pro.jk.ejoker_support.rocketmq.DefaultMQConsumerEJokerBindder;
+import pro.jk.ejoker_support.rocketmq.consumer.pull.DefaultMQConsumer;
 
 public class PullConsumer2 {
 	
@@ -16,8 +18,9 @@ public class PullConsumer2 {
 	public static void main(String[] args) throws Exception {
 		DefaultMQConsumer consumer = new DefaultMQConsumer("pullConsumer");
 		consumer.setNamesrvAddr("192.168.199.123:9876");
-		
-		consumer.registerEJokerCallback((msg, context) -> {
+
+		IConsumerWrokerAware eJokerBundlePullConsumerDirectly = DefaultMQConsumerEJokerBindder.getEJokerBundlePullConsumerDirectly(consumer);
+		eJokerBundlePullConsumerDirectly.registerEJokerCallback((msg, context) -> {
 			
 			System.out.println("Received: " + new String(msg.getBody()));
 			
