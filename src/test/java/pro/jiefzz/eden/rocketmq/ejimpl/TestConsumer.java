@@ -45,7 +45,7 @@ public class TestConsumer {
 		new Thread(() -> {
 			while(true) {
 				DiscardWrapper.sleepInterruptable(TimeUnit.SECONDS, 2l);
-				defaultMQConsumer.loopInterval();
+				defaultMQConsumer.collectAndUpdateLocalOffset();
 				System.err.println(".");
 			}
 		}).start();

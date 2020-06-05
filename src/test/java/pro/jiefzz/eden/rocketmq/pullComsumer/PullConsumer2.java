@@ -48,7 +48,7 @@ public class PullConsumer2 {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
 				}
-				consumer.loopInterval();
+				consumer.collectAndUpdateLocalOffset();
 			}
 		}).start();
 
