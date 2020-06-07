@@ -13,8 +13,8 @@ import pro.jk.ejoker.common.system.wrapper.DiscardWrapper;
 import pro.jk.ejoker.queue.skeleton.aware.EJokerQueueMessage;
 import pro.jk.ejoker.queue.skeleton.aware.IConsumerWrokerAware;
 import pro.jk.ejoker.queue.skeleton.aware.IEJokerQueueMessageContext;
+import pro.jk.ejoker_support.mq.rocketmq.consumer.pull.DefaultMQConsumer;
 import pro.jk.ejoker_support.rocketmq.DefaultMQConsumerEJokerBindder;
-import pro.jk.ejoker_support.rocketmq.consumer.pull.DefaultMQConsumer;
 
 public class TestConsumer {
 

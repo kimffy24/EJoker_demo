@@ -11,8 +11,8 @@ import pro.jk.ejoker.common.context.annotation.context.Dependence;
 import pro.jk.ejoker.common.context.annotation.context.EService;
 import pro.jk.ejoker.queue.command.CommandConsumer;
 import pro.jk.ejoker.queue.domainEvent.DomainEventConsumer;
-import pro.jk.ejoker_support.rocketmq.consumer.pull.DefaultMQConsumer;
-import pro.jk.ejoker_support.rocketmq.consumer.pull.DefaultMQConsumer.ControlStruct;
+import pro.jk.ejoker_support.mq.rocketmq.consumer.pull.DefaultMQConsumer;
+import pro.jk.ejoker_support.mq.rocketmq.consumer.pull.DefaultMQConsumer.ControlStruct;
 
 @EService
 public class DebugHelperMQ extends DAssemblier {

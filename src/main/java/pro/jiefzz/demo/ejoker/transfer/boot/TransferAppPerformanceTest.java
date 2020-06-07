@@ -16,7 +16,6 @@ import pro.jiefzz.demo.ejoker.transfer.commands.depositTransaction.StartDepositT
 import pro.jiefzz.demo.ejoker.transfer.domain.depositTransaction.DepositTransaction;
 import pro.jiefzz.demo.ejoker.transfer.eventHandlers.CountSyncHelper;
 import pro.jiefzz.demo.ejoker.transfer.eventHandlers.SyncHelper;
-import pro.jk.ejoker.bootstrap.EJokerBootstrap;
 import pro.jk.ejoker.commanding.CommandReturnType;
 import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jk.ejoker.common.system.task.context.SystemAsyncHelper;
@@ -26,6 +25,7 @@ import pro.jk.ejoker.eventing.IEventStore;
 import pro.jk.ejoker.eventing.impl.InMemoryEventStore;
 import pro.jk.ejoker.infrastructure.ITypeNameProvider;
 import pro.jk.ejoker.queue.command.CommandService;
+import pro.jk.ejoker_support.bootstrap.EJokerBootstrap;
 
 public class TransferAppPerformanceTest {
 	

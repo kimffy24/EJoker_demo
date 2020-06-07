@@ -3,9 +3,9 @@ package pro.jiefzz.demo.ejoker.transfer.boot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.jk.ejoker.bootstrap.EJokerBootstrap;
 import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jk.ejoker.common.service.IScheduleService;
+import pro.jk.ejoker_support.bootstrap.EJokerBootstrap;
 
 /**
  * 这是一个C端和Q端一起的demo<br />
