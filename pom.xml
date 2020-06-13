@@ -16,24 +16,15 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<version.ejoker>2.2.0-rc</version.ejoker>
-		
+		<version.ejoker>2.2.3</version.ejoker>
+
 		<useQuasar>0</useQuasar> <!-- 此处定义变量，可让命令传入 -DuseQuasar=? -->
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>minimal-maven-repository</id>
-			<url>file:///${project.basedir}/minimal-maven-repository</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+	<!-- 不再使用，留作参考 <repositories> <repository> <id>minimal-maven-repository</id> 
+		<url>file:///${project.basedir}/minimal-maven-repository</url> <layout>default</layout> 
+		<releases> <enabled>true</enabled> </releases> <snapshots> <enabled>true</enabled> 
+		</snapshots> </repository> </repositories> -->
 
 	<dependencies>
 		<dependency>
@@ -81,17 +72,17 @@
 		</dependency>
 
 		<dependency>
-			<groupId>pro.jk</groupId>
+			<groupId>com.github.kimffy24</groupId>
 			<artifactId>ejoker-support-bootstrap</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
 		<dependency>
-			<groupId>pro.jk</groupId>
+			<groupId>com.github.kimffy24</groupId>
 			<artifactId>ejoker-mq-rocketmq</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
 		<dependency>
-			<groupId>pro.jk</groupId>
+			<groupId>com.github.kimffy24</groupId>
 			<artifactId>ejoker-mq-javaqueue</artifactId>
 			<version>${version.ejoker}</version>
 		</dependency>
@@ -155,7 +146,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version><!--$NO-MVN-MAN-VER$-->
+				<version>1.8</version><!--$NO-MVN-MAN-VER$ -->
 				<dependencies>
 					<dependency>
 						<groupId>ant-contrib</groupId>
@@ -186,17 +177,18 @@
 								<echo message="useQuasar = ${useQuasar}" />
 								<property name="ant_classpath"
 									refid="maven.dependency.classpath" />
-									
-								<!--这句很重要，ant会加载antcontrib.properties中定义的标签-->
-								<taskdef resource="net/sf/antcontrib/antcontrib.properties"
+
+								<!--这句很重要，ant会加载antcontrib.properties中定义的标签 -->
+								<taskdef
+									resource="net/sf/antcontrib/antcontrib.properties"
 									classpathref="maven.runtime.classpath" />
-								
+
 								<if>
-									<!--  取maven参数 -DuseQuasar -->
+									<!-- 取maven参数 -DuseQuasar -->
 									<equals arg1="${useQuasar}" arg2="1" />
 									<then>
 										<echo message="Doing instrument... " />
-										
+
 										<!-- 解压ejoker相关包到指定目录，并在扫描时带上 -->
 										<mkdir dir="${project.build.directory}/elibx" />
 										<unzip
@@ -206,8 +198,9 @@
 											src="${maven.dependency.pro.jk.ejoker-core.jar.path}"
 											dest="${project.build.directory}/elibx" />
 										<delete file="${project.build.directory}/elibx/co" />
-										<delete file="${project.build.directory}/elibx/META-INF" />
-								
+										<delete
+											file="${project.build.directory}/elibx/META-INF" />
+
 										<taskdef name="scanSuspendables"
 											classname="co.paralleluniverse.fibers.instrument.SuspendablesScanner"
 											classpath="${ant_classpath}" />
@@ -219,7 +212,7 @@
 											<fileset dir="${project.build.directory}/elibx"
 												includes="**/*.class" />
 										</scanSuspendables>
-										
+
 									</then>
 									<else />
 								</if>
