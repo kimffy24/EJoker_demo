@@ -20,7 +20,7 @@ import pro.jk.ejoker.commanding.ICommandContext;
 import pro.jk.ejoker.common.context.annotation.context.Dependence;
 import pro.jk.ejoker.common.context.annotation.context.ESType;
 import pro.jk.ejoker.common.context.annotation.context.EService;
-import pro.jk.ejoker.common.service.IJSONConverter;
+import pro.jk.ejoker.common.service.IJSONStringConverterPro;
 import pro.jk.ejoker.messaging.AbstractApplicationMessage;
 import pro.jk.ejoker.messaging.IApplicationMessage;
 
@@ -30,7 +30,7 @@ public class BankAccountCommandHandler extends AbstractCommandHandler {
 	private final static  Logger logger = LoggerFactory.getLogger(BankAccountCommandHandler.class);
 			
 	@Dependence
-	IJSONConverter jsonConverter;
+	private IJSONStringConverterPro jsonConverter;
 	
 //	@Suspendable
 	public Future<Void> handleAsync(ICommandContext context, CreateAccountCommand command) {

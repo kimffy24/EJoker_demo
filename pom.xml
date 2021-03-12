@@ -16,7 +16,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<version.ejoker>2.2.3</version.ejoker>
+		<version.ejoker>3.0.2-SNAPSHOT</version.ejoker>
 
 		<useQuasar>0</useQuasar> <!-- 此处定义变量，可让命令传入 -DuseQuasar=? -->
 	</properties>

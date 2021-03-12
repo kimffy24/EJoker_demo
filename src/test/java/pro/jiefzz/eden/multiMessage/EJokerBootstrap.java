@@ -4,6 +4,7 @@ import pro.jk.ejoker.EJoker;
 import pro.jk.ejoker.EJoker.EJokerSingletonFactory;
 import pro.jk.ejoker.common.context.dev2.IEJokerSimpleContext;
 import pro.jk.ejoker.common.context.dev2.IEjokerContextDev2;
+import pro.jk.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
 
 public class EJokerBootstrap {
 
@@ -26,9 +27,9 @@ public class EJokerBootstrap {
 		
 		{
 			IEjokerContextDev2 eJokerFullContext = (IEjokerContextDev2 )eJokerContext;
-			eJokerFullContext.scanPackage(EJokerDefaultImplPackage);
-			eJokerFullContext.scanPackage(BusinessPackage);
-			eJokerFullContext.scanPackage("pro.jiefzz.eden.aa");
+			((EjokerContextDev2Impl )eJokerFullContext).getEJokerRootDefinationStore().scanPackage(EJokerDefaultImplPackage);
+			((EjokerContextDev2Impl )eJokerFullContext).getEJokerRootDefinationStore().scanPackage(BusinessPackage);
+			((EjokerContextDev2Impl )eJokerFullContext).getEJokerRootDefinationStore().scanPackage("pro.jiefzz.eden.aa");
 			eJokerFullContext.refresh();
 		}
 	}

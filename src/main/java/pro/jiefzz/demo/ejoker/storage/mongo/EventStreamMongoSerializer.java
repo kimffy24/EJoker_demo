@@ -11,7 +11,7 @@ import java.util.Set;
 import co.paralleluniverse.fibers.Suspendable;
 import pro.jk.ejoker.common.context.annotation.context.Dependence;
 import pro.jk.ejoker.common.context.annotation.context.EService;
-import pro.jk.ejoker.common.service.IJSONConverter;
+import pro.jk.ejoker.common.service.IJSONStringConverterPro;
 import pro.jk.ejoker.eventing.IDomainEvent;
 import pro.jk.ejoker.eventing.IEventSerializer;
 import pro.jk.ejoker.infrastructure.ITypeNameProvider;
@@ -20,7 +20,7 @@ import pro.jk.ejoker.infrastructure.ITypeNameProvider;
 public class EventStreamMongoSerializer implements IEventSerializer {
 
 	@Dependence
-	private IJSONConverter jsonSerializer;
+	private IJSONStringConverterPro jsonSerializer;
 	
 	@Dependence
 	private ITypeNameProvider typeNameProvider;

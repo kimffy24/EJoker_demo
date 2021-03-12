@@ -24,7 +24,7 @@ public class ScanAsync {
 		};
 
 		EjokerContextDev2Impl c = new EjokerContextDev2Impl();
-		c.registeScannerHook(clazz -> {
+		((EjokerContextDev2Impl )c).getEJokerRootDefinationStore().registeScannerHook(clazz -> {
 			GenericExpression middleStatementGenericExpression = GenericExpressionFactory.getMiddleStatementGenericExpression(clazz);
 			GenericDefination genericDefination = middleStatementGenericExpression.genericDefination;
 			concrete.add(clazz.getName() + ".*");
@@ -46,7 +46,7 @@ public class ScanAsync {
 				
 			}
 		});
-		c.scanPackage("com.jiefzz.ejoker");
+		((EjokerContextDev2Impl )c).getEJokerRootDefinationStore().scanPackage("com.jiefzz.ejoker");
 		
 		for(String s:concrete)
 			System.err.println(s);

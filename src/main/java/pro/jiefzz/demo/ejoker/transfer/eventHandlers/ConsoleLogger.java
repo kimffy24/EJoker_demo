@@ -26,7 +26,7 @@ import pro.jiefzz.demo.ejoker.transfer.domain.transferTransaction.domainEvents.T
 import pro.jk.ejoker.common.context.annotation.context.Dependence;
 import pro.jk.ejoker.common.context.annotation.context.ESType;
 import pro.jk.ejoker.common.context.annotation.context.EService;
-import pro.jk.ejoker.common.service.IJSONConverter;
+import pro.jk.ejoker.common.service.IJSONStringConverterPro;
 import pro.jk.ejoker.common.system.extension.acrossSupport.EJokerFutureUtil;
 import pro.jk.ejoker.infrastructure.impl.AbstractMessageHandler;
 
@@ -36,7 +36,7 @@ public class ConsoleLogger extends AbstractMessageHandler {
 	private final static Logger logger = LoggerFactory.getLogger(ConsoleLogger.class);
 
 	@Dependence
-	private IJSONConverter jsonConverter;
+	private IJSONStringConverterPro jsonConverter;
 
 	/// for debug
 

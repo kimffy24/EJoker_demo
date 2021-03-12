@@ -8,7 +8,6 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class GenericType <L extends List<String>, T extends C<String, Double> & 
 		}
 
 		@Override
-		public void replayEvents(Collection<DomainEventStream> eventStreams) {
+		public void replayEvents(List<DomainEventStream> eventStreams) {
 			
 		}}
 	
