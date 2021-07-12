@@ -6,7 +6,7 @@ import java.util.TreeSet;
 import pro.jk.ejoker.common.context.dev2.impl.EjokerContextDev2Impl;
 import pro.jk.ejoker.common.system.enhance.EachUtilx;
 import pro.jk.ejoker.common.system.functional.IVoidFunction2;
-import pro.jk.ejoker.common.utils.genericity.GenericDefination;
+import pro.jk.ejoker.common.utils.genericity.GenericDefinition;
 import pro.jk.ejoker.common.utils.genericity.GenericExpression;
 import pro.jk.ejoker.common.utils.genericity.GenericExpressionFactory;
 
@@ -17,7 +17,7 @@ public class ScanAsync {
 		final Set<String> concrete = new TreeSet<>();		
 		final Set<String> upper = new TreeSet<>();
 		
-		IVoidFunction2<Class<?>, GenericDefination> t = (iclazz, ig) -> {
+		IVoidFunction2<Class<?>, GenericDefinition> t = (iclazz, ig) -> {
 			if(!upper.contains(iclazz.getName() + ".*")) {
 				upper.add(iclazz.getName() + ".*");
 			}
@@ -26,10 +26,10 @@ public class ScanAsync {
 		EjokerContextDev2Impl c = new EjokerContextDev2Impl();
 		((EjokerContextDev2Impl )c).getEJokerRootDefinationStore().registeScannerHook(clazz -> {
 			GenericExpression middleStatementGenericExpression = GenericExpressionFactory.getMiddleStatementGenericExpression(clazz);
-			GenericDefination genericDefination = middleStatementGenericExpression.genericDefination;
+			GenericDefinition genericDefination = middleStatementGenericExpression.genericDefination;
 			concrete.add(clazz.getName() + ".*");
 			
-			for(GenericDefination g = genericDefination;
+			for(GenericDefinition g = genericDefination;
 					null != g && !Object.class.equals(g.genericPrototypeClazz);
 					g = g.getSuperDefination()
 					) {
